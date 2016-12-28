@@ -10,5 +10,5 @@ import org.apache.mina.core.session.IoSession;
  * Created by zhangkai on 2016/12/27.
  */
 public interface MessageProcess {
-    void handle(IoSession ioSession, MessagePacket messageObj) throws Exception;
+    void process(IoSession ioSession, MessagePacket messageObj) throws Exception;
 }

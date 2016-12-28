@@ -91,7 +91,7 @@ public class ChatServerHandler extends IoHandlerAdapter {
         MessageProcess messageProcess = MessagePoFactory.getClass(message.getCommand());
 
         if (messageProcess != null) {
-            messageProcess.handle(ioSession, message);
+            messageProcess.process(ioSession, message);
         }
 
     }
