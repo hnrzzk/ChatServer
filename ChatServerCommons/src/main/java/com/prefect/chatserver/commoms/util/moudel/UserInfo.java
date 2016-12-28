@@ -1,5 +1,8 @@
 package com.prefect.chatserver.commoms.util.moudel;
 
+import java.sql.Date;
+import java.sql.Timestamp;
+
 /**
  * 用户信息类
  * Created by zhangkai on 2016/12/26.
@@ -24,6 +27,10 @@ public class UserInfo {
      * 是否在线
      */
     int isOnline;
+
+    byte sex;
+
+    Timestamp registerTime;
 
     public long getId() {
         return id;
@@ -63,6 +70,22 @@ public class UserInfo {
 
     public void setIsOnline(int isOnline) {
         this.isOnline = isOnline;
+    }
+
+    public byte getSex() {
+        return sex;
+    }
+
+    public void setSex(byte sex) {
+        this.sex = sex;
+    }
+
+    public Timestamp getRegisterTime() {
+        return registerTime;
+    }
+
+    public void setRegisterTime(Timestamp registerTime) {
+        this.registerTime = registerTime;
     }
 
     @Override

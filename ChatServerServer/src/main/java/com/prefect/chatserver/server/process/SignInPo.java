@@ -9,6 +9,8 @@ import org.apache.mina.core.session.IoSession;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.sql.Date;
+import java.sql.Timestamp;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -29,10 +31,8 @@ public class SignInPo extends UserManagePo {
         String password = userInfo.getPassword();
         String nickName = userInfo.getAccount();
 
-        boolean userExist = DBUtil.getInstance().isExit("user", "account", account);
-
         //如果账户已存在则返回
-        if (userExist) {
+        if (DBUtil.getInstance().isExit("user", "account", account)) {
             response(ioSession, CommandType.USER_SIGN_IN_ACK, "ERROR: account is exist");
             return;
         }
@@ -41,7 +41,11 @@ public class SignInPo extends UserManagePo {
         dataMap.put("account", account);
         dataMap.put("password", password);
         dataMap.put("nick_name", nickName);
-        
+        dataMap.put("sex", userInfo.getSex());
+
+        Timestamp date = new Timestamp(System.currentTimeMillis());
+        dataMap.put("register_time", date);
+
         if (DBUtil.getInstance().executeInsert("user", dataMap) > 0) {
             //返回账户创建成功
             response(ioSession, CommandType.USER_SIGN_IN_ACK, "SUCCESS: account build success");
