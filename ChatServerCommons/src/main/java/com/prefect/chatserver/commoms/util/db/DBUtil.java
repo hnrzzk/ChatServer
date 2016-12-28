@@ -33,22 +33,24 @@ public class DBUtil {
      * @param sql
      * @return 查询得到的结果集
      */
-    public ResultSet executeQuery(String sql) {
+    public ChatServerDbConnectUnit executeQuery(String sql) {
         ResultSet resultSet = null;
         Connection connection = null;
         Statement statement = null;
         try {
             connection = this.dbManager.getConnection();
+            statement=connection.createStatement();
             statement = connection.createStatement(ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_UPDATABLE);
             resultSet = statement.executeQuery(sql);
         } catch (SQLException e) {
-            e.printStackTrace();
-        } finally {
             DBManager.closeConnection(connection);
             DBManager.closeStatement(statement);
+            e.printStackTrace();
         }
 
-        return resultSet;
+        ChatServerDbConnectUnit chatServerDbConnectUnit=new ChatServerDbConnectUnit(resultSet,statement,connection);
+
+        return chatServerDbConnectUnit;
     }
 
     /**
@@ -66,10 +68,9 @@ public class DBUtil {
             statement = connection.createStatement(ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_UPDATABLE);
             executeNum = statement.executeUpdate(sql);
         } catch (SQLException e) {
-            e.printStackTrace();
-        } finally {
             DBManager.closeConnection(connection);
             DBManager.closeStatement(statement);
+            e.printStackTrace();
         }
 
         return executeNum;
@@ -88,20 +89,9 @@ public class DBUtil {
                 "select * from %s where %s = '%s'",
                 table, column, value);
 
-        ResultSet resultSet = this.executeQuery(sql);
-        boolean flag = false;
-        try {
-            while (resultSet.next()) {
-                flag = true;
-                break;
-            }
-        } catch (SQLException e) {
-            e.printStackTrace();
-        } finally {
-            DBManager.closeResultSet(resultSet);
-        }
+        ChatServerDbConnectUnit connectUnit = this.executeQuery(sql);
 
-        return flag;
+        return resultSetIsEmpty(connectUnit);
     }
 
     /**
@@ -119,15 +109,27 @@ public class DBUtil {
                     String.format(" and %s = '%s'",
                             columns[i], values[i]));
         }
-        ResultSet resultSet = this.executeQuery(stringBuilder.toString());
+        ChatServerDbConnectUnit connectUnit = this.executeQuery(stringBuilder.toString());
+
+        return resultSetIsEmpty(connectUnit);
+    }
+
+    /**
+     * 判断结果集是否为空
+     * @param connectUnit
+     * @return 结果集是否是空
+     */
+    public boolean resultSetIsEmpty(ChatServerDbConnectUnit connectUnit){
         boolean flag = false;
         try {
-            while (resultSet.next()) {
+            while (connectUnit.getResultSet().next()) {
                 flag = true;
                 break;
             }
         } catch (SQLException e) {
             e.printStackTrace();
+        }finally {
+            connectUnit.close();
         }
         return flag;
     }

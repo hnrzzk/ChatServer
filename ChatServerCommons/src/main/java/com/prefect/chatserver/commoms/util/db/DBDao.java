@@ -32,7 +32,8 @@ public class DBDao {
      */
     public UserInfo getUserInfo(String sql) {
         UserInfo userInfo = null;
-        ResultSet resultSet = DBUtil.getInstance().executeQuery(sql);
+        ChatServerDbConnectUnit connectUnit = DBUtil.getInstance().executeQuery(sql);
+        ResultSet resultSet=connectUnit.getResultSet();
         try {
             while (resultSet.next()) {
                 userInfo = new UserInfo();
@@ -43,7 +44,7 @@ public class DBDao {
         } catch (SQLException e) {
             e.printStackTrace();
         } finally {
-            DBManager.closeResultSet(resultSet);
+            connectUnit.close();
         }
 
         return userInfo;
@@ -57,7 +58,9 @@ public class DBDao {
      */
     public List<FriendInfo> getFriendInfo(String sql) {
         List<FriendInfo> friendInfoList = new ArrayList<FriendInfo>();
-        ResultSet resultSet = DBUtil.getInstance().executeQuery(sql);
+        ChatServerDbConnectUnit connectUnit = DBUtil.getInstance().executeQuery(sql);
+
+        ResultSet resultSet=connectUnit.getResultSet();
         try {
             while (resultSet.next()) {
                 FriendInfo friendInfo = new FriendInfo();
@@ -70,7 +73,7 @@ public class DBDao {
         } catch (SQLException e) {
             e.printStackTrace();
         } finally {
-            DBManager.closeResultSet(resultSet);
+            connectUnit.close();
         }
 
         return friendInfoList;
@@ -85,8 +88,9 @@ public class DBDao {
     public List<CategoryInfo> getCategoryInfo(String sql) {
         List<CategoryInfo> categoryInfoList = new ArrayList<CategoryInfo>();
 
-        ResultSet resultSet = DBUtil.getInstance().executeQuery(sql);
+        ChatServerDbConnectUnit connectUnit = DBUtil.getInstance().executeQuery(sql);
 
+        ResultSet resultSet=connectUnit.getResultSet();
         try {
             while (resultSet.next()) {
                 CategoryInfo categoryInfo = new CategoryInfo();
@@ -98,7 +102,7 @@ public class DBDao {
         } catch (SQLException e) {
             e.printStackTrace();
         } finally {
-            DBManager.closeResultSet(resultSet);
+            connectUnit.close();
         }
 
         return categoryInfoList;
