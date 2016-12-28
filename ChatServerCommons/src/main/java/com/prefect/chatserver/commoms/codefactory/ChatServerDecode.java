@@ -1,6 +1,6 @@
 package com.prefect.chatserver.commoms.codefactory;
 
-import com.prefect.chatserver.commoms.util.ChatMessage;
+import com.prefect.chatserver.commoms.util.MessagePacket;
 import org.apache.mina.core.buffer.IoBuffer;
 import org.apache.mina.core.session.AttributeKey;
 import org.apache.mina.core.session.IoSession;
@@ -68,20 +68,20 @@ public class ChatServerDecode implements ProtocolDecoder {
             if (buffer.remaining() >= packHeadLength) {
                 buffer.mark();
 
-                //read chatMessage head
-                ChatMessage chatMessage = new ChatMessage();
-                chatMessage.setCommand(buffer.getInt());
-                chatMessage.setMessageType(buffer.getInt());
+                //read messagePacket head
+                MessagePacket messagePacket = new MessagePacket();
+                messagePacket.setCommand(buffer.getInt());
+                messagePacket.setMessageType(buffer.getInt());
                 int bodyLen = buffer.getInt();
-                chatMessage.setMessageLength(bodyLen);
+                messagePacket.setMessageLength(bodyLen);
 
                 //读取正常的消息包，并写入输出流中，以便IoHandler进行处理
                 if (bodyLen > 0 && buffer.remaining() >= bodyLen) {
-                    chatMessage.setMessage(buffer.getString(bodyLen, charset.newDecoder()));
+                    messagePacket.setMessage(buffer.getString(bodyLen, charset.newDecoder()));
                 } else {
                     //buffer.clear();
                 }
-                protocolDecoderOutput.write(chatMessage);
+                protocolDecoderOutput.write(messagePacket);
             }
 
             if (buffer.hasRemaining()) {

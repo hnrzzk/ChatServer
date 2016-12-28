@@ -1,6 +1,6 @@
 package com.prefect.chatserver.commoms.codefactory;
 
-import com.prefect.chatserver.commoms.util.ChatMessage;
+import com.prefect.chatserver.commoms.util.MessagePacket;
 import org.apache.mina.core.buffer.IoBuffer;
 import org.apache.mina.core.session.IoSession;
 import org.apache.mina.filter.codec.ProtocolEncoderAdapter;
@@ -21,17 +21,17 @@ public class ChatServerEncode extends ProtocolEncoderAdapter {
 
 
     public void encode(IoSession ioSession, Object o, ProtocolEncoderOutput protocolEncoderOutput) throws Exception {
-        if (o instanceof ChatMessage) {
-            ChatMessage chatMessage = (ChatMessage) o;
-            IoBuffer buffer = IoBuffer.allocate(chatMessage.getPackageHeadLength() + chatMessage.getMessageLength());//设置缓冲的容量
+        if (o instanceof MessagePacket) {
+            MessagePacket messagePacket = (MessagePacket) o;
+            IoBuffer buffer = IoBuffer.allocate(messagePacket.getPackageHeadLength() + messagePacket.getMessageLength());//设置缓冲的容量
 
             //buffer.setAutoExpand(true);
-            buffer.putInt(chatMessage.getPackageHeadLength());
-            buffer.putInt(chatMessage.getCommand());
-            buffer.putInt(chatMessage.getMessageType());
-            buffer.putInt(chatMessage.getMessageLength());
-            if (chatMessage.getMessageLength() > 0) {
-                buffer.putString(chatMessage.getMessage(), charset.newEncoder());
+            buffer.putInt(messagePacket.getPackageHeadLength());
+            buffer.putInt(messagePacket.getCommand());
+            buffer.putInt(messagePacket.getMessageType());
+            buffer.putInt(messagePacket.getMessageLength());
+            if (messagePacket.getMessageLength() > 0) {
+                buffer.putString(messagePacket.getMessage(), charset.newEncoder());
             }
             buffer.flip();
             protocolEncoderOutput.write(buffer);

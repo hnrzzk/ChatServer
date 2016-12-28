@@ -6,7 +6,7 @@ import java.io.Serializable;
  * 消息包头
  * Created by zhangkai on 2016/12/26.
  */
-public class ChatMessage implements Serializable {
+public class MessagePacket implements Serializable {
 
     private static final long serialVersionUID = -6744683316349472480L;
 

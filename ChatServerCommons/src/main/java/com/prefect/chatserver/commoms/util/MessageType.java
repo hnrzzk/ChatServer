@@ -11,7 +11,7 @@ public class MessageType {
     public static final int USER_MANAGE = 0x0003;
 
     //聊天消息
-    public static final int CHAT_MESSAGE = 0x0004;
+    public static final int MESSAGE = 0x0004;
 
     //登录消息
     public static final int LOGIN_MESSAGE = 0x0005;

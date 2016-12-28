@@ -1,6 +1,6 @@
 package com.prefect.chatserver.server.handle;
 
-import com.prefect.chatserver.commoms.util.ChatMessage;
+import com.prefect.chatserver.commoms.util.MessagePacket;
 import com.prefect.chatserver.server.process.MessageProcess;
 import com.prefect.chatserver.server.process.MessagePoFactory;
 import org.apache.mina.core.service.IoHandlerAdapter;
@@ -94,9 +94,9 @@ public class ChatServerHandler extends IoHandlerAdapter {
     public void messageReceived(IoSession ioSession, Object messageObj) throws Exception {
         logger.info(ioSession.toString() + " get message:" + messageObj);
 
-        ChatMessage message = null;
-        if (messageObj instanceof ChatMessage) {
-            message = (ChatMessage) messageObj;
+        MessagePacket message = null;
+        if (messageObj instanceof MessagePacket) {
+            message = (MessagePacket) messageObj;
         } else {
             logger.error("获取message失败 session:" + ioSession.toString());
             return;

@@ -1,13 +1,11 @@
 package com.prefect.chatserver.client.handler;
 
-import com.alibaba.fastjson.JSON;
-import com.prefect.chatserver.client.process.MessagePo;
-import com.prefect.chatserver.client.process.PoFactory;
-import com.prefect.chatserver.client.util.ClientCommandType;
-import com.prefect.chatserver.commoms.util.ChatMessage;
-import com.prefect.chatserver.commoms.util.CommandType;
-import com.prefect.chatserver.commoms.util.MessageType;
-import com.prefect.chatserver.commoms.util.moudel.LoginMessage;
+import com.prefect.chatserver.client.process.request.RequestPo;
+import com.prefect.chatserver.client.process.request.RequestPoFactory;
+import com.prefect.chatserver.client.process.response.ResponsePo;
+import com.prefect.chatserver.client.process.response.ResponsePoFactory;
+import com.prefect.chatserver.client.util.ClientRequestType;
+import com.prefect.chatserver.commoms.util.MessagePacket;
 
 import org.apache.mina.core.buffer.IoBuffer;
 import org.apache.mina.core.service.IoConnector;
@@ -31,51 +29,52 @@ public class ChatClientHandler extends IoHandlerAdapter {
     private long t1;
     private CountDownLatch counter;
 
+    @Override
     public void exceptionCaught(IoSession session, Throwable cause) throws Exception {
         cause.printStackTrace();
     }
 
+    @Override
     public void messageReceived(IoSession session, Object message) throws Exception {
-        long received = ((IoBuffer) message).getLong();
-        if (received != this.counter.getCount()) {
-            System.out.println("Error !");
-            session.closeNow();
-        } else if (this.counter.getCount() == 0L) {
-            this.t1 = System.currentTimeMillis();
-            System.out.println("------------->  end " + (this.t1 - this.t0));
-            session.closeNow();
-        } else {
-            this.counter.countDown();
-            this.buffer.flip();
-            this.buffer.putLong(this.counter.getCount());
-            this.buffer.flip();
-            session.write(this.buffer);
+
+        if (message instanceof MessagePacket) {
+            MessagePacket messagePacket = (MessagePacket) message;
+            messagePacket.getMessageType();
+
+            ResponsePo requestPo = ResponsePoFactory.getClass(messagePacket.getCommand());
+
+            requestPo.process(messagePacket);
         }
 
     }
 
+    @Override
     public void messageSent(IoSession session, Object message) throws Exception {
         System.out.println(message.toString());
 
     }
 
+    @Override
     public void sessionClosed(IoSession session) throws Exception {
     }
 
+    @Override
     public void sessionCreated(IoSession session) throws Exception {
     }
 
+    @Override
     public void sessionIdle(IoSession session, IdleStatus status) throws Exception {
     }
 
+    @Override
     public void sessionOpened(IoSession session) throws Exception {
-        MessagePo po = PoFactory.getClass(init());
+        RequestPo po = RequestPoFactory.getClass(init());
         if (po != null) {
             po.process(session, null);
         }
     }
 
-    ClientCommandType init() {
+    ClientRequestType init() {
         System.out.println("Welcome, please enty the number\nLoginin:1 Sigin:2");
         Scanner scanner = new Scanner(System.in);
         while (true) {
@@ -84,9 +83,9 @@ public class ChatClientHandler extends IoHandlerAdapter {
                 int command = Integer.parseInt(str);
                 switch (command) {
                     case 1:
-                        return ClientCommandType.Login;
+                        return ClientRequestType.Login;
                     case 2:
-                        return ClientCommandType.Sigin;
+                        return ClientRequestType.Sigin;
                 }
             } catch (NumberFormatException e) {
                 continue;

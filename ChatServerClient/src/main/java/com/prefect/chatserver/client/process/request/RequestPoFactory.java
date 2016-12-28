@@ -1,12 +1,12 @@
-package com.prefect.chatserver.client.process;
+package com.prefect.chatserver.client.process.request;
 
-import com.prefect.chatserver.client.util.ClientCommandType;
+import com.prefect.chatserver.client.util.ClientRequestType;
 
 /**
  * Created by zhangkai on 2016/12/28.
  */
-public class PoFactory {
-    public static MessagePo getClass(ClientCommandType commandType) {
+public class RequestPoFactory {
+    public static RequestPo getClass(ClientRequestType commandType) {
         switch (commandType) {
             case Login:
                 return new LoginPo();

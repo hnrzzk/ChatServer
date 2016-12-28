@@ -1,26 +1,25 @@
-package com.prefect.chatserver.client.process;
+package com.prefect.chatserver.client.process.request;
 
 import com.alibaba.fastjson.JSON;
 import com.prefect.chatserver.client.util.Interactive;
-import com.prefect.chatserver.commoms.util.ChatMessage;
+import com.prefect.chatserver.commoms.util.MessagePacket;
 import com.prefect.chatserver.commoms.util.CommandType;
 import com.prefect.chatserver.commoms.util.MessageType;
 import com.prefect.chatserver.commoms.util.moudel.UserInfo;
 import org.apache.mina.core.session.IoSession;
 
 import java.io.Console;
-import java.io.IOException;
 import java.util.Scanner;
 
 /**
  * Created by zhangkai on 2016/12/28.
  */
 
-class SiginInPo implements MessagePo {
+class SiginInPo implements RequestPo {
     Interactive interactive = Interactive.getInstance();
 
-    public void process(IoSession ioSession, ChatMessage chatMessage) {
-        ChatMessage message = new ChatMessage();
+    public void process(IoSession ioSession, MessagePacket messagePacket) {
+        MessagePacket message = new MessagePacket();
 
         message.setMessageType(MessageType.USER_MANAGE);
         message.setCommand(CommandType.USER_SIGN_IN);
