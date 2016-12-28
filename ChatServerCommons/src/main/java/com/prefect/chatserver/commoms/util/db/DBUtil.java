@@ -1,6 +1,9 @@
 package com.prefect.chatserver.commoms.util.db;
 
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -13,6 +16,8 @@ import java.util.Map;
  * Created by zhangkai on 2016/12/26.
  */
 public class DBUtil {
+    private final static Logger logger = LoggerFactory.getLogger(DBUtil.class);
+
     private static class DBUtilHandler {
         private static DBUtil instance = new DBUtil();
     }
@@ -39,16 +44,16 @@ public class DBUtil {
         Statement statement = null;
         try {
             connection = this.dbManager.getConnection();
-            statement=connection.createStatement();
+            statement = connection.createStatement();
             statement = connection.createStatement(ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_UPDATABLE);
             resultSet = statement.executeQuery(sql);
         } catch (SQLException e) {
             DBManager.closeConnection(connection);
             DBManager.closeStatement(statement);
-            e.printStackTrace();
+            logger.error("sql execute error, sql: " + sql, e);
         }
 
-        ChatServerDbConnectUnit chatServerDbConnectUnit=new ChatServerDbConnectUnit(resultSet,statement,connection);
+        ChatServerDbConnectUnit chatServerDbConnectUnit = new ChatServerDbConnectUnit(resultSet, statement, connection);
 
         return chatServerDbConnectUnit;
     }
@@ -70,7 +75,7 @@ public class DBUtil {
         } catch (SQLException e) {
             DBManager.closeConnection(connection);
             DBManager.closeStatement(statement);
-            e.printStackTrace();
+            logger.error("sql execute error, sql: " + sql, e);
         }
 
         return executeNum;
@@ -103,7 +108,7 @@ public class DBUtil {
      * @return 是否存在
      */
     public boolean isExit(String table, String[] columns, Object[] values) {
-        StringBuilder stringBuilder = new StringBuilder("select * from " + table + "where 1=1");
+        StringBuilder stringBuilder = new StringBuilder("select * from " + table + " where 1=1");
         for (int i = 0; i < columns.length; i++) {
             stringBuilder.append(
                     String.format(" and %s = '%s'",
@@ -116,10 +121,11 @@ public class DBUtil {
 
     /**
      * 判断结果集是否为空
+     *
      * @param connectUnit
      * @return 结果集是否是空
      */
-    public boolean resultSetIsEmpty(ChatServerDbConnectUnit connectUnit){
+    public boolean resultSetIsEmpty(ChatServerDbConnectUnit connectUnit) {
         boolean flag = false;
         try {
             while (connectUnit.getResultSet().next()) {
@@ -127,13 +133,20 @@ public class DBUtil {
                 break;
             }
         } catch (SQLException e) {
-            e.printStackTrace();
-        }finally {
+            logger.error(e.getMessage(), e);
+        } finally {
             connectUnit.close();
         }
         return flag;
     }
 
+    /**
+     * 执行插入操作
+     *
+     * @param tableName
+     * @param data
+     * @return
+     */
     public int executeInsert(String tableName, Map<String, Object> data) {
         if (data.isEmpty()) {
             return 0;

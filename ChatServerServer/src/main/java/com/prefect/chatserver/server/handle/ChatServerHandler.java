@@ -18,7 +18,7 @@ import java.util.concurrent.ConcurrentHashMap;
 public class ChatServerHandler extends IoHandlerAdapter {
     private final static Logger logger = LoggerFactory.getLogger(ChatServerHandler.class);
 
-    public static Map<Long, IoSession> sessionMap = new ConcurrentHashMap<Long, IoSession>();
+    public static Map<String, IoSession> sessionMap = new ConcurrentHashMap<String, IoSession>();
 
     @Override
     public void sessionCreated(IoSession session) throws Exception {
@@ -28,20 +28,6 @@ public class ChatServerHandler extends IoHandlerAdapter {
     @Override
     public void sessionOpened(IoSession session) throws Exception {
         logger.info(session.toString() + "打开链接");
-
-//        Message message=new Message();
-//        message.setMessageType(MessageType.LOGIN_MESSAGE);
-//        message.setCommand(CommandType.USER_LOGIN);
-//
-//        LoginMessage loginMessage=new LoginMessage();
-//        loginMessage.setAccount(1);
-//        loginMessage.setPassword("12345");
-//
-//        String jsonObject= JSON.toJSONString(loginMessage);
-//        message.setMessage(jsonObject);
-//        message.setMessageLength(jsonObject.getBytes().length);
-//
-//        session.write(message);
     }
 
     @Override

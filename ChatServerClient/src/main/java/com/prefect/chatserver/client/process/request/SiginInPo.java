@@ -16,7 +16,7 @@ import java.util.Scanner;
  */
 
 class SiginInPo implements RequestPo {
-    Interactive interactive = Interactive.getInstance();
+
 
     public void process(IoSession ioSession, MessagePacket messagePacket) {
         MessagePacket message = new MessagePacket();
@@ -32,12 +32,12 @@ class SiginInPo implements RequestPo {
     }
 
     private UserInfo getUserInfo() {
+        Interactive interactive = Interactive.getInstance();
+
         Scanner scanner = new Scanner(System.in);
         UserInfo userInfo = new UserInfo();
 
-        Console console = System.console();
-
-        interactive.printlnToConsole("请输入用户信息～～");
+        interactive.printlnToConsole("～～谢谢注册～～");
 
         interactive.printToConsole("请输入账户:");
         String account = scanner.next();

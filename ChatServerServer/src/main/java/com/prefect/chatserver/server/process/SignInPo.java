@@ -20,11 +20,12 @@ import java.util.Map;
  * 用户登录处理类
  * Created by zhangkai on 2016/12/27.
  */
-public class SignInPo implements MessageProcess {
+public class SignInPo extends UserManagePo {
     private final static Logger logger = LoggerFactory.getLogger(SignInPo.class);
 
     public void handle(IoSession ioSession, MessagePacket message) throws Exception {
 
+        //将消息内容从json转换成object
         UserInfo userInfo = JSON.parseObject(message.getMessage(), UserInfo.class);
 
         String account = userInfo.getAccount();
@@ -33,8 +34,9 @@ public class SignInPo implements MessageProcess {
 
         boolean userExist = DBUtil.getInstance().isExit("user", "account", account);
 
+        //如果账户已存在则返回
         if (userExist) {
-            response(ioSession,"account is exist");
+            response(ioSession, CommandType.USER_SIGN_IN_ACK, "ERROR: account is exist");
             return;
         }
 
@@ -43,25 +45,14 @@ public class SignInPo implements MessageProcess {
         dataMap.put("password", password);
         dataMap.put("nick_name", nickName);
 
+
         if (DBUtil.getInstance().executeInsert("user", dataMap) > 0) {
-            response(ioSession,"account build success");
+            //返回账户创建成功
+            response(ioSession, CommandType.USER_SIGN_IN_ACK, "SUCCESS: account build success");
+        } else {
+            //返回账户创建失败
+            response(ioSession, CommandType.USER_SIGN_IN_ACK, "ERROR: account build failed");
         }
 
-    }
-
-    private void response(IoSession ioSession,String message){
-        MessagePacket messagePacket = new MessagePacket();
-        messagePacket.setMessageType(MessageType.MESSAGE);
-        messagePacket.setCommand(CommandType.USER_SIGN_IN_ACK);
-
-        ChatMessage chatMessage = new ChatMessage();
-        chatMessage.setSendAccount("System");
-        chatMessage.setMessage(message);
-
-        String json = JSON.toJSONString(chatMessage);
-        messagePacket.setMessage(json);
-        messagePacket.setMessageLength(json.getBytes().length);
-
-        ioSession.write(messagePacket);
     }
 }
