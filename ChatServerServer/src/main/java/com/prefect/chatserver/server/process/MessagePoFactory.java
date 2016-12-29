@@ -10,6 +10,7 @@ import org.slf4j.LoggerFactory;
  */
 public class MessagePoFactory {
     private final static Logger logger = LoggerFactory.getLogger(MessagePoFactory.class);
+
     public static MessageProcess getClass(int commandType) {
         MessageProcess messageProcess = null;
         switch (commandType) {
@@ -17,6 +18,10 @@ public class MessagePoFactory {
                 return new LoginPo();
             case CommandType.USER_SIGN_IN:
                 return new SignInPo();
+            case CommandType.MESSAGE:
+                return new MessagePo();
+            case CommandType.FRIEND_LIST_ADD:
+                return new FriendAddPo();
         }
         return messageProcess;
     }

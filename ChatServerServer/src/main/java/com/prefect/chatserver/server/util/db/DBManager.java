@@ -1,11 +1,11 @@
-package com.prefect.chatserver.commoms.util.db;
+package com.prefect.chatserver.server.util.db;
 
 import org.apache.commons.dbcp.BasicDataSourceFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.sql.DataSource;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.IOException;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -17,6 +17,7 @@ import java.util.Properties;
  * Created by zhangkai on 2016/12/26.
  */
 public class DBManager {
+    private final static Logger logger = LoggerFactory.getLogger(DBManager.class);
 
     private static class DBUtilHandler {
         private static DBManager instance = new DBManager();
@@ -35,7 +36,7 @@ public class DBManager {
             properties.load(new FileInputStream("dbcpconfig.properties"));
             ds= BasicDataSourceFactory.createDataSource(properties);
         } catch (Exception e) {
-            e.printStackTrace();
+            logger.error(e.getMessage(),e);
         }
 
 
@@ -56,7 +57,7 @@ public class DBManager {
             }
 
         } catch (SQLException e) {
-            e.printStackTrace();
+            logger.error(e.getMessage(),e);
         }
 
         rs = null;
@@ -69,7 +70,7 @@ public class DBManager {
             }
 
         } catch (SQLException e) {
-            e.printStackTrace();
+            logger.error(e.getMessage(),e);
         }
 
         stm = null;
@@ -81,7 +82,7 @@ public class DBManager {
                 conn.close();
             }
         } catch (SQLException e) {
-            e.printStackTrace();
+            logger.error(e.getMessage(),e);
         }
 
         conn = null;

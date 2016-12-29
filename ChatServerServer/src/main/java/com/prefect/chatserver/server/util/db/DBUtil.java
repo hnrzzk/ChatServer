@@ -1,4 +1,4 @@
-package com.prefect.chatserver.commoms.util.db;
+package com.prefect.chatserver.server.util.db;
 
 
 import org.slf4j.Logger;
@@ -36,18 +36,24 @@ public class DBUtil {
      * @param sql
      * @return 查询得到的结果集
      */
-    public ChatServerDbConnectUnit executeQuery(String sql) {
+    public ChatServerDbConnectUnit executeQuery(String sql, Object[] values) {
         ResultSet resultSet = null;
         Connection connection = null;
         PreparedStatement statement = null;
         try {
             connection = this.dbManager.getConnection();
-            statement = connection.prepareStatement(sql,Statement.RETURN_GENERATED_KEYS);
+            statement = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
+
+            for (int i = 0; i < values.length; i++) {
+                statement.setObject(i+1, values[i]);
+            }
             resultSet = statement.executeQuery();
+
         } catch (SQLException e) {
             DBManager.closeConnection(connection);
             DBManager.closeStatement(statement);
-            logger.error("sql execute error, sql: " + sql, e);
+            DBManager.closeResultSet(resultSet);
+            logger.error(String.format("sql execute error, sql[%s] values[%s] ", sql, values), e);
         }
 
         return new ChatServerDbConnectUnit(resultSet, statement, connection);
@@ -59,19 +65,24 @@ public class DBUtil {
      * @param sql
      * @return sql影响的行数
      */
-    public ChatServerDbConnectUnit executeUpdate(String sql) {
+    public ChatServerDbConnectUnit executeUpdate(String sql, Object[] values) {
         Connection connection = null;
         PreparedStatement statement = null;
-        ResultSet resultSet=null;
+        ResultSet resultSet = null;
         try {
             connection = this.dbManager.getConnection();
-            statement = connection.prepareStatement(sql,Statement.RETURN_GENERATED_KEYS);
+            statement = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
+            for (int i = 0; i < values.length; i++) {
+                statement.setObject(i+1, values[i]);
+            }
+
             statement.executeUpdate();
-            resultSet= statement.getGeneratedKeys();
+            resultSet = statement.getGeneratedKeys();
         } catch (SQLException e) {
             DBManager.closeConnection(connection);
             DBManager.closeStatement(statement);
-            logger.error("sql execute error, sql: " + sql, e);
+            DBManager.closeResultSet(resultSet);
+            logger.error(String.format("sql execute error, sql[%s] values[%s] ", sql, values), e);
         }
 
         return new ChatServerDbConnectUnit(resultSet, statement, connection);
@@ -87,10 +98,10 @@ public class DBUtil {
      */
     public boolean isExit(String table, String column, String value) {
         String sql = String.format(
-                "select * from %s where %s = '%s'",
-                table, column, value);
+                "select * from %s where %s = ?",
+                table, column);
 
-        ChatServerDbConnectUnit connectUnit = this.executeQuery(sql);
+        ChatServerDbConnectUnit connectUnit = this.executeQuery(sql, new Object[]{value});
 
         return resultSetIsEmpty(connectUnit);
     }
@@ -107,10 +118,9 @@ public class DBUtil {
         StringBuilder stringBuilder = new StringBuilder("select * from " + table + " where 1=1");
         for (int i = 0; i < columns.length; i++) {
             stringBuilder.append(
-                    String.format(" and %s = '%s'",
-                            columns[i], values[i]));
+                    String.format(" and %s = ?", columns[i]));
         }
-        ChatServerDbConnectUnit connectUnit = this.executeQuery(stringBuilder.toString());
+        ChatServerDbConnectUnit connectUnit = this.executeQuery(stringBuilder.toString(), values);
 
         return resultSetIsEmpty(connectUnit);
     }
@@ -140,7 +150,7 @@ public class DBUtil {
      * 执行插入操作 返回受影响的key 列表
      *
      * @param tableName 数据表
-     * @param data 要插入的数据
+     * @param data      要插入的数据
      * @return 返回一个ResultSet里面保存了受影响的key
      */
     public ChatServerDbConnectUnit executeInsert(String tableName, Map<String, Object> data) {
@@ -151,22 +161,24 @@ public class DBUtil {
         StringBuilder keyNameList = new StringBuilder();
         StringBuilder valueList = new StringBuilder();
 
+        int i = 0;
+        Object[] objects = new Object[data.size()];
+
         Iterator iterator = data.entrySet().iterator();
         while (iterator.hasNext()) {
             Map.Entry entry = (Map.Entry) iterator.next();
+            objects[i++] = entry.getValue();
             keyNameList.append(String.format("%s,", entry.getKey()));
-            valueList.append(String.format("'%s',", entry.getValue()));
+            valueList.append("?,");
         }
 
         //删除最后一个逗号
         keyNameList.deleteCharAt(keyNameList.length() - 1);
         valueList.deleteCharAt(valueList.length() - 1);
 
-
         StringBuilder sql = new StringBuilder(
                 String.format("insert into %s (%s) values (%s)", tableName, keyNameList, valueList));
 
-        System.out.println(sql);
-        return this.executeUpdate(sql.toString());
+        return this.executeUpdate(sql.toString(), objects);
     }
 }

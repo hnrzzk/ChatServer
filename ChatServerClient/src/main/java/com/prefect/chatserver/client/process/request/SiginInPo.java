@@ -15,7 +15,7 @@ import java.util.Scanner;
  * Created by zhangkai on 2016/12/28.
  */
 
-class SiginInPo implements RequestPo {
+public class SiginInPo implements RequestPo {
 
 
     public void process(IoSession ioSession, MessagePacket messagePacket) {

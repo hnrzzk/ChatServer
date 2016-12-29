@@ -3,8 +3,8 @@ package com.prefect.chatserver.server.process;
 import com.alibaba.fastjson.JSON;
 import com.prefect.chatserver.commoms.util.MessagePacket;
 import com.prefect.chatserver.commoms.util.CommandType;
-import com.prefect.chatserver.commoms.util.db.ChatServerDbConnectUnit;
-import com.prefect.chatserver.commoms.util.db.DBUtil;
+import com.prefect.chatserver.server.util.db.ChatServerDbConnectUnit;
+import com.prefect.chatserver.server.util.db.DBUtil;
 import com.prefect.chatserver.commoms.util.moudel.UserInfo;
 import org.apache.mina.core.session.IoSession;
 import org.slf4j.Logger;
@@ -64,6 +64,7 @@ public class SignInPo extends ActionPo {
             //返回账户创建失败
             response(ioSession, CommandType.USER_SIGN_IN_ACK, true, "ERROR: account build failed");
         }
+        connectUnit.close();
 
     }
 }

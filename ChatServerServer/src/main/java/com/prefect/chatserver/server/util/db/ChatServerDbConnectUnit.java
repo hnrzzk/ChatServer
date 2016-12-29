@@ -1,9 +1,8 @@
-package com.prefect.chatserver.commoms.util.db;
+package com.prefect.chatserver.server.util.db;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
-import java.sql.Statement;
 
 /**
  * 数据库连接单元
@@ -48,5 +47,9 @@ public class ChatServerDbConnectUnit {
         DBManager.closeResultSet(this.resultSet);
         DBManager.closeStatement(this.statement);
         DBManager.closeConnection(this.connection);
+    }
+
+    protected void finalize(){
+        this.close();
     }
 }

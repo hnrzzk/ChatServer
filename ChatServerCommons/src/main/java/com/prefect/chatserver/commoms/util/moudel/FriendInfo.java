@@ -5,45 +5,36 @@ package com.prefect.chatserver.commoms.util.moudel;
  * Created by zhangkai on 2016/12/26.
  */
 public class FriendInfo {
-    long id;
 
     /**
-     * 用户账号id
+     * 用户账号
      */
-    long userId;
+    String userAccount;
 
     /**
-     * 好友的账号id
+     * 好友的账号
      */
-    long friendId;
+    String friendAccount;
 
     /**
      * 分组名称
      */
     String categoryName;
 
-    public long getId() {
-        return id;
+    public String getUserAccount() {
+        return userAccount;
     }
 
-    public void setId(long id) {
-        this.id = id;
+    public void setUserAccount(String userAccount) {
+        this.userAccount = userAccount;
     }
 
-    public long getUserId() {
-        return userId;
+    public String getFriendAccount() {
+        return friendAccount;
     }
 
-    public void setUserId(long userId) {
-        this.userId = userId;
-    }
-
-    public long getFriendId() {
-        return friendId;
-    }
-
-    public void setFriendId(long friendId) {
-        this.friendId = friendId;
+    public void setFriendAccount(String friendAccount) {
+        this.friendAccount = friendAccount;
     }
 
     public String getCategoryName() {

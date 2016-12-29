@@ -3,7 +3,7 @@ package com.prefect.chatserver.server.process;
 import com.alibaba.fastjson.JSON;
 import com.prefect.chatserver.commoms.util.CommandType;
 import com.prefect.chatserver.commoms.util.MessagePacket;
-import com.prefect.chatserver.commoms.util.db.DBUtil;
+import com.prefect.chatserver.server.util.db.DBUtil;
 import com.prefect.chatserver.commoms.util.moudel.UserInfo;
 import com.prefect.chatserver.server.handle.ChatServerHandler;
 import org.apache.mina.core.session.IoSession;
@@ -35,11 +35,14 @@ public class LoginPo extends ActionPo {
         }
 
         //拼凑sql语句
-        String updateOnlineStateSql = String.format("update user set %s='%s' where %s='%s'",
-                "is_online", 1, "account", account);
+        String updateOnlineStateSql = "update user set is_online=1 where account=?";
 
-        if (DBUtil.getInstance().executeUpdate(updateOnlineStateSql) != null) { //更新在线状态 成功
+        if (DBUtil.getInstance().executeUpdate(updateOnlineStateSql, new Object[]{account}) != null) { //更新在线状态 成功
+            //将已建立的连接保存在内存中
             ChatServerHandler.sessionMap.put(account, ioSession);
+            //在session中记录account名称
+            ioSession.setAttribute("account", account);
+
             super.response(ioSession, CommandType.USER_LOGIN_ACK, true, "SUCCESS LOGIN: Welcome!");
         } else {
             //更新在线状态失败

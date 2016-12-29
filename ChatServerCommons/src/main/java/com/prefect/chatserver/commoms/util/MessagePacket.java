@@ -3,10 +3,27 @@ package com.prefect.chatserver.commoms.util;
 import java.io.Serializable;
 
 /**
- * 消息包头
+ * 消息包
  * Created by zhangkai on 2016/12/26.
  */
 public class MessagePacket implements Serializable {
+
+    public MessagePacket() {
+    }
+
+    /**
+     * 消息包 构造函数
+     * @param command   命令
+     * @param messageType   消息类型
+     * @param messageLength 消息长度
+     * @param message   消息
+     */
+    public MessagePacket(int command, int messageType, int messageLength, String message) {
+        this.command = command;
+        this.messageType = messageType;
+        this.messageLength = messageLength;
+        this.message = message;
+    }
 
     private static final long serialVersionUID = -6744683316349472480L;
 

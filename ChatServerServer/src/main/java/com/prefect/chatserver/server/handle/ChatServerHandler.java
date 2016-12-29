@@ -1,6 +1,7 @@
 package com.prefect.chatserver.server.handle;
 
 import com.prefect.chatserver.commoms.util.MessagePacket;
+import com.prefect.chatserver.server.util.db.DBUtil;
 import com.prefect.chatserver.server.process.MessageProcess;
 import com.prefect.chatserver.server.process.MessagePoFactory;
 import org.apache.mina.core.service.IoHandlerAdapter;
@@ -32,37 +33,14 @@ public class ChatServerHandler extends IoHandlerAdapter {
 
     @Override
     public void sessionClosed(IoSession session) throws Exception {
-        logger.info(session.toString() + " 关闭连接");
+        String account = session.getAttribute("account").toString();
+        logger.info(account + " 关闭连接");
 
-//        long userId = Long.parseLong(session.getAttribute("userId").toString());
-//
-//        String sql = "update user set is_online=1 where id=" + userId;
-//        DBUtil.getInstance().executeQuery(sql);
-//        sessionMap.remove(userId);
-//
-//        //修改下线通知
-//        String userSql = "Select * from user where id=" + userId;
-//        UserInfo userInfo = DBDao.getInstance().getUserInfo(userSql);
-//
-//        String friendListSql = "select * from friends where user_id=" + userInfo.getId();
-//        List<FriendInfo> friendInfoList = DBDao.getInstance().getFriendInfo(friendListSql);
-//        for (FriendInfo item : friendInfoList) {
-//            String fUserSql = "select * from user where id=" + item.getFriendId();
-//            UserInfo userInfo1 = DBDao.getInstance().getUserInfo(fUserSql);
-//            IoSession ioSession = sessionMap.get(userInfo1.getId());
-//            if (ioSession != null) {
-//                Message message = new Message();
-//                Map<String, Object> objectMap = new HashMap<String, Object>();
-//                objectMap.put("userId", userInfo1.getId());
-//                objectMap.put("status", 1); //下线
-//                String content = JSON.toJSONString(objectMap);
-//                message.setPackageHeadLength(10);
-//                message.setCommand(CommandType.USER_OFF_LINE_NOTICE);
-//                message.setMessageLength(content.getBytes().length);
-//                message.setMessage(content);
-//                ioSession.write(message);
-//            }
-//        }
+        String sql = "update user set is_online= 0 where account=?";
+        DBUtil.getInstance().executeUpdate(sql, new Object[]{account});
+        sessionMap.remove(account);
+
+        //TODO:下线通知
     }
 
     @Override
@@ -88,6 +66,7 @@ public class ChatServerHandler extends IoHandlerAdapter {
             return;
         }
 
+        //根据message从工厂类生产对应的处理类
         MessageProcess messageProcess = MessagePoFactory.getClass(message.getCommand());
 
         if (messageProcess != null) {
