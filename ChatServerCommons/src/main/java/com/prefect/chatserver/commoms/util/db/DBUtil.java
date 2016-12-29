@@ -4,11 +4,9 @@ package com.prefect.chatserver.commoms.util.db;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.sql.Connection;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
+import java.sql.*;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -41,21 +39,18 @@ public class DBUtil {
     public ChatServerDbConnectUnit executeQuery(String sql) {
         ResultSet resultSet = null;
         Connection connection = null;
-        Statement statement = null;
+        PreparedStatement statement = null;
         try {
             connection = this.dbManager.getConnection();
-            statement = connection.createStatement();
-            statement = connection.createStatement(ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_UPDATABLE);
-            resultSet = statement.executeQuery(sql);
+            statement = connection.prepareStatement(sql,Statement.RETURN_GENERATED_KEYS);
+            resultSet = statement.executeQuery();
         } catch (SQLException e) {
             DBManager.closeConnection(connection);
             DBManager.closeStatement(statement);
             logger.error("sql execute error, sql: " + sql, e);
         }
 
-        ChatServerDbConnectUnit chatServerDbConnectUnit = new ChatServerDbConnectUnit(resultSet, statement, connection);
-
-        return chatServerDbConnectUnit;
+        return new ChatServerDbConnectUnit(resultSet, statement, connection);
     }
 
     /**
@@ -64,21 +59,22 @@ public class DBUtil {
      * @param sql
      * @return sql影响的行数
      */
-    public int executeUpdate(String sql) {
-        int executeNum = 0;
+    public ChatServerDbConnectUnit executeUpdate(String sql) {
         Connection connection = null;
-        Statement statement = null;
+        PreparedStatement statement = null;
+        ResultSet resultSet=null;
         try {
             connection = this.dbManager.getConnection();
-            statement = connection.createStatement(ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_UPDATABLE);
-            executeNum = statement.executeUpdate(sql);
+            statement = connection.prepareStatement(sql,Statement.RETURN_GENERATED_KEYS);
+            statement.executeUpdate();
+            resultSet= statement.getGeneratedKeys();
         } catch (SQLException e) {
             DBManager.closeConnection(connection);
             DBManager.closeStatement(statement);
             logger.error("sql execute error, sql: " + sql, e);
         }
 
-        return executeNum;
+        return new ChatServerDbConnectUnit(resultSet, statement, connection);
     }
 
     /**
@@ -141,15 +137,15 @@ public class DBUtil {
     }
 
     /**
-     * 执行插入操作
+     * 执行插入操作 返回受影响的key 列表
      *
-     * @param tableName
-     * @param data
-     * @return
+     * @param tableName 数据表
+     * @param data 要插入的数据
+     * @return 返回一个ResultSet里面保存了受影响的key
      */
-    public int executeInsert(String tableName, Map<String, Object> data) {
+    public ChatServerDbConnectUnit executeInsert(String tableName, Map<String, Object> data) {
         if (data.isEmpty()) {
-            return 0;
+            return null;
         }
 
         StringBuilder keyNameList = new StringBuilder();

@@ -38,7 +38,7 @@ public class LoginPo extends UserManagePo {
         String updateOnlineStateSql = String.format("update user set %s='%s' where %s='%s'",
                 "is_online", 1, "account", account);
 
-        if (DBUtil.getInstance().executeUpdate(updateOnlineStateSql) > 0) { //更新在线状态 成功
+        if (DBUtil.getInstance().executeUpdate(updateOnlineStateSql) !=null) { //更新在线状态 成功
             ChatServerHandler.sessionMap.put(account, ioSession);
             super.response(ioSession, CommandType.USER_LOGIN_ACK, "SUCCESS LOGIN: Welcome!");
         } else {

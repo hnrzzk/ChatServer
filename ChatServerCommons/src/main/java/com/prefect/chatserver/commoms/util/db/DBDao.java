@@ -4,6 +4,8 @@ package com.prefect.chatserver.commoms.util.db;
 import com.prefect.chatserver.commoms.util.moudel.CategoryInfo;
 import com.prefect.chatserver.commoms.util.moudel.FriendInfo;
 import com.prefect.chatserver.commoms.util.moudel.UserInfo;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -16,6 +18,8 @@ import java.util.List;
  * Created by zhangkai on 2016/12/26.
  */
 public class DBDao {
+    private final static Logger logger = LoggerFactory.getLogger(DBDao.class);
+
     private static class DBServiceHandler {
         private static DBDao instance = new DBDao();
     }
@@ -33,7 +37,7 @@ public class DBDao {
     public UserInfo getUserInfo(String sql) {
         UserInfo userInfo = null;
         ChatServerDbConnectUnit connectUnit = DBUtil.getInstance().executeQuery(sql);
-        ResultSet resultSet=connectUnit.getResultSet();
+        ResultSet resultSet = connectUnit.getResultSet();
         try {
             while (resultSet.next()) {
                 userInfo = new UserInfo();
@@ -42,7 +46,7 @@ public class DBDao {
                 userInfo.setPassword(resultSet.getString("password"));
             }
         } catch (SQLException e) {
-            e.printStackTrace();
+            logger.error(e.getMessage(), e);
         } finally {
             connectUnit.close();
         }
@@ -60,7 +64,7 @@ public class DBDao {
         List<FriendInfo> friendInfoList = new ArrayList<FriendInfo>();
         ChatServerDbConnectUnit connectUnit = DBUtil.getInstance().executeQuery(sql);
 
-        ResultSet resultSet=connectUnit.getResultSet();
+        ResultSet resultSet = connectUnit.getResultSet();
         try {
             while (resultSet.next()) {
                 FriendInfo friendInfo = new FriendInfo();
@@ -71,7 +75,7 @@ public class DBDao {
                 friendInfoList.add(friendInfo);
             }
         } catch (SQLException e) {
-            e.printStackTrace();
+            logger.error(e.getMessage(), e);
         } finally {
             connectUnit.close();
         }
@@ -90,7 +94,7 @@ public class DBDao {
 
         ChatServerDbConnectUnit connectUnit = DBUtil.getInstance().executeQuery(sql);
 
-        ResultSet resultSet=connectUnit.getResultSet();
+        ResultSet resultSet = connectUnit.getResultSet();
         try {
             while (resultSet.next()) {
                 CategoryInfo categoryInfo = new CategoryInfo();
@@ -100,7 +104,7 @@ public class DBDao {
                 categoryInfoList.add(categoryInfo);
             }
         } catch (SQLException e) {
-            e.printStackTrace();
+            logger.error(e.getMessage(), e);
         } finally {
             connectUnit.close();
         }

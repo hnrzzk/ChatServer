@@ -1,6 +1,7 @@
 package com.prefect.chatserver.commoms.util.db;
 
 import java.sql.Connection;
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.Statement;
 
@@ -9,7 +10,7 @@ import java.sql.Statement;
  * Created by zhangkai on 2016/12/28.
  */
 public class ChatServerDbConnectUnit {
-    public ChatServerDbConnectUnit(ResultSet resultSet, Statement statement, Connection connection) {
+    public ChatServerDbConnectUnit(ResultSet resultSet, PreparedStatement statement, Connection connection) {
         this.resultSet = resultSet;
         this.statement = statement;
         this.connection = connection;
@@ -17,7 +18,7 @@ public class ChatServerDbConnectUnit {
 
     private ResultSet resultSet;
     private Connection connection;
-    private Statement statement;
+    private PreparedStatement statement;
 
     public ResultSet getResultSet() {
         return resultSet;
@@ -35,11 +36,11 @@ public class ChatServerDbConnectUnit {
         this.connection = connection;
     }
 
-    public Statement getStatement() {
+    public PreparedStatement getStatement() {
         return statement;
     }
 
-    public void setStatement(Statement statement) {
+    public void setStatement(PreparedStatement statement) {
         this.statement = statement;
     }
 
