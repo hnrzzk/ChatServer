@@ -1,5 +1,6 @@
 package com.prefect.chatserver.client.handler;
 
+import com.prefect.chatserver.client.process.UserInputPo;
 import com.prefect.chatserver.client.process.request.RequestPo;
 import com.prefect.chatserver.client.process.request.RequestPoFactory;
 import com.prefect.chatserver.client.process.response.ResponsePo;
@@ -72,6 +73,10 @@ public class ChatClientHandler extends IoHandlerAdapter {
         if (po != null) {
             po.process(session, null);
         }
+
+        UserInputPo userInputPo = new UserInputPo();
+        Thread thread = new Thread(userInputPo);
+        thread.start();
     }
 
     ClientRequestType init() {

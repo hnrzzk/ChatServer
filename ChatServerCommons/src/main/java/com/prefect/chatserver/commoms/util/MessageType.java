@@ -15,4 +15,7 @@ public class MessageType {
 
     //登录消息 对应 LoginMessage
     public static final int LOGIN_MESSAGE = 0x0005;
+
+    //请求响应结果 对应ActionResponseMessage
+    public static final int RESPONSE = 0x0006;
 }

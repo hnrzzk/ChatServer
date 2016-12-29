@@ -10,7 +10,6 @@ import org.apache.mina.core.session.IoSession;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.sql.Date;
 import java.sql.ResultSet;
 import java.sql.Timestamp;
 import java.util.HashMap;
@@ -21,7 +20,7 @@ import java.util.Map;
  * 用户注册逻辑处理类
  * Created by zhangkai on 2016/12/27.
  */
-public class SignInPo extends UserManagePo {
+public class SignInPo extends ActionPo {
     private final static Logger logger = LoggerFactory.getLogger(SignInPo.class);
 
     public void process(IoSession ioSession, MessagePacket message) throws Exception {
@@ -35,7 +34,7 @@ public class SignInPo extends UserManagePo {
 
         //如果账户已存在则返回
         if (DBUtil.getInstance().isExit("user", "account", account)) {
-            response(ioSession, CommandType.USER_SIGN_IN_ACK, "ERROR: account is exist");
+            response(ioSession, CommandType.USER_SIGN_IN_ACK, false, "ERROR: account is exist");
             return;
         }
 
@@ -50,21 +49,20 @@ public class SignInPo extends UserManagePo {
 
         ChatServerDbConnectUnit connectUnit;
         if ((connectUnit = DBUtil.getInstance().executeInsert("user", dataMap)) != null) {
-            ResultSet resultSet=connectUnit.getResultSet();
-            long id=-1;
-            while (resultSet.next()){
-                id=resultSet.getLong(1);
+            ResultSet resultSet = connectUnit.getResultSet();
+            long id = -1;
+            while (resultSet.next()) {
+                id = resultSet.getLong(1);
             }
 
-            if (id>=0){
+            if (id >= 0) {
                 //返回账户创建成功
-                response(ioSession, CommandType.USER_SIGN_IN_ACK, "SUCCESS: account build success, UserID is: "+id);
+                response(ioSession, CommandType.USER_SIGN_IN_ACK, true, "SUCCESS: account build success, UserID is: " + id);
             }
-
 
         } else {
             //返回账户创建失败
-            response(ioSession, CommandType.USER_SIGN_IN_ACK, "ERROR: account build failed");
+            response(ioSession, CommandType.USER_SIGN_IN_ACK, true, "ERROR: account build failed");
         }
 
     }
