@@ -198,4 +198,35 @@ public class DBUtil {
 
         return key;
     }
+
+    public long deleteRow(String table, Map<String, Object> condition) {
+        Object[] values = new Object[condition.size()];
+
+        StringBuilder conditionSql = new StringBuilder("");
+        Iterator iterator = condition.entrySet().iterator();
+        int i = 0;
+        while (iterator.hasNext()) {
+            Map.Entry entry = (Map.Entry) iterator.next();
+            values[i++] = entry.getValue();
+            conditionSql.append(entry.getKey()).append("=?,");
+        }
+        conditionSql.deleteCharAt(conditionSql.length() - 1);
+
+        String sql = new StringBuilder()
+                .append("Delete from ").append(table).append(" where ").append(conditionSql)
+                .toString();
+
+        ChatServerDbConnectUnit chatServerDbConnectUnit = this.executeUpdate(sql, values);
+        ResultSet resultSet = chatServerDbConnectUnit.getResultSet();
+        try {
+            while (resultSet.next()) {
+                return chatServerDbConnectUnit.getSuccessRow();
+            }
+        } catch (SQLException e) {
+            logger.error(e.getMessage(), e);
+        } finally {
+            chatServerDbConnectUnit.close();
+        }
+        return -1;
+    }
 }

@@ -2,7 +2,6 @@ package com.prefect.chatserver.client.process.interactive;
 
 import com.alibaba.fastjson.JSON;
 import com.prefect.chatserver.client.ChatClient;
-import com.prefect.chatserver.client.process.request.FriendManagePo;
 import com.prefect.chatserver.client.process.request.SendMessagePo;
 import com.prefect.chatserver.client.util.Interactive;
 import com.prefect.chatserver.commoms.util.CommandType;
@@ -56,6 +55,9 @@ public class UserInteractive implements Runnable {
             case InteractiveCommandType.FRIEND_ADD:
                 processFriendAdd(strings[1]);
                 break;
+            case InteractiveCommandType.FRIEND_REMOVE:
+                processFriendRemove(strings[1]);
+                break;
         }
     }
 
@@ -71,6 +73,7 @@ public class UserInteractive implements Runnable {
 
     /**
      * 处理用户输入的聊天命令
+     *
      * @param receiveAccount
      * @param message
      */
@@ -91,30 +94,44 @@ public class UserInteractive implements Runnable {
         new SendMessagePo().process(ChatClient.session, messagePacket);
     }
 
-    private  void processFriendAdd(String receiveAccount){
+    private void processFriendAdd(String receiveAccount) {
 
-        FriendManageMessage friendManageMessage =new FriendManageMessage();
+        FriendManageMessage friendManageMessage = new FriendManageMessage();
         friendManageMessage.setUserAccount(ChatClient.account);
         friendManageMessage.setFriendAccount(receiveAccount);
         friendManageMessage.setCategoryName("好友");
 
-        String json= JSON.toJSONString(friendManageMessage);
+        String json = JSON.toJSONString(friendManageMessage);
 
-        MessagePacket messagePacket=new MessagePacket(
+        MessagePacket messagePacket = new MessagePacket(
                 CommandType.FRIEND_LIST_ADD,
                 MessageType.FRIEND_MANAGE,
                 json.getBytes().length,
                 json);
 
-        new FriendManagePo().process(ChatClient.session, messagePacket);
+        ChatClient.session.write(messagePacket);
+    }
 
+    private void processFriendRemove(String receiveAccount) {
+        FriendManageMessage friendManageMessage = new FriendManageMessage();
+        friendManageMessage.setUserAccount(ChatClient.account);
+        friendManageMessage.setFriendAccount(receiveAccount);
 
+        String json = JSON.toJSONString(friendManageMessage);
+
+        MessagePacket messagePacket = new MessagePacket(
+                CommandType.FRIEND_LIST_REMOVE,
+                MessageType.FRIEND_MANAGE,
+                json.getBytes().length,
+                json);
+
+        ChatClient.session.write(messagePacket);
     }
 }
 
 class InteractiveCommandType {
-    final static String FRIEND_FIND="-friendFind";    //查找好友
-    final static String FRIEND_ADD="-friendAdd";     //增加好友
-    final static String FRIEND_REMOVE="-friendRemove";  //
-    final static String TALK="-talk";
+    final static String FRIEND_FIND = "-friendFind";    //查找好友
+    final static String FRIEND_ADD = "-friendAdd";     //增加好友
+    final static String FRIEND_REMOVE = "-friendRemove";  //
+    final static String TALK = "-talk";
 }

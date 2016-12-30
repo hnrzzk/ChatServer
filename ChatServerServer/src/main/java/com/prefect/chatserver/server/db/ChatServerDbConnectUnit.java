@@ -19,6 +19,8 @@ public class ChatServerDbConnectUnit {
     private Connection connection;
     private PreparedStatement statement;
 
+    private int successRow;
+
     public ResultSet getResultSet() {
         return resultSet;
     }
@@ -41,6 +43,14 @@ public class ChatServerDbConnectUnit {
 
     public void setStatement(PreparedStatement statement) {
         this.statement = statement;
+    }
+
+    public int getSuccessRow() {
+        return successRow;
+    }
+
+    public void setSuccessRow(int successRow) {
+        this.successRow = successRow;
     }
 
     public void close() {
