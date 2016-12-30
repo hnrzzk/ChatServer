@@ -1,6 +1,10 @@
 package com.prefect.chatserver.commoms.util;
 
 /**
+ * 命令类型
+ * 0x00XX 用户请求
+ * 0x01XX 请求响应
+ * 0x02XX 服务器通知
  * Created by zhangkai on 2016/12/27.
  */
 public class CommandType {
@@ -21,19 +25,23 @@ public class CommandType {
     public final static int FRIEND_LIST_ADD = 0x0003;
     public final static int FRIEND_LIST_ADD_ACK = 0x0103;
 
+    //移除好友
+    public final static int FRIEND_LIST_REMOVE= 0x0030;
+    public final static int FRIEND_LIST_REMOVE_ACK= 0x0105;
 
-//    //用户上下线通知
-//    public final static int USER_ON_LINE_NOTICE= 0x1020;
-//    public final static int USER_OFF_LINE_NOTICE= 0x1030;
+
+
+    //用户上下线通知
+    public final static int USER_ON_LINE_NOTICE= 0x0204;
+    public final static int USER_OFF_LINE_NOTICE= 0x0205;
+
 //
 //    //好友列表请求
 //    public final static int FRIEND_LIST_GET= 0x2010;
 //    public final static int FRIEND_LIST_GET_ACK= 0x0003;
 //
 
-//    //移除好友
-//    public final static int FRIEND_LIST_REMOVE= 0x2030;
-//    public final static int FRIEND_LIST_REMOVE_ACK= 0x0005;
+
 //
 //    //修改分组
 //    public final static int FRIEND_LIST_GROUP_CHANGE= 0x2040;
@@ -46,10 +54,6 @@ public class CommandType {
 //    //移除分组
 //    public final static int FRIEND_LIST_GROUP_REMOVE= 0x2060;
 //    public final static int FRIEND_LIST_GROUP_REMOVE_ACK= 0x0008;
-//
-//    //好友申请
-//    public final static int FRIEND_LIST_FIND= 0x2070;
-//    public final static int FRIEND_LIST_FIND_ACK= 0x0009;
 //
 //    //黑名单列表请求
 //    public final static int BLACK_LIST_GET= 0x3010;

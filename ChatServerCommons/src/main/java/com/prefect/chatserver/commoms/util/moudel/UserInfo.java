@@ -1,6 +1,5 @@
 package com.prefect.chatserver.commoms.util.moudel;
 
-import java.sql.Date;
 import java.sql.Timestamp;
 
 /**

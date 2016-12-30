@@ -13,7 +13,10 @@ public class ResponsePoFactory {
             case CommandType.USER_LOGIN_ACK:
             case CommandType.USER_SIGN_IN_ACK:
             case CommandType.MESSAGE_ACK:
+            case CommandType.FRIEND_LIST_ADD_ACK:
                 return new ActionResponsePo();
+            case CommandType.FRIEND_LIST_ADD:
+                return new FriendAddResponsePo();
             default:
                  return null;
         }

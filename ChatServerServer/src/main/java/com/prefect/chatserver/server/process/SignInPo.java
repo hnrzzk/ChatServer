@@ -3,14 +3,13 @@ package com.prefect.chatserver.server.process;
 import com.alibaba.fastjson.JSON;
 import com.prefect.chatserver.commoms.util.MessagePacket;
 import com.prefect.chatserver.commoms.util.CommandType;
-import com.prefect.chatserver.server.util.db.ChatServerDbConnectUnit;
-import com.prefect.chatserver.server.util.db.DBUtil;
+import com.prefect.chatserver.server.db.DBUtil;
 import com.prefect.chatserver.commoms.util.moudel.UserInfo;
+import com.prefect.chatserver.server.db.TableInfo.UserTable;
 import org.apache.mina.core.session.IoSession;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.sql.ResultSet;
 import java.sql.Timestamp;
 import java.util.HashMap;
 import java.util.Map;
@@ -33,27 +32,23 @@ public class SignInPo extends ActionPo {
         String nickName = userInfo.getAccount();
 
         //如果账户已存在则返回
-        if (DBUtil.getInstance().isExit("user", "account", account)) {
+        if (DBUtil.getInstance().isExit(UserTable.name, UserTable.Field.account, account)) {
             response(ioSession, CommandType.USER_SIGN_IN_ACK, false, "ERROR: account is exist");
             return;
         }
 
         Map<String, Object> dataMap = new HashMap<>();
-        dataMap.put("account", account);
-        dataMap.put("password", password);
-        dataMap.put("nick_name", nickName);
-        dataMap.put("sex", userInfo.getSex());
+        dataMap.put(UserTable.Field.account, account);
+        dataMap.put(UserTable.Field.password, password);
+        dataMap.put(UserTable.Field.nickName, nickName);
+        dataMap.put(UserTable.Field.sex, userInfo.getSex());
 
         Timestamp date = new Timestamp(System.currentTimeMillis());
-        dataMap.put("register_time", date);
+        dataMap.put(UserTable.Field.registerTime, date);
 
-        ChatServerDbConnectUnit connectUnit;
-        if ((connectUnit = DBUtil.getInstance().executeInsert("user", dataMap)) != null) {
-            ResultSet resultSet = connectUnit.getResultSet();
-            long id = -1;
-            while (resultSet.next()) {
-                id = resultSet.getLong(1);
-            }
+        Object key;
+        if ((key = DBUtil.getInstance().executeInsert(UserTable.name, dataMap)) != null) {
+            long id = Long.parseLong(key.toString());
 
             if (id >= 0) {
                 //返回账户创建成功
@@ -64,7 +59,6 @@ public class SignInPo extends ActionPo {
             //返回账户创建失败
             response(ioSession, CommandType.USER_SIGN_IN_ACK, true, "ERROR: account build failed");
         }
-        connectUnit.close();
 
     }
 }

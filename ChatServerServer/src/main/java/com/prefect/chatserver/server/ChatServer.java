@@ -49,12 +49,12 @@ public class ChatServer {
 
         DefaultIoFilterChainBuilder filterChainBuilder = getAcceptor().getFilterChain();
 
-        filterChainBuilder.addLast("codec", new ProtocolCodecFilter(new ChatServerCodecFactory()));
-        LoggingFilter loggingFilter = new LoggingFilter();
-        loggingFilter.setMessageReceivedLogLevel(LogLevel.INFO);
-        loggingFilter.setMessageSentLogLevel(LogLevel.INFO);
+//        LoggingFilter loggingFilter = new LoggingFilter();
+//        loggingFilter.setMessageReceivedLogLevel(LogLevel.INFO);
+//        loggingFilter.setMessageSentLogLevel(LogLevel.INFO);
+//        filterChainBuilder.addLast("loger", loggingFilter);
 
-        filterChainBuilder.addLast("loger", loggingFilter);
+        filterChainBuilder.addLast("codec", new ProtocolCodecFilter(new ChatServerCodecFactory()));
 
         getAcceptor().setHandler(new ChatServerHandler());
         getAcceptor().getSessionConfig().setBothIdleTime(serverInfo.getIdleTime());

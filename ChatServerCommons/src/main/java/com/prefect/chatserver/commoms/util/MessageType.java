@@ -28,4 +28,9 @@ public class MessageType {
      * 请求响应结果 对应ActionResponseMessage
      */
     public static final int RESPONSE = 0x0006;
+
+    /**
+     * 字符串
+     */
+    public static final int STRING =0x0007;
 }

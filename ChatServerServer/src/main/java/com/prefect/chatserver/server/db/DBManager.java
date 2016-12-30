@@ -1,4 +1,4 @@
-package com.prefect.chatserver.server.util.db;
+package com.prefect.chatserver.server.db;
 
 import org.apache.commons.dbcp.BasicDataSourceFactory;
 import org.slf4j.Logger;
@@ -42,12 +42,8 @@ public class DBManager {
 
     }
 
-    public Connection getConnection() {
-        try {
+    public Connection getConnection() throws SQLException {
             return ds.getConnection();
-        } catch (SQLException e) {
-            throw new RuntimeException("获取数据库连接失败！error:" + e);
-        }
     }
 
     public static void closeResultSet(ResultSet rs) {

@@ -15,13 +15,16 @@ public class MessagePoFactory {
         MessageProcess messageProcess = null;
         switch (commandType) {
             case CommandType.USER_LOGIN:
-                return new LoginPo();
+                return new LogInPo();
             case CommandType.USER_SIGN_IN:
                 return new SignInPo();
             case CommandType.MESSAGE:
-                return new MessagePo();
             case CommandType.FRIEND_LIST_ADD:
-                return new FriendAddPo();
+                return new MessagePo();
+            case CommandType.FRIEND_LIST_ADD_ACK:
+                return new FriendAddACKPo();
+            case CommandType.FRIEND_LIST_REMOVE:
+                return new FriendRemovePo();
         }
         return messageProcess;
     }

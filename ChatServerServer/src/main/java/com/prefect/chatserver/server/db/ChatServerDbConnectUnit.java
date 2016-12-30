@@ -1,4 +1,4 @@
-package com.prefect.chatserver.server.util.db;
+package com.prefect.chatserver.server.db;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;

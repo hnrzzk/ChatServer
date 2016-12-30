@@ -1,4 +1,4 @@
-package com.prefect.chatserver.server.util.db;
+package com.prefect.chatserver.server.db;
 
 
 import org.slf4j.Logger;
@@ -6,7 +6,6 @@ import org.slf4j.LoggerFactory;
 
 import java.sql.*;
 import java.util.Iterator;
-import java.util.List;
 import java.util.Map;
 
 /**
@@ -45,7 +44,7 @@ public class DBUtil {
             statement = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
 
             for (int i = 0; i < values.length; i++) {
-                statement.setObject(i+1, values[i]);
+                statement.setObject(i + 1, values[i]);
             }
             resultSet = statement.executeQuery();
 
@@ -73,16 +72,17 @@ public class DBUtil {
             connection = this.dbManager.getConnection();
             statement = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
             for (int i = 0; i < values.length; i++) {
-                statement.setObject(i+1, values[i]);
+                statement.setObject(i + 1, values[i]);
             }
 
             statement.executeUpdate();
             resultSet = statement.getGeneratedKeys();
         } catch (SQLException e) {
-            DBManager.closeConnection(connection);
-            DBManager.closeStatement(statement);
             DBManager.closeResultSet(resultSet);
+            DBManager.closeStatement(statement);
+            DBManager.closeConnection(connection);
             logger.error(String.format("sql execute error, sql[%s] values[%s] ", sql, values), e);
+            return null;
         }
 
         return new ChatServerDbConnectUnit(resultSet, statement, connection);
@@ -153,7 +153,7 @@ public class DBUtil {
      * @param data      要插入的数据
      * @return 返回一个ResultSet里面保存了受影响的key
      */
-    public ChatServerDbConnectUnit executeInsert(String tableName, Map<String, Object> data) {
+    public Object executeInsert(String tableName, Map<String, Object> data) {
         if (data.isEmpty()) {
             return null;
         }
@@ -179,6 +179,23 @@ public class DBUtil {
         StringBuilder sql = new StringBuilder(
                 String.format("insert into %s (%s) values (%s)", tableName, keyNameList, valueList));
 
-        return this.executeUpdate(sql.toString(), objects);
+        System.out.println(sql);
+
+        Object key = null;
+        ChatServerDbConnectUnit chatServerDbConnectUnit = this.executeUpdate(sql.toString(), objects);
+        ResultSet resultSet = chatServerDbConnectUnit.getResultSet();
+
+        //得到主键
+        try {
+            while (resultSet.next()) {
+                key = resultSet.getObject(1);
+            }
+        } catch (SQLException e) {
+            logger.error(e.getMessage(), e);
+        } finally {
+            chatServerDbConnectUnit.close();
+        }
+
+        return key;
     }
 }

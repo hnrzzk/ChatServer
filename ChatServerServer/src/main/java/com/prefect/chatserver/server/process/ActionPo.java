@@ -6,7 +6,11 @@ import com.prefect.chatserver.commoms.util.MessagePacket;
 import com.prefect.chatserver.commoms.util.MessageType;
 import com.prefect.chatserver.commoms.util.moudel.ActionResponseMessage;
 import com.prefect.chatserver.commoms.util.moudel.ChatMessage;
+import com.prefect.chatserver.server.handle.ChatServerHandler;
 import org.apache.mina.core.session.IoSession;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * 抽象类：处理客户端请求的
@@ -35,5 +39,38 @@ public abstract class ActionPo implements MessageProcess {
         messagePacket.setMessageLength(json.getBytes().length);
 
         ioSession.write(messagePacket);
+    }
+
+    /**
+     * 向用户发送通知
+     *
+     * @param accountList   需要发送通知的用户列表
+     * @param messagePacket 发送的消息
+     */
+    void sendNotice(List<String> accountList, MessagePacket messagePacket) {
+        for (IoSession itemSession : getSession(accountList)) {
+            if (itemSession != null) {
+                itemSession.write(messagePacket);
+            }
+        }
+    }
+
+    /**
+     * 根据用户名列表获取当前活动的Iosession
+     *
+     * @param accountList
+     */
+    List<IoSession> getSession(List<String> accountList) {
+        //当前活动的IoSession列表
+        List<IoSession> activeSessionList = new ArrayList<>();
+
+        //遍历用户名列表，根据用户名从sessionMap中获取session，如果不为null，则加入list中
+        for (String item : accountList) {
+            IoSession tempSession = ChatServerHandler.sessionMap.get(item);
+            if (tempSession != null) {
+                activeSessionList.add(tempSession);
+            }
+        }
+        return activeSessionList;
     }
 }

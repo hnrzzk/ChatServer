@@ -4,7 +4,7 @@ package com.prefect.chatserver.commoms.util.moudel;
  * 好友信息类
  * Created by zhangkai on 2016/12/26.
  */
-public class FriendInfo {
+public class FriendManageMessage {
 
     /**
      * 用户账号
@@ -20,6 +20,11 @@ public class FriendInfo {
      * 分组名称
      */
     String categoryName;
+
+    /**
+     * 是否接受好友请求
+     */
+    boolean accept;
 
     public String getUserAccount() {
         return userAccount;
@@ -43,5 +48,13 @@ public class FriendInfo {
 
     public void setCategoryName(String categoryName) {
         this.categoryName = categoryName;
+    }
+
+    public boolean isAccept() {
+        return accept;
+    }
+
+    public void setAccept(boolean accept) {
+        this.accept = accept;
     }
 }

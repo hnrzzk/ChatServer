@@ -1,7 +1,8 @@
 package com.prefect.chatserver.server.handle;
 
 import com.prefect.chatserver.commoms.util.MessagePacket;
-import com.prefect.chatserver.server.util.db.DBUtil;
+import com.prefect.chatserver.server.db.DBUtil;
+import com.prefect.chatserver.server.process.LogOutPo;
 import com.prefect.chatserver.server.process.MessageProcess;
 import com.prefect.chatserver.server.process.MessagePoFactory;
 import org.apache.mina.core.service.IoHandlerAdapter;
@@ -19,6 +20,9 @@ import java.util.concurrent.ConcurrentHashMap;
 public class ChatServerHandler extends IoHandlerAdapter {
     private final static Logger logger = LoggerFactory.getLogger(ChatServerHandler.class);
 
+    //session存储账户的属性名
+    public static String attributeNameOfAccount ="account";
+
     public static Map<String, IoSession> sessionMap = new ConcurrentHashMap<String, IoSession>();
 
     @Override
@@ -33,14 +37,8 @@ public class ChatServerHandler extends IoHandlerAdapter {
 
     @Override
     public void sessionClosed(IoSession session) throws Exception {
-        String account = session.getAttribute("account").toString();
-        logger.info(account + " 关闭连接");
-
-        String sql = "update user set is_online= 0 where account=?";
-        DBUtil.getInstance().executeUpdate(sql, new Object[]{account});
-        sessionMap.remove(account);
-
-        //TODO:下线通知
+        logger.info(session.toString() + "关闭连接");
+        new LogOutPo().process(session,null);
     }
 
     @Override
@@ -72,6 +70,5 @@ public class ChatServerHandler extends IoHandlerAdapter {
         if (messageProcess != null) {
             messageProcess.process(ioSession, message);
         }
-
     }
 }

@@ -9,8 +9,7 @@ import com.prefect.chatserver.commoms.util.CommandType;
 import com.prefect.chatserver.commoms.util.MessagePacket;
 import com.prefect.chatserver.commoms.util.MessageType;
 import com.prefect.chatserver.commoms.util.moudel.ChatMessage;
-import com.prefect.chatserver.commoms.util.moudel.FriendInfo;
-import com.prefect.chatserver.commoms.util.moudel.UserInfo;
+import com.prefect.chatserver.commoms.util.moudel.FriendManageMessage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -94,12 +93,12 @@ public class UserInteractive implements Runnable {
 
     private  void processFriendAdd(String receiveAccount){
 
-        FriendInfo friendInfo=new FriendInfo();
-        friendInfo.setUserAccount(ChatClient.account);
-        friendInfo.setFriendAccount(receiveAccount);
-        friendInfo.setCategoryName("好友");
+        FriendManageMessage friendManageMessage =new FriendManageMessage();
+        friendManageMessage.setUserAccount(ChatClient.account);
+        friendManageMessage.setFriendAccount(receiveAccount);
+        friendManageMessage.setCategoryName("好友");
 
-        String json= JSON.toJSONString(friendInfo);
+        String json= JSON.toJSONString(friendManageMessage);
 
         MessagePacket messagePacket=new MessagePacket(
                 CommandType.FRIEND_LIST_ADD,
