@@ -5,7 +5,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.sql.*;
+import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -199,7 +201,13 @@ public class DBUtil {
         return key;
     }
 
-    public long deleteRow(String table, Map<String, Object> condition) {
+    /**
+     * 删除数据库的数据
+     * @param table 表名
+     * @param condition 条件
+     * @return 受影响的id列表
+     */
+    public List<Long>  deleteRow(String table, Map<String, Object> condition) {
         Object[] values = new Object[condition.size()];
 
         StringBuilder conditionSql = new StringBuilder("");
@@ -208,25 +216,28 @@ public class DBUtil {
         while (iterator.hasNext()) {
             Map.Entry entry = (Map.Entry) iterator.next();
             values[i++] = entry.getValue();
-            conditionSql.append(entry.getKey()).append("=?,");
+            conditionSql.append(" and ").append(entry.getKey()).append("=?");
         }
-        conditionSql.deleteCharAt(conditionSql.length() - 1);
 
         String sql = new StringBuilder()
-                .append("Delete from ").append(table).append(" where ").append(conditionSql)
+                .append("Delete from ").append(table).append(" where 1=1").append(conditionSql)
                 .toString();
 
+        System.out.println(sql);
+        System.out.println(condition);
         ChatServerDbConnectUnit chatServerDbConnectUnit = this.executeUpdate(sql, values);
         ResultSet resultSet = chatServerDbConnectUnit.getResultSet();
+        List<Long> list=new ArrayList<>();
+
         try {
             while (resultSet.next()) {
-                return chatServerDbConnectUnit.getSuccessRow();
+                list.add(resultSet.getLong(1));
             }
         } catch (SQLException e) {
             logger.error(e.getMessage(), e);
         } finally {
             chatServerDbConnectUnit.close();
         }
-        return -1;
+        return list;
     }
 }

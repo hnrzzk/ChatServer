@@ -1,6 +1,7 @@
 package com.prefect.chatserver.server.process;
 
 import com.alibaba.fastjson.JSON;
+import com.prefect.chatserver.commoms.util.CommandType;
 import com.prefect.chatserver.commoms.util.MessagePacket;
 import com.prefect.chatserver.commoms.util.moudel.FriendManageMessage;
 import com.prefect.chatserver.server.db.DBDao;
@@ -23,10 +24,14 @@ public class FriendRemovePo extends ActionPo {
         //类型转换 从json到object
         FriendManageMessage friendManageMessage = JSON.parseObject(messageObj.getMessage(), FriendManageMessage.class);
 
-        //从ioSession的属性中获取account
-        String account = ioSession.getAttribute(ChatServerHandler.attributeNameOfAccount).toString();
+        String userAccount = friendManageMessage.getUserAccount();
+        String friendAccount = friendManageMessage.getFriendAccount();
 
+        removeFriendRelationShip(userAccount,friendAccount);
 
+        removeFriendRelationShip(friendAccount,userAccount);
+
+        response(ioSession, CommandType.FRIEND_LIST_REMOVE_ACK,true, "已成功删除好友 account："+friendAccount);
     }
 
     void removeFriendRelationShip(String userAccount, String friendAccount) {

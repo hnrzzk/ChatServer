@@ -140,11 +140,15 @@ public class DBDao {
      * @return
      */
     public List<String> getFriendLIst(String uesrAccount, int onLineStatue) {
-        String sql = String.format("select %s.%s from %s,%s where %s=?",
-                FriendsTable.Field.friendAccount,
-                FriendsTable.name, UserTable.name,
-                FriendsTable.Field.userAccount);
-        ChatServerDbConnectUnit chatServerDbConnectUnit = DBUtil.getInstance().executeQuery(sql, new Object[]{uesrAccount});
+
+        //select friends.friend_account from friends left join user on friends.friend_account=user.account where friend.user_account=? and user.is_online = ?;
+        String sql=new StringBuilder().append("select ").append(FriendsTable.name).append(".").append(FriendsTable.Field.friendAccount)
+                .append(" from ").append(FriendsTable.name).append(" left join ").append(UserTable.name)
+                .append(" on ").append(FriendsTable.name).append(".").append(FriendsTable.Field.friendAccount).append("=").append(UserTable.name).append(".").append(UserTable.Field.account)
+                .append(" where ").append(FriendsTable.name).append(".").append(FriendsTable.Field.userAccount).append("=?")
+                .append(" and ").append(UserTable.name).append(".").append(UserTable.Field.isOnline).append("=?").toString();
+
+        ChatServerDbConnectUnit chatServerDbConnectUnit = DBUtil.getInstance().executeQuery(sql, new Object[]{uesrAccount,onLineStatue});
         ResultSet resultSet = chatServerDbConnectUnit.getResultSet();
 
         List<String> friendInfoList = new ArrayList<>();

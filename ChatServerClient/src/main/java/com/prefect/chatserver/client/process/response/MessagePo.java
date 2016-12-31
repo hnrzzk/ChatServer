@@ -18,6 +18,10 @@ public class MessagePo implements ResponsePo{
             case MessageType.MESSAGE:
                 ChatMessage chatMessage = JSON.parseObject(messagePacket.getMessage(),ChatMessage.class);
                 Interactive.getInstance().printlnToConsole(String.format("%s:\n%s", chatMessage.getSendAccount(), chatMessage.getMessage()));
+                break;
+            case MessageType.STRING:
+                Interactive.getInstance().printlnToConsole("System:"+messagePacket.getMessage().toString());
+                break;
         }
 
     }

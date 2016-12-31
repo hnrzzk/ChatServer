@@ -49,10 +49,10 @@ public class ChatServer {
 
         DefaultIoFilterChainBuilder filterChainBuilder = getAcceptor().getFilterChain();
 
-//        LoggingFilter loggingFilter = new LoggingFilter();
-//        loggingFilter.setMessageReceivedLogLevel(LogLevel.INFO);
-//        loggingFilter.setMessageSentLogLevel(LogLevel.INFO);
-//        filterChainBuilder.addLast("loger", loggingFilter);
+        LoggingFilter loggingFilter = new LoggingFilter();
+        loggingFilter.setMessageReceivedLogLevel(LogLevel.INFO);
+        loggingFilter.setMessageSentLogLevel(LogLevel.INFO);
+        filterChainBuilder.addLast("loger", loggingFilter);
 
         filterChainBuilder.addLast("codec", new ProtocolCodecFilter(new ChatServerCodecFactory()));
 

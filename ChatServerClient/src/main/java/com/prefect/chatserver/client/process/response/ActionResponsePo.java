@@ -19,6 +19,10 @@ public class ActionResponsePo implements ResponsePo{
             case MessageType.RESPONSE:
                 ActionResponseMessage actionResponseMessage = JSON.parseObject(messagePacket.getMessage(),ActionResponseMessage.class);
                 Interactive.getInstance().printlnToConsole(String.format("System:\n%s", actionResponseMessage.getMessage()));
+                break;
+            case MessageType.STRING:
+                Interactive.getInstance().printlnToConsole("System:"+messagePacket.getMessage().toString());
+                break;
         }
 
     }

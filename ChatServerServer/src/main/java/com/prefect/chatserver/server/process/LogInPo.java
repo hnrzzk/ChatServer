@@ -61,6 +61,7 @@ public class LogInPo extends ActionPo {
     void sendOnlineNotice(String account){
         //根据得到该账号的在线好友列表
         List<String> accountList = DBDao.getInstance().getFriendLIst(account, 1);
+        System.out.println(accountList);
 
         //生产消息字符串
         String message = new StringBuilder().append("您的好友").append(account).append("已上线").toString();
