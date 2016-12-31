@@ -48,7 +48,7 @@ public class FriendAddACKPo extends ActionPo {
                     friendManageMessage.getFriendAccount(), friendManageMessage.getUserAccount(), defaultCategory);
             if (friendId > 0) { //好友添加成功
                 response(ioSession, CommandType.FRIEND_LIST_ADD_ACK, true,
-                        String.format("Friend request is accepted. accountInfo:[%s]", friendManageMessage.getFriendAccount()));
+                        String.format("Friend request is accepted. accountInfo:[%s]", friendManageMessage.getUserAccount()));
             } else { //好友添加失败
                 response(ioSession, CommandType.FRIEND_LIST_ADD_ACK, false,
                         String.format("Friend add error. accountInfo:[%s]", friendManageMessage.getFriendAccount()));

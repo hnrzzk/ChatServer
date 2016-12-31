@@ -19,8 +19,10 @@ public class MessagePo extends ActionPo {
         switch (messageObj.getMessageType()) {
             case MessageType.MESSAGE:
                 sendChatMessage(ioSession, messageObj);
+                break;
             case MessageType.FRIEND_MANAGE:
                 sendFriendAddRequest(ioSession, messageObj);
+                break;
         }
     }
 

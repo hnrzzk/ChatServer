@@ -2,6 +2,7 @@ package com.prefect.chatserver.client.process.interactive;
 
 import com.alibaba.fastjson.JSON;
 import com.prefect.chatserver.client.ChatClient;
+import com.prefect.chatserver.client.process.request.FriendManagePo;
 import com.prefect.chatserver.client.process.request.SendMessagePo;
 import com.prefect.chatserver.client.util.Interactive;
 import com.prefect.chatserver.commoms.util.CommandType;
@@ -48,90 +49,18 @@ public class UserInteractive implements Runnable {
     void parseCommand(String userInput) throws Exception {
         String[] strings = userInput.split(" ");
 
-        switch (getCommandType(strings[0])) {
+        switch (strings[0]) {
             case InteractiveCommandType.TALK:
-                processTalk(strings[1], strings[2]);
+                new SendMessagePo().requestSendMessage(strings);
                 break;
-            case InteractiveCommandType.FRIEND_ADD:
-                processFriendAdd(strings[1]);
-                break;
-            case InteractiveCommandType.FRIEND_REMOVE:
-                processFriendRemove(strings[1]);
+            case InteractiveCommandType.FRIEND_Manage:
+                new FriendManagePo().manageFriend(strings);
                 break;
         }
-    }
-
-    /**
-     * 根据用户输入获取命令类型
-     *
-     * @param userInput
-     * @return
-     */
-    private String getCommandType(String userInput) {
-        return userInput;
-    }
-
-    /**
-     * 处理用户输入的聊天命令
-     *
-     * @param receiveAccount
-     * @param message
-     */
-    private void processTalk(String receiveAccount, String message) {
-        MessagePacket messagePacket = new MessagePacket();
-        messagePacket.setCommand(CommandType.MESSAGE);
-        messagePacket.setMessageType(MessageType.MESSAGE);
-
-        ChatMessage chatMessage = new ChatMessage();
-        chatMessage.setSendAccount(ChatClient.account);
-        chatMessage.setReceiveAccount(receiveAccount);
-        chatMessage.setMessage(message);
-
-        String json = JSON.toJSONString(chatMessage);
-        messagePacket.setMessage(json);
-        messagePacket.setMessageLength(json.getBytes().length);
-
-        new SendMessagePo().process(ChatClient.session, messagePacket);
-    }
-
-    private void processFriendAdd(String receiveAccount) {
-
-        FriendManageMessage friendManageMessage = new FriendManageMessage();
-        friendManageMessage.setUserAccount(ChatClient.account);
-        friendManageMessage.setFriendAccount(receiveAccount);
-        friendManageMessage.setCategoryName("好友");
-
-        String json = JSON.toJSONString(friendManageMessage);
-
-        MessagePacket messagePacket = new MessagePacket(
-                CommandType.FRIEND_LIST_ADD,
-                MessageType.FRIEND_MANAGE,
-                json.getBytes().length,
-                json);
-
-        ChatClient.session.write(messagePacket);
-    }
-
-    private void processFriendRemove(String receiveAccount) {
-        FriendManageMessage friendManageMessage = new FriendManageMessage();
-        friendManageMessage.setUserAccount(ChatClient.account);
-        friendManageMessage.setFriendAccount(receiveAccount);
-
-        String json = JSON.toJSONString(friendManageMessage);
-
-        MessagePacket messagePacket = new MessagePacket(
-                CommandType.FRIEND_LIST_REMOVE,
-                MessageType.FRIEND_MANAGE,
-                json.getBytes().length,
-                json);
-
-        ChatClient.session.write(messagePacket);
     }
 }
 
 class InteractiveCommandType {
-    final static String FRIEND_FIND = "-friendFind";    //查找好友
-    final static String FRIEND_ADD = "-friendAdd";     //增加好友
-    final static String FRIEND_REMOVE = "-friendRemove";  //
+    final static String FRIEND_Manage = "-friend";
     final static String TALK = "-talk";
 }

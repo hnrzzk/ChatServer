@@ -1,9 +1,7 @@
 package com.prefect.chatserver.client.handler;
 
 import com.prefect.chatserver.client.process.interactive.UserInteractive;
-import com.prefect.chatserver.client.process.request.LoginPo;
-import com.prefect.chatserver.client.process.request.RequestPo;
-import com.prefect.chatserver.client.process.request.SiginInPo;
+import com.prefect.chatserver.client.process.request.AccountManagePo;
 import com.prefect.chatserver.client.process.response.ResponsePo;
 import com.prefect.chatserver.client.process.response.ResponsePoFactory;
 import com.prefect.chatserver.commoms.util.MessagePacket;
@@ -32,9 +30,9 @@ public class ChatClientHandler extends IoHandlerAdapter {
             MessagePacket messagePacket = (MessagePacket) message;
             messagePacket.getMessageType();
 
-            ResponsePo requestPo = ResponsePoFactory.getClass(messagePacket.getCommand());
+            ResponsePo reponsePo = ResponsePoFactory.getClass(messagePacket.getCommand());
 
-            requestPo.process(messagePacket);
+            reponsePo.process(messagePacket);
         }
 
     }
@@ -59,35 +57,10 @@ public class ChatClientHandler extends IoHandlerAdapter {
 
     @Override
     public void sessionOpened(IoSession session) throws Exception {
-        RequestPo po = init();
-        if (po != null) {
-            po.process(session, null);
-        }
+        new AccountManagePo().manangeUser(session);
 
         UserInteractive userInteractive = new UserInteractive();
         Thread thread = new Thread(userInteractive);
         thread.start();
-    }
-
-    RequestPo init() {
-        System.out.println("Welcome, please enty the number\nLoginin:1 Sigin:2");
-        Scanner scanner = new Scanner(System.in);
-        while (true) {
-            try {
-                String str = scanner.next();
-                int command = Integer.parseInt(str);
-                switch (command) {
-                    case 1:
-                        return new LoginPo();
-                    case 2:
-                        return new SiginInPo();
-                    default:
-                        return null;
-                }
-            } catch (NumberFormatException e) {
-                continue;
-            }
-        }
-
     }
 }
