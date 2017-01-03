@@ -35,7 +35,11 @@ public class ChatClient {
      */
     public static IoSession session;
 
+    //账户名
     public static String account="";
+
+    //聊天室名称
+    public static String chatRoomName="";
 
     synchronized public static String getAccount() {
         return account;

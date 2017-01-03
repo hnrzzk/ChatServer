@@ -5,9 +5,9 @@ package com.prefect.chatserver.commoms.util;
  */
 public class MessageType {
     /**
-     * 好友管理消息 对应FriendInfo
+     * 好友管理消息 对应RelationShipMessage
      */
-    public static final int FRIEND_MANAGE = 0x0002;
+    public static final int RELATIONSHIP_MANAGE = 0x0002;
 
     /**
      * 用户管理消息 对应 UserInfo
@@ -33,4 +33,9 @@ public class MessageType {
      * 字符串
      */
     public static final int STRING =0x0007;
+
+    /**
+     * 聊天室消息 对应ChatRoomMessage
+     */
+    public static final int CHATROOM_MANAGE =0x0008;
 }

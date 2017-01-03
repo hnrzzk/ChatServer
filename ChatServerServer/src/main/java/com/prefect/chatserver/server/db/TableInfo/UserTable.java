@@ -15,5 +15,6 @@ public class UserTable {
         public static String registerTime = "register_time";
         public static String sex = "sex";
         public static String isOnline = "is_online";
+        public static String isGag="is_gag";
     }
 }

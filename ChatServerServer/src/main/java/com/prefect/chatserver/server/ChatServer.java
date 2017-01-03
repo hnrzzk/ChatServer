@@ -2,11 +2,12 @@ package com.prefect.chatserver.server;
 
 import com.prefect.chatserver.commoms.codefactory.ChatServerCodecFactory;
 import com.prefect.chatserver.server.handle.ChatServerHandler;
-import com.prefect.chatserver.server.util.Config;
-import com.prefect.chatserver.server.util.ServerInfo;
+import com.prefect.chatserver.server.utils.Config;
+import com.prefect.chatserver.server.utils.ServerInfo;
 import org.apache.mina.core.filterchain.DefaultIoFilterChainBuilder;
 import org.apache.mina.core.service.IoAcceptor;
 import org.apache.mina.core.session.IdleStatus;
+import org.apache.mina.core.session.IoSession;
 import org.apache.mina.filter.codec.ProtocolCodecFilter;
 import org.apache.mina.filter.codec.textline.TextLineCodecFactory;
 import org.apache.mina.filter.logging.LogLevel;
@@ -21,12 +22,18 @@ import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.nio.charset.Charset;
 
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.CopyOnWriteArraySet;
+
 /**
  * 聊天服务器启动类
  * Created by zhangkai on 2016/12/23.
  */
 public class ChatServer {
     private final static Logger logger = LoggerFactory.getLogger(ChatServer.class);
+
+    //聊天室信息 <聊天室名称，用户session列表>
+    public static ConcurrentHashMap<String, CopyOnWriteArraySet<IoSession>> chatRoomInfo=new ConcurrentHashMap<>();
 
     private SocketAcceptor acceptor;
 
@@ -45,7 +52,6 @@ public class ChatServer {
         } catch (Exception e) {
             logger.warn("读取配置文件失败，启用默认设置. ", e);
         }
-
 
         DefaultIoFilterChainBuilder filterChainBuilder = getAcceptor().getFilterChain();
 
@@ -74,6 +80,11 @@ public class ChatServer {
         this.acceptor.dispose();
     }
 
+    @Override
+    protected void finalize(){
+        this.stop();
+    }
+
 
     public static void main(String[] argv) throws IOException {
         ChatServer chatServer = new ChatServer();
@@ -82,33 +93,5 @@ public class ChatServer {
         } else {
             logger.error("服务器启动失败");
         }
-
-//        try {
-//            Thread.sleep(100000);
-//        } catch (InterruptedException e) {
-//            e.printStackTrace();
-//        }
-//        chatServer.stop();
-    }
-}
-
-/**
- * 时间服务器
- */
-class TimeServer {
-    public void run() throws IOException {
-        IoAcceptor acceptor = new NioSocketAcceptor();
-
-        acceptor.getFilterChain().addLast("logger", new LoggingFilter());//添加过滤器，将所有信息记录日志
-        acceptor.getFilterChain().addLast("codec", new ProtocolCodecFilter(
-                new TextLineCodecFactory((Charset.forName("UTF-8")))
-        )); //把二进制或者协议特定的数据翻译为消息对象，反之亦然
-
-        acceptor.setHandler(new TimeServerHandler());
-        acceptor.getSessionConfig().setReadBufferSize(2048);
-        acceptor.getSessionConfig().setIdleTime(IdleStatus.BOTH_IDLE, 10);
-
-        acceptor.bind(new InetSocketAddress(9123)); //绑定端口号 接受客户端消息
-
     }
 }

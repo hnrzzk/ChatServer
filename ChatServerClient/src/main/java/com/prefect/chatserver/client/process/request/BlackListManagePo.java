@@ -9,17 +9,13 @@ import com.prefect.chatserver.commoms.util.MessageType;
 import com.prefect.chatserver.commoms.util.moudel.RelationShipMessage;
 
 /**
- * Created by liuxiaonan on 2016/12/31.
+ * 黑名单管理请求逻辑
+ * Created by zhangkai on 2017/1/3.
  */
-public class FriendManagePo {
-    public final String addFriend = "add";
-    public final String removeFriend = "remove";
+public class BlackListManagePo {
+    public final String addFriend="add";
+    public final String removeFriend="remove";
 
-    /**
-     * 管理用户的逻辑
-     *
-     * @param commands 用户输入的命令行
-     */
     public void manageFriend(String[] commands) {
         try {
             String command = commands[1];
@@ -27,12 +23,12 @@ public class FriendManagePo {
 
             switch (command) {
                 case addFriend:
-                    //-friend add userAccount
-                    requestAddFriend(userAccount);
+                    //-blackList add userAccount
+                    requestAddBlack(userAccount);
                     break;
                 case removeFriend:
-                    //-friend remove userAccount
-                    requestRemoveFriend(userAccount);
+                    //-blackList remove userAccount
+                    requestRemoveBlack(userAccount);
                     break;
                 default:
                     printHelpInfo();
@@ -43,16 +39,15 @@ public class FriendManagePo {
         }
     }
 
-    private void requestAddFriend(String friendAccount) {
+    private void requestAddBlack(String friendAccount) {
         RelationShipMessage relationShipMessage = new RelationShipMessage();
         relationShipMessage.setUserAccount(ChatClient.account);
         relationShipMessage.setFriendAccount(friendAccount);
-        relationShipMessage.setCategoryName("好友");
 
         String json = JSON.toJSONString(relationShipMessage);
 
         MessagePacket messagePacket = new MessagePacket(
-                CommandType.FRIEND_LIST_ADD,
+                CommandType.BLACK_LIST_ADD,
                 MessageType.RELATIONSHIP_MANAGE,
                 json.getBytes().length,
                 json);
@@ -60,7 +55,7 @@ public class FriendManagePo {
         ChatClient.session.write(messagePacket);
     }
 
-    private void requestRemoveFriend(String account) {
+    private void requestRemoveBlack(String account) {
         RelationShipMessage relationShipMessage = new RelationShipMessage();
         relationShipMessage.setUserAccount(ChatClient.account);
         relationShipMessage.setFriendAccount(account);
@@ -68,7 +63,7 @@ public class FriendManagePo {
         String json = JSON.toJSONString(relationShipMessage);
 
         MessagePacket messagePacket = new MessagePacket(
-                CommandType.FRIEND_LIST_REMOVE,
+                CommandType.BLACK_LIST_REMOVE,
                 MessageType.RELATIONSHIP_MANAGE,
                 json.getBytes().length,
                 json);
@@ -78,8 +73,8 @@ public class FriendManagePo {
 
     private void printHelpInfo() {
         String string = new StringBuilder()
-                .append("-friend add [UserAccount] 增加好友\n")
-                .append("-friend remove [UserAccount] 移除好友")
+                .append("-blackList add [UserAccount] 增加黑名单\n")
+                .append("-blackList remove [UserAccount] 移除黑名单")
                 .toString();
         Interactive.getInstance().printlnToConsole(string);
     }

@@ -1,7 +1,6 @@
 package com.prefect.chatserver.server.handle;
 
 import com.prefect.chatserver.commoms.util.MessagePacket;
-import com.prefect.chatserver.server.db.DBUtil;
 import com.prefect.chatserver.server.process.LogOutPo;
 import com.prefect.chatserver.server.process.MessageProcess;
 import com.prefect.chatserver.server.process.MessagePoFactory;
@@ -13,6 +12,8 @@ import org.slf4j.LoggerFactory;
 
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 /**
  * Created by zhangkai on 2016/12/26.
@@ -20,10 +21,11 @@ import java.util.concurrent.ConcurrentHashMap;
 public class ChatServerHandler extends IoHandlerAdapter {
     private final static Logger logger = LoggerFactory.getLogger(ChatServerHandler.class);
 
-    //session存储账户的属性名
-    public static String attributeNameOfAccount ="account";
+
 
     public static Map<String, IoSession> sessionMap = new ConcurrentHashMap<String, IoSession>();
+
+    private ExecutorService cachedThreadPool = Executors.newCachedThreadPool();
 
     @Override
     public void sessionCreated(IoSession session) throws Exception {
@@ -38,7 +40,12 @@ public class ChatServerHandler extends IoHandlerAdapter {
     @Override
     public void sessionClosed(IoSession session) throws Exception {
         logger.info(session.toString() + "关闭连接");
-        new LogOutPo().process(session,null);
+
+        MultiThreadHandler multiThreadHandler = new MultiThreadHandler();
+        multiThreadHandler.setIoSession(session);
+        multiThreadHandler.setMessagePacket(null);
+        multiThreadHandler.setMessageProcess(new LogOutPo());
+        cachedThreadPool.execute(multiThreadHandler);
     }
 
     @Override
@@ -54,6 +61,7 @@ public class ChatServerHandler extends IoHandlerAdapter {
 
     @Override
     public void messageReceived(IoSession ioSession, Object messageObj) throws Exception {
+
         logger.info(ioSession.toString() + " get message:" + messageObj);
 
         MessagePacket message = null;
@@ -67,8 +75,10 @@ public class ChatServerHandler extends IoHandlerAdapter {
         //根据message从工厂类生产对应的处理类
         MessageProcess messageProcess = MessagePoFactory.getClass(message.getCommand());
 
-        if (messageProcess != null) {
-            messageProcess.process(ioSession, message);
-        }
+        MultiThreadHandler multiThreadHandler = new MultiThreadHandler();
+        multiThreadHandler.setIoSession(ioSession);
+        multiThreadHandler.setMessagePacket(message);
+        multiThreadHandler.setMessageProcess(messageProcess);
+        cachedThreadPool.execute(multiThreadHandler);
     }
 }

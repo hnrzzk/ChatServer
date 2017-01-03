@@ -4,7 +4,7 @@ package com.prefect.chatserver.commoms.util.moudel;
  * 好友信息类
  * Created by zhangkai on 2016/12/26.
  */
-public class FriendManageMessage {
+public class RelationShipMessage {
 
     /**
      * 用户账号

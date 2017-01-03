@@ -22,7 +22,7 @@ import java.util.Map;
 public class SignInPo extends ActionPo {
     private final static Logger logger = LoggerFactory.getLogger(SignInPo.class);
 
-    public void process(IoSession ioSession, MessagePacket message) throws Exception {
+    public void process(IoSession ioSession, MessagePacket message) {
 
         //将消息内容从json转换成object
         UserInfo userInfo = JSON.parseObject(message.getMessage(), UserInfo.class);

@@ -17,9 +17,16 @@ public class ResponsePoFactory {
             case CommandType.FRIEND_LIST_REMOVE_ACK:
             case CommandType.USER_ON_LINE_NOTICE:
             case CommandType.USER_OFF_LINE_NOTICE:
+            case CommandType.BLACK_LIST_ADD_ACK:
+            case CommandType.BLACK_LIST_REMOVE_ACK:
                 return new ActionResponsePo();
             case CommandType.FRIEND_LIST_ADD:
                 return new FriendAddResponsePo();
+            case CommandType.CHAT_ROOM_ENTER_ACK:
+                return new ChatRoomEnterAckResponsePo();
+            case CommandType.CHAT_ROOM_QUIT_ACK:
+            case CommandType.CHAT_ROOM_SEND_ACK:
+                return new ChatRoomResponsePo();
             default:
                 return null;
         }

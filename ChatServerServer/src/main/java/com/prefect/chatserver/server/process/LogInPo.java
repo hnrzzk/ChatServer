@@ -1,6 +1,7 @@
 package com.prefect.chatserver.server.process;
 
 import com.alibaba.fastjson.JSON;
+import com.prefect.chatserver.commoms.util.AttributeDispose;
 import com.prefect.chatserver.commoms.util.CommandType;
 import com.prefect.chatserver.commoms.util.MessagePacket;
 import com.prefect.chatserver.commoms.util.MessageType;
@@ -10,7 +11,6 @@ import com.prefect.chatserver.commoms.util.moudel.UserInfo;
 import com.prefect.chatserver.server.handle.ChatServerHandler;
 import com.prefect.chatserver.server.db.TableInfo.UserTable;
 import org.apache.mina.core.session.IoSession;
-import org.omg.PortableInterceptor.ACTIVE;
 
 import java.util.List;
 
@@ -19,7 +19,7 @@ import java.util.List;
  * Created by zhangkai on 2016/12/28.
  */
 public class LogInPo extends ActionPo {
-    public void process(IoSession ioSession, MessagePacket message) throws Exception {
+    public void process(IoSession ioSession, MessagePacket message) {
         //将消息内容从json转换成object
         UserInfo userInfo = JSON.parseObject(message.getMessage(), UserInfo.class);
 
@@ -44,7 +44,7 @@ public class LogInPo extends ActionPo {
             //将已建立的连接保存在内存中
             ChatServerHandler.sessionMap.put(account, ioSession);
             //在session中记录account名称
-            ioSession.setAttribute(ChatServerHandler.attributeNameOfAccount, account);
+            AttributeDispose.getInstance().setAccountOfAttribute(ioSession,account);
 
             super.response(ioSession, CommandType.USER_LOGIN_ACK, true, "SUCCESS LOGIN: Welcome!");
         } else {

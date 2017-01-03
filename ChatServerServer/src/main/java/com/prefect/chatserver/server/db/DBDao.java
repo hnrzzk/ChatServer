@@ -1,9 +1,9 @@
 package com.prefect.chatserver.server.db;
 
+import com.prefect.chatserver.server.db.TableInfo.BlackListTable;
 import com.prefect.chatserver.server.db.TableInfo.CategoryTable;
 import com.prefect.chatserver.server.db.TableInfo.FriendsTable;
 import com.prefect.chatserver.server.db.TableInfo.UserTable;
-import com.prefect.chatserver.server.handle.ChatServerHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -120,8 +120,9 @@ public class DBDao {
                 friendRelationship.put(FriendsTable.Field.userAccount, userAccount);
                 friendRelationship.put(FriendsTable.Field.friendAccount, friendAccount);
                 friendRelationship.put(FriendsTable.Field.createTime, date);
-                friendRelationship.put(FriendsTable.Field.categoryId, categoryId);
-
+                if (friendAccount != null) {
+                    friendRelationship.put(FriendsTable.Field.categoryId, categoryId);
+                }
                 Object key = DBUtil.getInstance().executeInsert(FriendsTable.name, friendRelationship);
                 return Long.parseLong(key.toString());
             } else {
@@ -142,13 +143,13 @@ public class DBDao {
     public List<String> getFriendLIst(String uesrAccount, int onLineStatue) {
 
         //select friends.friend_account from friends left join user on friends.friend_account=user.account where friend.user_account=? and user.is_online = ?;
-        String sql=new StringBuilder().append("select ").append(FriendsTable.name).append(".").append(FriendsTable.Field.friendAccount)
+        String sql = new StringBuilder().append("select ").append(FriendsTable.name).append(".").append(FriendsTable.Field.friendAccount)
                 .append(" from ").append(FriendsTable.name).append(" left join ").append(UserTable.name)
                 .append(" on ").append(FriendsTable.name).append(".").append(FriendsTable.Field.friendAccount).append("=").append(UserTable.name).append(".").append(UserTable.Field.account)
                 .append(" where ").append(FriendsTable.name).append(".").append(FriendsTable.Field.userAccount).append("=?")
                 .append(" and ").append(UserTable.name).append(".").append(UserTable.Field.isOnline).append("=?").toString();
 
-        ChatServerDbConnectUnit chatServerDbConnectUnit = DBUtil.getInstance().executeQuery(sql, new Object[]{uesrAccount,onLineStatue});
+        ChatServerDbConnectUnit chatServerDbConnectUnit = DBUtil.getInstance().executeQuery(sql, new Object[]{uesrAccount, onLineStatue});
         ResultSet resultSet = chatServerDbConnectUnit.getResultSet();
 
         List<String> friendInfoList = new ArrayList<>();
@@ -179,11 +180,68 @@ public class DBDao {
                 .append(UserTable.Field.account).append("=?")
                 .toString();
 
-        if (DBUtil.getInstance().executeUpdate(sql, new Object[]{account})!=null){
+        if (DBUtil.getInstance().executeUpdate(sql, new Object[]{account}) != null) {
             return true;
-        }else{
+        } else {
             return false;
         }
+    }
+
+    /**
+     * 增加黑名单
+     *
+     * @param userAccount
+     * @param friendAccount
+     * @return
+     */
+    public long addBlackListInfo(String userAccount, String friendAccount) {
+        //如果用户关系不存在
+        if (!DBUtil.getInstance().isExit(
+                BlackListTable.name,
+                new String[]{BlackListTable.Field.userAccount, BlackListTable.Field.blackAccount},
+                new Object[]{userAccount, friendAccount})) {
+
+            Timestamp date = new Timestamp(System.currentTimeMillis());
+
+            Map<String, Object> friendRelationship = new HashMap<>();
+            friendRelationship.put(BlackListTable.Field.userAccount, userAccount);
+            friendRelationship.put(BlackListTable.Field.blackAccount, friendAccount);
+            friendRelationship.put(BlackListTable.Field.createTime, date);
+
+            Object key = DBUtil.getInstance().executeInsert(BlackListTable.name, friendRelationship);
+            return Long.parseLong(key.toString());
+
+        } else {
+            return 0;
+        }
+    }
+
+    /**
+     * 移出黑名单
+     *
+     * @param userAccount 用户帐号
+     * @param account     目标账号
+     * @return
+     */
+    public List<Long> removeFriendRelationShip(String userAccount, String account) {
+        Map<String, Object> map = new HashMap<>();
+        map.put(FriendsTable.Field.userAccount, userAccount);
+        map.put(FriendsTable.Field.friendAccount, account);
+        return DBUtil.getInstance().deleteRow(FriendsTable.name, map);
+    }
+
+    /**
+     * 是否在黑名单中
+     *
+     * @param userAccount 用户帐号
+     * @param account     目标账号
+     * @return
+     */
+    public boolean isInBlackList(String userAccount, String account) {
+        return DBUtil.getInstance().isExit(
+                BlackListTable.name,
+                new String[]{BlackListTable.Field.userAccount, BlackListTable.Field.blackAccount}
+                , new Object[]{userAccount, account});
     }
 
 }

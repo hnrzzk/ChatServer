@@ -1,8 +1,12 @@
 package com.prefect.chatserver.server.process;
 
+import com.alibaba.fastjson.JSON;
+import com.prefect.chatserver.commoms.util.AttributeDispose;
 import com.prefect.chatserver.commoms.util.CommandType;
 import com.prefect.chatserver.commoms.util.MessagePacket;
 import com.prefect.chatserver.commoms.util.MessageType;
+import com.prefect.chatserver.commoms.util.moudel.ChatRoomMessage;
+import com.prefect.chatserver.server.ChatServer;
 import com.prefect.chatserver.server.db.DBDao;
 import com.prefect.chatserver.server.handle.ChatServerHandler;
 import org.apache.mina.core.session.IoSession;
@@ -10,28 +14,35 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.List;
+import java.util.concurrent.CopyOnWriteArraySet;
 
 /**
+ * 用户登出处理逻辑
  * Created by zhangkai on 2016/12/30.
  */
 public class LogOutPo extends ActionPo {
     private final static Logger logger = LoggerFactory.getLogger(LogOutPo.class);
 
     @Override
-    public void process(IoSession ioSession, MessagePacket messageObj) throws Exception {
+    public void process(IoSession ioSession, MessagePacket messageObj) {
+
         //从session中得到账号
-        String account = ioSession.getAttribute(ChatServerHandler.attributeNameOfAccount).toString();
+        String account = AttributeDispose.getInstance().getAccountOfAttribute(ioSession);
+        String chatRoomName = AttributeDispose.getInstance().getChatRoomNameOfAttribute(ioSession);
 
         //发送离线通知
         sendOfflineNotice(account);
 
         //修改用户离线状态
-        if (!DBDao.getInstance().changeAccountOnlineStatus(account, 0)){
+        if (!DBDao.getInstance().changeAccountOnlineStatus(account, 0)) {
             logger.error("修改离线操作失败：修改数据库状态失败");
         }
 
         //修改sessionMap
         ChatServerHandler.sessionMap.remove(account);
+
+        //修改对应聊天室消息
+        quitChatRoom(account, chatRoomName, ioSession);
     }
 
     /**
@@ -52,5 +63,48 @@ public class LogOutPo extends ActionPo {
 
         //发送通知
         sendNotice(accountList, messagePacket);
+    }
+
+    /**
+     * 将该session从对应的聊天室中清除
+     *
+     * @param chatRoomName
+     * @param session
+     */
+    private void quitChatRoom(String account, String chatRoomName, IoSession session) {
+        if (chatRoomName.isEmpty()) { //如果聊天室名字是null
+            return;
+        }
+
+        CopyOnWriteArraySet<IoSession> sessionSet = ChatServer.chatRoomInfo.get(chatRoomName);
+        if (null == sessionSet) {   //如果用户列表为null
+            return;
+        }
+
+        sessionSet.remove(session);
+
+        String message = new StringBuilder()
+                .append("用户[").append(account).append("]")
+                .append("离开聊天室")
+                .toString();
+
+        ChatRoomMessage chatRoomMessage = new ChatRoomMessage();
+        chatRoomMessage.setAccount(account);
+        chatRoomMessage.setChatRoomName(chatRoomName);
+        chatRoomMessage.setMessage(message);
+
+        String json = JSON.toJSONString(chatRoomMessage);
+
+        MessagePacket messagePacket = new MessagePacket(
+                CommandType.CHAT_ROOM_QUIT_ACK,
+                MessageType.CHATROOM_MANAGE,
+                json.getBytes().length,
+                json);
+
+        for (IoSession item : sessionSet) {
+            if (item.isConnected()) {
+                item.write(messagePacket);
+            }
+        }
     }
 }
