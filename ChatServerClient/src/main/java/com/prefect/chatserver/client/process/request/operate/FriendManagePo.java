@@ -1,4 +1,4 @@
-package com.prefect.chatserver.client.process.request;
+package com.prefect.chatserver.client.process.request.operate;
 
 import com.alibaba.fastjson.JSON;
 import com.prefect.chatserver.client.ChatClient;
@@ -11,19 +11,22 @@ import com.prefect.chatserver.commoms.util.moudel.RelationShipMessage;
 /**
  * Created by liuxiaonan on 2016/12/31.
  */
-public class FriendManagePo {
+public class FriendManagePo extends OperatePo{
     public final String addFriend = "add";
     public final String removeFriend = "remove";
 
+    public FriendManagePo(String[] strings) {
+        super(strings);
+    }
+
     /**
      * 管理用户的逻辑
-     *
-     * @param commands 用户输入的命令行
      */
-    public void manageFriend(String[] commands) {
+    @Override
+    public void process() {
         try {
-            String command = commands[1];
-            String userAccount = commands[2];
+            String command = super.strings[1];
+            String userAccount = super.strings[2];
 
             switch (command) {
                 case addFriend:

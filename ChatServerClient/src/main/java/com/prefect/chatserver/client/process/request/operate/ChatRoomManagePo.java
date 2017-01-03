@@ -1,4 +1,4 @@
-package com.prefect.chatserver.client.process.request;
+package com.prefect.chatserver.client.process.request.operate;
 
 import com.alibaba.fastjson.JSON;
 import com.prefect.chatserver.client.ChatClient;
@@ -12,26 +12,31 @@ import com.prefect.chatserver.commoms.util.moudel.ChatRoomMessage;
  * 聊天室
  * Created by zhangkai on 2017/1/3.
  */
-public class ChatRoomManagePo {
+public class ChatRoomManagePo extends OperatePo{
     final static String enter = "enter";
     final static String quit = "quit";
     final static String chat = "send";
     final static String getName = "name";
 
-    public void process(String[] userInput) {
+    public ChatRoomManagePo(String[] strings) {
+        super(strings);
+    }
+
+    @Override
+    public void process() {
 
         try {
-            String commandStr = userInput[1];
+            String commandStr = super.strings[1];
 
             switch (commandStr) {
                 case enter:
-                    enterChatRoom(userInput[2]);
+                    enterChatRoom(super.strings[2]);
                     break;
                 case quit:
                     quitChatRoom();
                     break;
                 case chat:
-                    sendChatMessage(userInput[2]);
+                    sendChatMessage(super.strings[2]);
                     break;
                 case getName:
                     printChatRoomName();

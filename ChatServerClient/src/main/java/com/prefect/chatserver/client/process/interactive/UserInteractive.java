@@ -1,11 +1,7 @@
 package com.prefect.chatserver.client.process.interactive;
 
-import com.prefect.chatserver.client.process.request.BlackListManagePo;
-import com.prefect.chatserver.client.process.request.ChatRoomManagePo;
-import com.prefect.chatserver.client.process.request.FriendManagePo;
-import com.prefect.chatserver.client.process.request.SendMessagePo;
+import com.prefect.chatserver.client.process.request.operate.*;
 import com.prefect.chatserver.client.util.Interactive;
-import com.prefect.chatserver.commoms.util.moudel.ChatRoomMessage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -42,44 +38,14 @@ public class UserInteractive implements Runnable {
      *
      * @param userInput 用户在控制台的输入
      */
-    void parseCommand(String userInput) throws Exception {
+    private void parseCommand(String userInput) throws Exception {
         String[] strings = userInput.split(" ");
 
-        switch (strings[0]) {
-            case InteractiveCommandType.TALK:
-                new SendMessagePo().requestSendMessage(strings);
-                break;
-            case InteractiveCommandType.FRIEND_MANAGE:
-                new FriendManagePo().manageFriend(strings);
-                break;
-            case InteractiveCommandType.BLACK_LIST_MANAGE:
-                new BlackListManagePo().manageFriend(strings);
-                break;
-            case InteractiveCommandType.Chat_ROOM_MANAGE:
-                new ChatRoomManagePo().process(strings);
-                break;
-            default:
-                printHelpInfo();
+        OperatePo operatePo=OperateFactory.getClass(strings);
+
+        if (operatePo!=null){
+            operatePo.process();
         }
     }
 
-    /**
-     * 帮助信息
-     */
-    private void printHelpInfo() {
-        String string = new StringBuilder()
-                .append("-friend 好友管理\n")
-                .append("-blackList 黑名单管理\n")
-                .append("-talk userAccount message 聊天\n")
-                .append("-chatRoom 聊天室" )
-                .toString();
-        Interactive.getInstance().printlnToConsole(string);
-    }
-}
-
-class InteractiveCommandType {
-    final static String FRIEND_MANAGE = "-friend";
-    final static String BLACK_LIST_MANAGE = "-blackList";
-    final static String TALK = "-talk";
-    final static String Chat_ROOM_MANAGE = "-chatRoom";
 }

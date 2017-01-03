@@ -1,4 +1,4 @@
-package com.prefect.chatserver.client.process.request;
+package com.prefect.chatserver.client.process.request.operate;
 
 import com.alibaba.fastjson.JSON;
 import com.prefect.chatserver.client.ChatClient;
@@ -12,21 +12,25 @@ import org.apache.mina.core.session.IoSession;
  * 发送消息的处理逻辑
  * Created by zhangkai on 2016/12/29.
  */
-public class SendMessagePo {
+public class SendMessagePo extends OperatePo {
+
+    public SendMessagePo(String[] strings) {
+        super(strings);
+    }
 
     /**
      * -talk friendAccount message
-     * @param command
      */
-    public void requestSendMessage(String[] command) {
+    @Override
+    public void process() {
         MessagePacket messagePacket = new MessagePacket();
         messagePacket.setCommand(CommandType.MESSAGE);
         messagePacket.setMessageType(MessageType.MESSAGE);
 
         ChatMessage chatMessage = new ChatMessage();
         chatMessage.setSendAccount(ChatClient.account);
-        chatMessage.setReceiveAccount(command[1]);
-        chatMessage.setMessage(command[2]);
+        chatMessage.setReceiveAccount(super.strings[1]);
+        chatMessage.setMessage(super.strings[2]);
 
         String json = JSON.toJSONString(chatMessage);
         messagePacket.setMessage(json);

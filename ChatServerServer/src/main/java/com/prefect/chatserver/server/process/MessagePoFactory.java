@@ -38,6 +38,8 @@ public class MessagePoFactory {
                 return new ChatRoomSend();
             case CommandType.CHAT_ROOM_QUIT:    //用户请求退出聊天室
                 return new ChatRoomQuit();
+            case CommandType.SEND_BROADCAST:
+                return new BroadcastPo();
         }
         return messageProcess;
     }

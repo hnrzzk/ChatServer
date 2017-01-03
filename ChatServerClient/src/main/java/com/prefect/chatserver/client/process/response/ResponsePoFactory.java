@@ -19,6 +19,7 @@ public class ResponsePoFactory {
             case CommandType.USER_OFF_LINE_NOTICE:
             case CommandType.BLACK_LIST_ADD_ACK:
             case CommandType.BLACK_LIST_REMOVE_ACK:
+            case CommandType.SEND_BROADCAST_ACK:
                 return new ActionResponsePo();
             case CommandType.FRIEND_LIST_ADD:
                 return new FriendAddResponsePo();

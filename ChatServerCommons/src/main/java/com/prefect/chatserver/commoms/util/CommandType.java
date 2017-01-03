@@ -53,6 +53,10 @@ public class CommandType {
     public final static int CHAT_ROOM_SEND = 0x0009;
     public final static int CHAT_ROOM_SEND_ACK = 0x0109;
 
+    //用户发送广播请求
+    public final static int SEND_BROADCAST = 0x000A;
+    public final static int SEND_BROADCAST_ACK=0x010A;
+
 //    //好友列表请求
 //    public final static int FRIEND_LIST_GET= 0x2010;
 //    public final static int FRIEND_LIST_GET_ACK= 0x0003;

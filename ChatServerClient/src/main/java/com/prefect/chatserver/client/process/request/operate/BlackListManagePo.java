@@ -1,4 +1,4 @@
-package com.prefect.chatserver.client.process.request;
+package com.prefect.chatserver.client.process.request.operate;
 
 import com.alibaba.fastjson.JSON;
 import com.prefect.chatserver.client.ChatClient;
@@ -12,14 +12,19 @@ import com.prefect.chatserver.commoms.util.moudel.RelationShipMessage;
  * 黑名单管理请求逻辑
  * Created by zhangkai on 2017/1/3.
  */
-public class BlackListManagePo {
+public class BlackListManagePo extends OperatePo{
     public final String addFriend="add";
     public final String removeFriend="remove";
 
-    public void manageFriend(String[] commands) {
+    public BlackListManagePo(String[] strings) {
+        super(strings);
+    }
+
+    @Override
+    public void process() {
         try {
-            String command = commands[1];
-            String userAccount = commands[2];
+            String command = super.strings[1];
+            String userAccount = super.strings[2];
 
             switch (command) {
                 case addFriend:
