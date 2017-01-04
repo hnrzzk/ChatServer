@@ -1,7 +1,7 @@
 package com.prefect.chatserver.server.process;
 
 import com.alibaba.fastjson.JSON;
-import com.prefect.chatserver.commoms.util.AttributeDispose;
+import com.prefect.chatserver.commoms.util.AttributeOperate;
 import com.prefect.chatserver.commoms.util.CommandType;
 import com.prefect.chatserver.commoms.util.MessagePacket;
 import com.prefect.chatserver.commoms.util.MessageType;
@@ -44,7 +44,7 @@ public class LogInPo extends ActionPo {
             //将已建立的连接保存在内存中
             ChatServerHandler.sessionMap.put(account, ioSession);
             //在session中记录account名称
-            AttributeDispose.getInstance().setAccountOfAttribute(ioSession,account);
+            AttributeOperate.getInstance().setAccountOfAttribute(ioSession,account);
 
             super.response(ioSession, CommandType.USER_LOGIN_ACK, true, "SUCCESS LOGIN: Welcome!");
         } else {

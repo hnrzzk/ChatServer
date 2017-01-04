@@ -58,7 +58,7 @@ public class ChatServer {
         LoggingFilter loggingFilter = new LoggingFilter();
         loggingFilter.setMessageReceivedLogLevel(LogLevel.INFO);
         loggingFilter.setMessageSentLogLevel(LogLevel.INFO);
-        filterChainBuilder.addLast("loger", loggingFilter);
+        filterChainBuilder.addLast("logger", loggingFilter);
 
         filterChainBuilder.addLast("codec", new ProtocolCodecFilter(new ChatServerCodecFactory()));
 
@@ -75,16 +75,6 @@ public class ChatServer {
 
         return true;
     }
-
-    public void stop() {
-        this.acceptor.dispose();
-    }
-
-    @Override
-    protected void finalize(){
-        this.stop();
-    }
-
 
     public static void main(String[] argv) throws IOException {
         ChatServer chatServer = new ChatServer();

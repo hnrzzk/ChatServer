@@ -9,12 +9,13 @@ public class UserTable {
 
     public static class Field {
         public static String id = "id";
-        public static String nickName = "nickName";
+        public static String nickName = "nick_name";
         public static String account = "account";
         public static String password = "password";
         public static String registerTime = "register_time";
         public static String sex = "sex";
         public static String isOnline = "is_online";
-        public static String isGag="is_gag";
+        public static String isGag = "is_gag";
+        public static String identify = "identify";
     }
 }

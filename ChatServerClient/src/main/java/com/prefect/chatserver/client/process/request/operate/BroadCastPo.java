@@ -1,9 +1,11 @@
 package com.prefect.chatserver.client.process.request.operate;
 
+import com.alibaba.fastjson.JSON;
 import com.prefect.chatserver.client.ChatClient;
 import com.prefect.chatserver.commoms.util.CommandType;
 import com.prefect.chatserver.commoms.util.MessagePacket;
 import com.prefect.chatserver.commoms.util.MessageType;
+import com.prefect.chatserver.commoms.util.moudel.ChatMessage;
 
 /**
  * 发送广播消息请求
@@ -20,17 +22,26 @@ public class BroadCastPo extends OperatePo {
 
         StringBuilder stringBuilder = new StringBuilder();
         for (int i = 1; i < strings.length; i++) {
-            stringBuilder.append(i).append(" ");
+            stringBuilder.append(strings[i]).append(" ");
         }
-        stringBuilder.deleteCharAt(stringBuilder.length() - 1);
+        if (stringBuilder.length() > 0) {
+            stringBuilder.deleteCharAt(stringBuilder.length() - 1);
+        }
 
         MessagePacket messagePacket = new MessagePacket();
         messagePacket.setCommand(CommandType.SEND_BROADCAST);
-        messagePacket.setCommand(MessageType.MESSAGE);
+        messagePacket.setMessageType(MessageType.MESSAGE);
 
         String message = stringBuilder.toString();
-        messagePacket.setMessage(message);
-        messagePacket.setMessageLength(message.getBytes().length);
+        ChatMessage chatMessage = new ChatMessage();
+        chatMessage.setSendAccount(ChatClient.account);
+        chatMessage.setMessage(message);
+
+        String json = JSON.toJSONString(chatMessage);
+
+        messagePacket.setMessage(json);
+        messagePacket.setMessageLength(json.getBytes().length);
+
         ChatClient.session.write(messagePacket);
     }
 }

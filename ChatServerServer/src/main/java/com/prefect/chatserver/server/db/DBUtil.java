@@ -181,7 +181,6 @@ public class DBUtil {
         StringBuilder sql = new StringBuilder(
                 String.format("insert into %s (%s) values (%s)", tableName, keyNameList, valueList));
 
-        System.out.println(sql);
 
         Object key = null;
         ChatServerDbConnectUnit chatServerDbConnectUnit = this.executeUpdate(sql.toString(), objects);
@@ -223,8 +222,6 @@ public class DBUtil {
                 .append("Delete from ").append(table).append(" where 1=1").append(conditionSql)
                 .toString();
 
-        System.out.println(sql);
-        System.out.println(condition);
         ChatServerDbConnectUnit chatServerDbConnectUnit = this.executeUpdate(sql, values);
         ResultSet resultSet = chatServerDbConnectUnit.getResultSet();
         List<Long> list=new ArrayList<>();

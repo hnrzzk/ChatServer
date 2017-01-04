@@ -1,7 +1,7 @@
 package com.prefect.chatserver.server.process;
 
 import com.alibaba.fastjson.JSON;
-import com.prefect.chatserver.commoms.util.AttributeDispose;
+import com.prefect.chatserver.commoms.util.AttributeOperate;
 import com.prefect.chatserver.commoms.util.CommandType;
 import com.prefect.chatserver.commoms.util.MessagePacket;
 import com.prefect.chatserver.commoms.util.MessageType;
@@ -27,22 +27,25 @@ public class LogOutPo extends ActionPo {
     public void process(IoSession ioSession, MessagePacket messageObj) {
 
         //从session中得到账号
-        String account = AttributeDispose.getInstance().getAccountOfAttribute(ioSession);
-        String chatRoomName = AttributeDispose.getInstance().getChatRoomNameOfAttribute(ioSession);
+        String account = AttributeOperate.getInstance().getAccountOfAttribute(ioSession);
+        String chatRoomName = AttributeOperate.getInstance().getChatRoomNameOfAttribute(ioSession);
 
-        //发送离线通知
-        sendOfflineNotice(account);
+        if (account!=null&&!account.isEmpty()){
+            //发送离线通知
+            sendOfflineNotice(account);
 
-        //修改用户离线状态
-        if (!DBDao.getInstance().changeAccountOnlineStatus(account, 0)) {
-            logger.error("修改离线操作失败：修改数据库状态失败");
+            //修改用户离线状态
+            if (!DBDao.getInstance().changeAccountOnlineStatus(account, 0)) {
+                logger.error("修改离线操作失败：修改数据库状态失败");
+            }
+
+            //修改sessionMap
+            ChatServerHandler.sessionMap.remove(account);
+
+            //修改对应聊天室消息
+            quitChatRoom(account, chatRoomName, ioSession);
         }
 
-        //修改sessionMap
-        ChatServerHandler.sessionMap.remove(account);
-
-        //修改对应聊天室消息
-        quitChatRoom(account, chatRoomName, ioSession);
     }
 
     /**

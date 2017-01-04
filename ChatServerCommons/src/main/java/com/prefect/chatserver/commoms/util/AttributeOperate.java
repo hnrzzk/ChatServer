@@ -6,20 +6,20 @@ import org.apache.mina.core.session.IoSession;
  * 获取session中属性的工具类
  * Created by zhangkai on 2017/1/3.
  */
-public class AttributeDispose {
+public class AttributeOperate {
     //session存储账户的属性名
     public String attributeNameOfAccount = "account";
     public String attributeNameOfChatRoom = "chatRoom";
 
-    private AttributeDispose() {
+    private AttributeOperate() {
     }
 
-    private static class AttributeDisposeHandle {
-        private static AttributeDispose attributeDispose = new AttributeDispose();
+    private static class AttributeOperateHandle {
+        private static AttributeOperate attributeOperate = new AttributeOperate();
     }
 
-    public static AttributeDispose getInstance() {
-        return AttributeDisposeHandle.attributeDispose;
+    public static AttributeOperate getInstance() {
+        return AttributeOperateHandle.attributeOperate;
     }
 
     /**

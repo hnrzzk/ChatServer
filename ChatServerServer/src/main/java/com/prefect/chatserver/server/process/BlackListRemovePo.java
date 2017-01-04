@@ -5,6 +5,7 @@ import com.prefect.chatserver.commoms.util.CommandType;
 import com.prefect.chatserver.commoms.util.MessagePacket;
 import com.prefect.chatserver.commoms.util.moudel.RelationShipMessage;
 import com.prefect.chatserver.server.db.DBUtil;
+import com.prefect.chatserver.server.db.TableInfo.BlackListTable;
 import com.prefect.chatserver.server.db.TableInfo.FriendsTable;
 import org.apache.mina.core.session.IoSession;
 
@@ -26,15 +27,13 @@ public class BlackListRemovePo extends ActionPo{
 
         removeBlackListRelationShip(userAccount,friendAccount);
 
-        removeBlackListRelationShip(friendAccount,userAccount);
-
         response(ioSession, CommandType.BLACK_LIST_REMOVE_ACK,true, "已成功将用户移出黑名单 account："+friendAccount);
     }
 
     private void removeBlackListRelationShip(String userAccount, String friendAccount) {
         Map<String, Object> map = new HashMap<>();
-        map.put(FriendsTable.Field.userAccount, userAccount);
-        map.put(FriendsTable.Field.friendAccount, friendAccount);
-        DBUtil.getInstance().deleteRow(FriendsTable.name, map);
+        map.put(BlackListTable.Field.userAccount, userAccount);
+        map.put(BlackListTable.Field.blackAccount, friendAccount);
+        DBUtil.getInstance().deleteRow(BlackListTable.name, map);
     }
 }

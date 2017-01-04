@@ -25,7 +25,7 @@ public class ChatServerEncode extends ProtocolEncoderAdapter {
             MessagePacket messagePacket = (MessagePacket) o;
             IoBuffer buffer = IoBuffer.allocate(messagePacket.getPackageHeadLength() + messagePacket.getMessageLength());//设置缓冲的容量
 
-            //buffer.setAutoExpand(true);
+            buffer.setAutoExpand(true);
             buffer.putInt(messagePacket.getPackageHeadLength());
             buffer.putInt(messagePacket.getCommand());
             buffer.putInt(messagePacket.getMessageType());

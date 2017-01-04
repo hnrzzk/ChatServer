@@ -6,15 +6,18 @@ import com.prefect.chatserver.client.process.response.ResponsePo;
 import com.prefect.chatserver.client.process.response.ResponsePoFactory;
 import com.prefect.chatserver.commoms.util.MessagePacket;
 
+import org.apache.mina.core.service.IoHandler;
 import org.apache.mina.core.service.IoHandlerAdapter;
 import org.apache.mina.core.session.IdleStatus;
 import org.apache.mina.core.session.IoSession;
 
+import java.util.Timer;
+import java.util.TimerTask;
+
 /**
- *
  * Created by zhangkai on 2016/12/27.
  */
-public class ChatClientHandler extends IoHandlerAdapter {
+public class ChatClientHandler implements IoHandler {
 
     @Override
     public void exceptionCaught(IoSession session, Throwable cause) throws Exception {
@@ -26,11 +29,12 @@ public class ChatClientHandler extends IoHandlerAdapter {
 
         if (message instanceof MessagePacket) {
             MessagePacket messagePacket = (MessagePacket) message;
-            messagePacket.getMessageType();
 
-            ResponsePo reponsePo = ResponsePoFactory.getClass(messagePacket.getCommand());
+            System.out.println("接收到：" + messagePacket);
 
-            reponsePo.process(messagePacket);
+            ResponsePo responsePo = ResponsePoFactory.getClass(messagePacket.getCommand());
+
+            responsePo.process(messagePacket);
         }
 
     }
@@ -39,6 +43,10 @@ public class ChatClientHandler extends IoHandlerAdapter {
     public void messageSent(IoSession session, Object message) throws Exception {
         System.out.println(message.toString());
 
+    }
+
+    @Override
+    public void inputClosed(IoSession ioSession) throws Exception {
     }
 
     @Override
@@ -55,10 +63,22 @@ public class ChatClientHandler extends IoHandlerAdapter {
 
     @Override
     public void sessionOpened(IoSession session) throws Exception {
-        new AccountManagePo().manangeUser(session);
+        //每500ms检查一次session是否建立成功
+        Timer timer = new Timer();
+        timer.schedule(new TimerTask() {
+            @Override
+            public void run() {
+                if (session.isConnected()) {
 
-        UserInteractive userInteractive = new UserInteractive();
-        Thread thread = new Thread(userInteractive);
-        thread.start();
+                    new AccountManagePo().manangeUser(session);
+                    UserInteractive userInteractive = new UserInteractive();
+                    Thread thread = new Thread(userInteractive);
+                    thread.start();
+
+                    this.cancel();
+                }
+            }
+        }, 0, 500);
+
     }
 }

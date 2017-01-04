@@ -1,9 +1,6 @@
 package com.prefect.chatserver.server.db;
 
-import com.prefect.chatserver.server.db.TableInfo.BlackListTable;
-import com.prefect.chatserver.server.db.TableInfo.CategoryTable;
-import com.prefect.chatserver.server.db.TableInfo.FriendsTable;
-import com.prefect.chatserver.server.db.TableInfo.UserTable;
+import com.prefect.chatserver.server.db.TableInfo.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -58,7 +55,6 @@ public class DBDao {
 
         //该用户下没有改分组
         if (!dbUtil.isExit(CategoryTable.name, new String[]{CategoryTable.Field.userAccount, CategoryTable.Field.name}, new String[]{account, category})) {
-            System.out.println("category does not exist, create");
 
             Map<String, Object> dataMap = new HashMap<>();
             dataMap.put(CategoryTable.Field.userAccount, account);
@@ -72,7 +68,6 @@ public class DBDao {
             result = Long.parseLong(key.toString());
 
         } else {
-            System.out.println("category exist, get");
 
             //该用户下有分组，则根据account和categoryName得到分组id
             String sql = String.format("select %s from %s where %s=? and %s=?",
@@ -242,6 +237,17 @@ public class DBDao {
                 BlackListTable.name,
                 new String[]{BlackListTable.Field.userAccount, BlackListTable.Field.blackAccount}
                 , new Object[]{userAccount, account});
+    }
+
+    /**
+     * 检查该用户是否是管理员
+     * @param userAccount   用户帐号
+     * @return
+     */
+    public boolean authorityCheck(String userAccount){
+        return DBUtil.getInstance().isExit(UserTable.name,
+                new String[]{UserTable.Field.account,UserTable.Field.identify},
+                new Object[]{userAccount, AuthorityTable.ADMINISTER});
     }
 
 }

@@ -22,7 +22,6 @@ public class ChatServerHandler extends IoHandlerAdapter {
     private final static Logger logger = LoggerFactory.getLogger(ChatServerHandler.class);
 
 
-
     public static Map<String, IoSession> sessionMap = new ConcurrentHashMap<String, IoSession>();
 
     private ExecutorService cachedThreadPool = Executors.newCachedThreadPool();
@@ -56,7 +55,7 @@ public class ChatServerHandler extends IoHandlerAdapter {
     @Override
     public void exceptionCaught(IoSession session, Throwable cause) throws Exception {
         logger.warn(session.toString() + "异常");
-        session.closeNow();
+//        session.closeNow();
     }
 
     @Override

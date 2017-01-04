@@ -1,6 +1,8 @@
 package com.prefect.chatserver.client;
 
 import com.prefect.chatserver.client.handler.ChatClientHandler;
+import com.prefect.chatserver.client.process.interactive.UserInteractive;
+import com.prefect.chatserver.client.process.request.account.AccountManagePo;
 import com.prefect.chatserver.client.util.Config;
 import com.prefect.chatserver.client.util.Interactive;
 import com.prefect.chatserver.client.util.ServerInfo;
@@ -12,18 +14,17 @@ import org.apache.mina.core.session.IoSession;
 import org.apache.mina.filter.codec.ProtocolCodecFilter;
 import org.apache.mina.filter.logging.LoggingFilter;
 import org.apache.mina.transport.socket.nio.NioSocketConnector;
-
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.net.InetSocketAddress;
-import java.util.concurrent.CopyOnWriteArrayList;
 
 /**
  * 客户端类
  * Created by zhangkai on 2016/12/23.
  */
 public class ChatClient {
-
-    public static CopyOnWriteArrayList<String> friendList;
+    private static Logger logger = LoggerFactory.getLogger(ChatClient.class);
 
     private final String HOSTNAME = "localhost";
     private final int PORT = 9123;
@@ -36,10 +37,10 @@ public class ChatClient {
     public static IoSession session;
 
     //账户名
-    public static String account="";
+    public static String account = "";
 
     //聊天室名称
-    public static String chatRoomName="";
+    public static String chatRoomName = "";
 
     synchronized public static String getAccount() {
         return account;
@@ -51,13 +52,13 @@ public class ChatClient {
 
     public void start() throws InterruptedException {
         Interactive.getInstance().printlnToConsole("程序启动……");
-        friendList=new CopyOnWriteArrayList<>();
-
         Interactive.getInstance().printlnToConsole("正在读取配置文件……");
+
         Config config = new Config();
         ServerInfo serverInfo = config.getServerConf();
 
         Interactive.getInstance().printlnToConsole("正在初始化连接……");
+
         NioSocketConnector connector = new NioSocketConnector();
         connector.setConnectTimeoutMillis(CONNECT_TIMEOUT);
 
@@ -68,7 +69,6 @@ public class ChatClient {
         connector.setHandler(new ChatClientHandler());
 
 
-
         Interactive.getInstance().printlnToConsole("正在连接服务器……");
         while (true) {
             try {
@@ -77,20 +77,25 @@ public class ChatClient {
                 session = future.getSession();
                 break;
             } catch (RuntimeIoException e) {
-                System.err.println("Failed to connect.");
-                e.printStackTrace();
-                Thread.sleep(5000);
+                logger.error("Failed to connect." + e.getMessage(), e);
+                Thread.sleep(1000);
             }
         }
 
+        Interactive.getInstance().printlnToConsole("服务器连接成功");
+
         // Wait until the connection is closed or the connection attempt fails.
-        session.getCloseFuture().awaitUninterruptibly();
-        connector.dispose();
+//        session.getCloseFuture().awaitUninterruptibly();
+//        connector.dispose();
+    }
+
+    public void close() {
+        this.session.closeNow();
     }
 
 
     public static void main(String[] args) throws Throwable {
-        ChatClient clientInstance=new ChatClient();
+        ChatClient clientInstance = new ChatClient();
         clientInstance.start();
     }
 

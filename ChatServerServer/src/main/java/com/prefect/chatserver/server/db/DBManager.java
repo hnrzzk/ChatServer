@@ -34,26 +34,27 @@ public class DBManager {
 
         try {
             properties.load(new FileInputStream("dbcpconfig.properties"));
-            ds= BasicDataSourceFactory.createDataSource(properties);
+            ds = BasicDataSourceFactory.createDataSource(properties);
         } catch (Exception e) {
-            logger.error(e.getMessage(),e);
+            logger.error(e.getMessage(), e);
         }
 
 
     }
 
     public Connection getConnection() throws SQLException {
-            return ds.getConnection();
+        Connection connection=ds.getConnection();
+        return connection;
     }
 
     public static void closeResultSet(ResultSet rs) {
         try {
-            if (rs != null) {
+            if (rs != null && !rs.isClosed()) {
                 rs.close();
             }
 
         } catch (SQLException e) {
-            logger.error(e.getMessage(),e);
+            logger.error(e.getMessage(), e);
         }
 
         rs = null;
@@ -61,24 +62,24 @@ public class DBManager {
 
     public static void closeStatement(Statement stm) {
         try {
-            if (stm != null) {
+            if (stm != null && !stm.isClosed()) {
                 stm.close();
             }
 
         } catch (SQLException e) {
-            logger.error(e.getMessage(),e);
+            logger.error(e.getMessage(), e);
         }
 
         stm = null;
     }
 
-    public static void closeConnection(Connection conn){
+    public static void closeConnection(Connection conn) {
         try {
-            if (conn != null) {
+            if (conn != null && !conn.isClosed()) {
                 conn.close();
             }
         } catch (SQLException e) {
-            logger.error(e.getMessage(),e);
+            logger.error(e.getMessage(), e);
         }
 
         conn = null;

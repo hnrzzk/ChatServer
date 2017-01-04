@@ -17,7 +17,7 @@ import java.nio.charset.Charset;
 public class ChatServerDecode implements ProtocolDecoder {
     private final AttributeKey CONTEXT = new AttributeKey(getClass(), "CONTEXT");
     private final Charset charset;
-    private int maxMessageLength = 100; //可通过配置文件配置
+    private int maxMessageLength = 100;
 
     public ChatServerDecode(Charset charset) {
         this.charset = charset;
@@ -68,7 +68,7 @@ public class ChatServerDecode implements ProtocolDecoder {
             if (buffer.remaining() >= packHeadLength) {
                 buffer.mark();
 
-                //read messagePacket head
+                //读取messagePacket包头信息
                 MessagePacket messagePacket = new MessagePacket();
                 messagePacket.setCommand(buffer.getInt());
                 messagePacket.setMessageType(buffer.getInt());
@@ -79,7 +79,7 @@ public class ChatServerDecode implements ProtocolDecoder {
                 if (bodyLen > 0 && buffer.remaining() >= bodyLen) {
                     messagePacket.setMessage(buffer.getString(bodyLen, charset.newDecoder()));
                 } else {
-                    //buffer.clear();
+                    buffer.reset();
                 }
                 protocolDecoderOutput.write(messagePacket);
             }
@@ -92,7 +92,7 @@ public class ChatServerDecode implements ProtocolDecoder {
                 buffer.clear();
                 buffer.put(temp);
             } else {
-                //is handle finished , clear
+                //处理完成，清空标识
                 buffer.clear();
             }
         }

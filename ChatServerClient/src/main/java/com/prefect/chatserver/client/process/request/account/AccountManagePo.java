@@ -33,7 +33,6 @@ public class AccountManagePo {
                         continue;
                 }
             } catch (NumberFormatException e) {
-                e.printStackTrace();
                 continue;
             }
         }

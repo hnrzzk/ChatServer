@@ -5,6 +5,7 @@ import com.prefect.chatserver.client.util.Interactive;
 import com.prefect.chatserver.commoms.util.MessagePacket;
 import com.prefect.chatserver.commoms.util.MessageType;
 import com.prefect.chatserver.commoms.util.moudel.ActionResponseMessage;
+import com.prefect.chatserver.commoms.util.moudel.ChatMessage;
 
 /**
  * 服务器响应处理逻辑
@@ -15,6 +16,7 @@ public class ActionResponsePo implements ResponsePo{
 
     @Override
     public void process(MessagePacket messagePacket) {
+        System.out.println(messagePacket);
         switch (messagePacket.getMessageType()){
             case MessageType.RESPONSE:
                 ActionResponseMessage actionResponseMessage = JSON.parseObject(messagePacket.getMessage(),ActionResponseMessage.class);
@@ -23,6 +25,9 @@ public class ActionResponsePo implements ResponsePo{
             case MessageType.STRING:
                 Interactive.getInstance().printlnToConsole("System:"+messagePacket.getMessage().toString());
                 break;
+            case MessageType.MESSAGE:
+                ChatMessage chatMessage= JSON.parseObject(messagePacket.getMessage(),ChatMessage.class);
+                Interactive.getInstance().printlnToConsole(chatMessage.getSendAccount()+":\n"+chatMessage.getMessage());
         }
 
     }
