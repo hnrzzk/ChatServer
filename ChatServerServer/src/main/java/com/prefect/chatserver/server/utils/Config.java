@@ -25,11 +25,15 @@ public class Config {
         String SERVER_IDLE_TIME = "server.IdleTime";
         String SERVER_BUFFER_SIZE = "server.BufferSize";
 
-        File file=new File("ChatServerConfig.properties");
-        System.out.println(file.getAbsolutePath());
+        ClassLoader classLoader = Config.class.getClassLoader();
+        if (classLoader != null) {
+            System.out.println("项目路径：" + classLoader.getResource("ChatServerConfig.properties").toString());
+        } else {
+            System.out.println("项目路径：" + ClassLoader.getSystemResource("ChatServerConfig.properties").getPath());
+        }
 
         Properties properties = new Properties();
-        properties.load(new FileInputStream(filePath));
+        properties.load(Config.class.getClassLoader().getResourceAsStream("ChatServerConfig.properties"));
 
         ServerInfo serverInfo = new ServerInfo();
 

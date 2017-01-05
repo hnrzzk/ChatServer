@@ -34,7 +34,7 @@ public class DBManager {
         Properties properties = new Properties();
 
         try {
-            properties.load(new FileInputStream("dbcpconfig.properties"));
+            properties.load(DBManager.class.getClassLoader().getResourceAsStream("dbcpconfig.properties"));
             ds = BasicDataSourceFactory.createDataSource(properties);
         } catch (Exception e) {
             logger.error(e.getMessage(), e);

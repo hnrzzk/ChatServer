@@ -78,8 +78,8 @@ public class ChatServer {
 
     public static void main(String[] argv) throws IOException {
         ChatServer chatServer = new ChatServer();
-        if (chatServer.start()) {
-            logger.info("服务器启动成功。。。");
+         if (chatServer.start()) {
+               logger.info("服务器启动成功。。。");
         } else {
             logger.error("服务器启动失败");
         }

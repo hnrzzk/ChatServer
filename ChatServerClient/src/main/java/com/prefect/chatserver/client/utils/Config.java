@@ -21,11 +21,7 @@ public class Config {
     public Config(String filePath) {
         properties = new Properties();
         try {
-            File directory=new File("ChatClientConfig.properties");
-            System.out.println(directory.getAbsolutePath());
-
-            FileInputStream fileInputStream=new FileInputStream(filePath);
-            properties.load(fileInputStream);
+            properties.load(Config.class.getClassLoader().getResourceAsStream(filePath));
         } catch (IOException e) {
             e.printStackTrace();
         }
