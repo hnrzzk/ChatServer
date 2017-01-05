@@ -1,18 +1,9 @@
 package com.prefect.chatserver.client.handler;
 
-import com.alibaba.fastjson.JSON;
 import com.prefect.chatserver.client.Robot;
-import com.prefect.chatserver.client.process.RobotPo;
-import com.prefect.chatserver.client.process.interactive.UserInteractive;
-import com.prefect.chatserver.client.process.request.account.AccountManagePo;
-import com.prefect.chatserver.client.process.response.ResponsePo;
-import com.prefect.chatserver.client.process.response.ResponsePoFactory;
-import com.prefect.chatserver.client.util.Interactive;
-import com.prefect.chatserver.commoms.util.AttributeOperate;
-import com.prefect.chatserver.commoms.util.CommandType;
+import com.prefect.chatserver.client.process.RobotRequestPo;
+import com.prefect.chatserver.client.process.RobotResponsePo;
 import com.prefect.chatserver.commoms.util.MessagePacket;
-import com.prefect.chatserver.commoms.util.MessageType;
-import com.prefect.chatserver.commoms.util.moudel.UserInfo;
 import org.apache.mina.core.service.IoHandler;
 import org.apache.mina.core.session.IdleStatus;
 import org.apache.mina.core.session.IoSession;
@@ -21,12 +12,16 @@ import org.slf4j.LoggerFactory;
 
 import java.util.Timer;
 import java.util.TimerTask;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 /**
  * Created by zhangkai on 2017/1/4.
  */
 public class RobotHandler implements IoHandler {
     private static Logger logger = LoggerFactory.getLogger(RobotHandler.class);
+
+    private ExecutorService cachedThreadPool = Executors.newCachedThreadPool();
 
     @Override
     public void sessionCreated(IoSession ioSession) throws Exception {
@@ -45,7 +40,7 @@ public class RobotHandler implements IoHandler {
                 if (ioSession.isConnected()) {
                     logger.info(Thread.currentThread().getName() + " 已建立连接，当前连接数:" + Robot.sessionConcurrentHashMap.size());
 
-                    RobotPo.getInstance().login(ioSession);
+                    RobotRequestPo.getInstance().login(ioSession);
 
                     //取消定时任务
                     this.cancel();
@@ -76,11 +71,8 @@ public class RobotHandler implements IoHandler {
         if (o instanceof MessagePacket) {
             MessagePacket messagePacket = (MessagePacket) o;
 
-            ResponsePo responsePo = ResponsePoFactory.getClass(messagePacket.getCommand());
-
-            if (responsePo!=null){
-                responsePo.process(messagePacket);
-            }
+            RobotResponsePo responsePo=new RobotResponsePo(ioSession,messagePacket);
+            cachedThreadPool.execute(responsePo);
         }
     }
 

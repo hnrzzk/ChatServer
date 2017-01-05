@@ -19,6 +19,8 @@ import java.util.List;
  * Created by zhangkai on 2016/12/28.
  */
 public class LogInPo extends ActionPo {
+
+    @Override
     public void process(IoSession ioSession, MessagePacket message) {
         //将消息内容从json转换成object
         UserInfo userInfo = JSON.parseObject(message.getMessage(), UserInfo.class);
@@ -44,7 +46,7 @@ public class LogInPo extends ActionPo {
             //将已建立的连接保存在内存中
             ChatServerHandler.sessionMap.put(account, ioSession);
             //在session中记录account名称
-            AttributeOperate.getInstance().setAccountOfAttribute(ioSession,account);
+            AttributeOperate.getInstance().setAccountOfAttribute(ioSession, account);
 
             super.response(ioSession, CommandType.USER_LOGIN_ACK, true, "登录成功: Welcome!");
         } else {
@@ -58,10 +60,9 @@ public class LogInPo extends ActionPo {
 
     }
 
-    void sendOnlineNotice(String account){
+    void sendOnlineNotice(String account) {
         //根据得到该账号的在线好友列表
         List<String> accountList = DBDao.getInstance().getFriendLIst(account, 1);
-        System.out.println(accountList);
 
         //生产消息字符串
         String message = new StringBuilder().append("您的好友").append(account).append("已上线").toString();

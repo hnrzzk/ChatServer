@@ -2,7 +2,7 @@ package com.prefect.chatserver.client.process.response;
 
 import com.alibaba.fastjson.JSON;
 import com.prefect.chatserver.client.ChatClient;
-import com.prefect.chatserver.client.util.Interactive;
+import com.prefect.chatserver.client.utils.Interactive;
 import com.prefect.chatserver.commoms.util.CommandType;
 import com.prefect.chatserver.commoms.util.MessagePacket;
 import com.prefect.chatserver.commoms.util.MessageType;

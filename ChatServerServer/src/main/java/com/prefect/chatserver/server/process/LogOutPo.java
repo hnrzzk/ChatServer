@@ -39,7 +39,7 @@ public class LogOutPo extends ActionPo {
                 logger.error("修改离线操作失败：修改数据库状态失败");
             }
 
-            //修改sessionMap
+            //将离线用户的session从在线sessionMap中移除
             ChatServerHandler.sessionMap.remove(account);
 
             //修改对应聊天室消息

@@ -12,7 +12,7 @@ public class ActionResponseMessage {
     //详细信息
     private String message;
 
-    public boolean isActionResult() {
+    public boolean getActionResult() {
         return actionResult;
     }
 

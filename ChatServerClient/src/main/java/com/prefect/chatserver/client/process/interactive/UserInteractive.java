@@ -1,7 +1,7 @@
 package com.prefect.chatserver.client.process.interactive;
 
 import com.prefect.chatserver.client.process.request.operate.*;
-import com.prefect.chatserver.client.util.Interactive;
+import com.prefect.chatserver.client.utils.Interactive;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

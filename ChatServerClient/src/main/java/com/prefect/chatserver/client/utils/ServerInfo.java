@@ -1,4 +1,4 @@
-package com.prefect.chatserver.client.util;
+package com.prefect.chatserver.client.utils;
 
 /**
  * Created by zhangkai on 2016/12/27.

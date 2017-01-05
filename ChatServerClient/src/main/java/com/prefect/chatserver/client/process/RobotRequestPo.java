@@ -1,8 +1,8 @@
 package com.prefect.chatserver.client.process;
 
 import com.alibaba.fastjson.JSON;
-import com.prefect.chatserver.client.Robot;
-import com.prefect.chatserver.client.util.Interactive;
+import com.prefect.chatserver.client.utils.Interactive;
+import com.prefect.chatserver.client.utils.Util;
 import com.prefect.chatserver.commoms.util.AttributeOperate;
 import com.prefect.chatserver.commoms.util.CommandType;
 import com.prefect.chatserver.commoms.util.MessagePacket;
@@ -15,18 +15,18 @@ import org.slf4j.LoggerFactory;
 /**
  * Created by zhangkai on 2017/1/5.
  */
-public class RobotPo {
-    private static Logger logger = LoggerFactory.getLogger(RobotPo.class);
+public class RobotRequestPo {
+    private static Logger logger = LoggerFactory.getLogger(RobotRequestPo.class);
 
-    private RobotPo() {
+    private RobotRequestPo() {
 
     }
 
     private static class RobotPoHandle {
-        private static RobotPo instance = new RobotPo();
+        private static RobotRequestPo instance = new RobotRequestPo();
     }
 
-    public static RobotPo getInstance() {
+    public static RobotRequestPo getInstance() {
         return RobotPoHandle.instance;
     }
 
@@ -38,7 +38,7 @@ public class RobotPo {
     public void signIn(IoSession session) {
 
         //判断session中是否有account属性，如果没有等待一下
-        String account = getAccount(session);
+        String account = Util.getInstance().getAccount(session);
 
         //编辑报文
         MessagePacket messagePacket = new MessagePacket();
@@ -65,7 +65,7 @@ public class RobotPo {
      */
     public void login(IoSession session) {
         //判断session中是否有account属性，如果没有等待一下
-        String account = getAccount(session);
+        String account = Util.getInstance().getAccount(session);
 
         MessagePacket messagePacket = new MessagePacket();
         messagePacket.setCommand(CommandType.USER_LOGIN);
@@ -83,21 +83,7 @@ public class RobotPo {
         session.write(messagePacket);
     }
 
-    /**
-     * 从session中获取账户名
-     * @param session
-     * @return
-     */
-    private String getAccount(IoSession session) {
-        //判断session中是否有account属性，如果没有等待一下
-        String account = "";
-        while (account.equals("")) {
-            account = AttributeOperate.getInstance().getAccountOfAttribute(session);
-        }
-        Interactive.getInstance().printlnToConsole("get account: " + account);
 
-        return account;
-    }
 
 
 }

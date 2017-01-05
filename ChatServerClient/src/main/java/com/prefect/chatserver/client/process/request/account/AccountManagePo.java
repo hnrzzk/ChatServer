@@ -1,12 +1,5 @@
 package com.prefect.chatserver.client.process.request.account;
 
-import com.alibaba.fastjson.JSON;
-import com.prefect.chatserver.client.ChatClient;
-import com.prefect.chatserver.client.util.Interactive;
-import com.prefect.chatserver.commoms.util.CommandType;
-import com.prefect.chatserver.commoms.util.MessagePacket;
-import com.prefect.chatserver.commoms.util.MessageType;
-import com.prefect.chatserver.commoms.util.moudel.UserInfo;
 import org.apache.mina.core.session.IoSession;
 
 import java.util.Scanner;

@@ -1,4 +1,4 @@
-package com.prefect.chatserver.client.util;
+package com.prefect.chatserver.client.utils;
 
 /**
  * 控制台交互相关工具类

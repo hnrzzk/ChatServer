@@ -49,7 +49,7 @@ public class Robot {
     }
 
     private void getConnect() {
-        for (int i = 0; i < connectNum; i++) {
+        for (int i = 1; i <= connectNum; i++) {
 
             while (true) {
                 try {

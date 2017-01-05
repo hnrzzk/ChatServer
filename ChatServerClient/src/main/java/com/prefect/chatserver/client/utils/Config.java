@@ -1,4 +1,4 @@
-package com.prefect.chatserver.client.util;
+package com.prefect.chatserver.client.utils;
 
 import java.io.File;
 import java.io.FileInputStream;

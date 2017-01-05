@@ -1,11 +1,9 @@
 package com.prefect.chatserver.client;
 
 import com.prefect.chatserver.client.handler.ChatClientHandler;
-import com.prefect.chatserver.client.process.interactive.UserInteractive;
-import com.prefect.chatserver.client.process.request.account.AccountManagePo;
-import com.prefect.chatserver.client.util.Config;
-import com.prefect.chatserver.client.util.Interactive;
-import com.prefect.chatserver.client.util.ServerInfo;
+import com.prefect.chatserver.client.utils.Config;
+import com.prefect.chatserver.client.utils.Interactive;
+import com.prefect.chatserver.client.utils.ServerInfo;
 import com.prefect.chatserver.commoms.codefactory.ChatServerCodecFactory;
 
 import org.apache.mina.core.RuntimeIoException;
@@ -54,8 +52,8 @@ public class ChatClient {
         Interactive.getInstance().printlnToConsole("程序启动……");
         Interactive.getInstance().printlnToConsole("正在读取配置文件……");
 
-        Config config = new Config();
-        ServerInfo serverInfo = config.getServerConf();
+        Config Config = new Config();
+        ServerInfo serverInfo = Config.getServerConf();
 
         Interactive.getInstance().printlnToConsole("正在初始化连接……");
 

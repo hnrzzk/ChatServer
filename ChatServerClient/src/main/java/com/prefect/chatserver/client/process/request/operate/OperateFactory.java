@@ -1,6 +1,6 @@
 package com.prefect.chatserver.client.process.request.operate;
 
-import com.prefect.chatserver.client.util.Interactive;
+import com.prefect.chatserver.client.utils.Interactive;
 
 /**
  * Created by zhangkai on 2017/1/3.
