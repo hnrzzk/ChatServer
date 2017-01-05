@@ -18,7 +18,7 @@ import java.util.Properties;
  * Created by zhangkai on 2016/12/26.
  */
 public class DBManager {
-    String filePath = "../config/dbcpconfig.properties";
+    String filePath = "dbcpconfig.properties";
 
     private final static Logger logger = LoggerFactory.getLogger(DBManager.class);
 
@@ -36,7 +36,7 @@ public class DBManager {
         Properties properties = new Properties();
 
         try {
-            properties.load(DBManager.class.getClassLoader().getResourceAsStream("filePath"));
+            properties.load(DBManager.class.getClassLoader().getResourceAsStream(filePath));
             ds = BasicDataSourceFactory.createDataSource(properties);
         } catch (Exception e) {
             logger.error(e.getMessage(), e);

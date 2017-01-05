@@ -22,7 +22,7 @@ public class ActionResponsePo implements ResponsePo{
                 Interactive.getInstance().printlnToConsole(String.format("System:\n    %s", actionResponseMessage.getMessage()));
                 break;
             case MessageType.STRING:
-                Interactive.getInstance().printlnToConsole("System:"+messagePacket.getMessage().toString());
+                Interactive.getInstance().printlnToConsole("System:\n    "+messagePacket.getMessage().toString());
                 break;
             case MessageType.MESSAGE:
                 ChatMessage chatMessage= JSON.parseObject(messagePacket.getMessage(),ChatMessage.class);

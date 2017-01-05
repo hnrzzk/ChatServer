@@ -34,7 +34,7 @@ public class RobotResponsePo implements Runnable {
         switch (command) {
             case CommandType.USER_LOGIN_ACK:
                 System.out.println("登录成功!!");
-                processLogin();
+//                processLogin();
                 break;
             case CommandType.MESSAGE:
             case CommandType.SEND_BROADCAST_ACK:

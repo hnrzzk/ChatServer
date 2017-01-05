@@ -30,8 +30,6 @@ public class ChatClientHandler implements IoHandler {
         if (message instanceof MessagePacket) {
             MessagePacket messagePacket = (MessagePacket) message;
 
-            System.out.println("接收到：" + messagePacket);
-
             ResponsePo responsePo = ResponsePoFactory.getClass(messagePacket.getCommand());
 
             responsePo.process(messagePacket);

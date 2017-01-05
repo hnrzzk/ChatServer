@@ -20,7 +20,7 @@ public class MessagePo implements ResponsePo{
                 Interactive.getInstance().printlnToConsole(String.format("%s:\n%s", chatMessage.getSendAccount(), chatMessage.getMessage()));
                 break;
             case MessageType.STRING:
-                Interactive.getInstance().printlnToConsole("System:"+messagePacket.getMessage().toString());
+                Interactive.getInstance().printlnToConsole("System:\n    "+messagePacket.getMessage().toString());
                 break;
         }
 
