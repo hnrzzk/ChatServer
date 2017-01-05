@@ -32,11 +32,11 @@ public class Robot {
     }
 
     public Robot(int connectNum) {
-        sessionConcurrentHashMap=new ConcurrentHashMap<>();
+        sessionConcurrentHashMap = new ConcurrentHashMap<>();
 
         this.connector = new NioSocketConnector();
         this.connector.setConnectTimeoutMillis(CONNECT_TIMEOUT);
-//        this.connector.getFilterChain().addLast("logger", new LoggingFilter());
+        this.connector.getFilterChain().addLast("logger", new LoggingFilter());
         this.connector.getFilterChain().addLast("codec",
                 new ProtocolCodecFilter(new ChatServerCodecFactory()));
         this.connector.setHandler(new RobotHandler());
@@ -55,8 +55,9 @@ public class Robot {
                 try {
                     ConnectFuture future = connector.connect(new InetSocketAddress(HOSTNAME, PORT));
                     future.awaitUninterruptibly();
-                    String account = String.valueOf(i);
+                    String account = String.format("%04d", i);
                     IoSession session = future.getSession();
+                    System.out.println("get session: "+session);
                     AttributeOperate.getInstance().setAccountOfAttribute(session, account);
                     this.sessionConcurrentHashMap.put(account, session);
                     break;
@@ -71,7 +72,7 @@ public class Robot {
     }
 
     public static void main(String[] args) {
-        Robot robot=new Robot(5000);
+        Robot robot = new Robot(5000);
         robot.start();
     }
 }

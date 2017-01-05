@@ -18,7 +18,7 @@ public class AttributeOperate {
         private static AttributeOperate attributeOperate = new AttributeOperate();
     }
 
-    public static AttributeOperate getInstance() {
+    synchronized public static AttributeOperate getInstance() {
         return AttributeOperateHandle.attributeOperate;
     }
 
@@ -28,7 +28,7 @@ public class AttributeOperate {
      * @param session
      * @return
      */
-    public String getAccountOfAttribute(IoSession session) {
+    synchronized public String getAccountOfAttribute(IoSession session) {
         Object obj = session.getAttribute(attributeNameOfAccount);
         if (null != obj) {
             return obj.toString();
@@ -42,7 +42,7 @@ public class AttributeOperate {
      * @param session
      * @param value
      */
-    public void setAccountOfAttribute(IoSession session, Object value) {
+    synchronized public void setAccountOfAttribute(IoSession session, Object value) {
         session.setAttribute(attributeNameOfAccount, value);
     }
 
@@ -52,7 +52,7 @@ public class AttributeOperate {
      * @param session
      * @return
      */
-    public String getChatRoomNameOfAttribute(IoSession session) {
+    synchronized public String getChatRoomNameOfAttribute(IoSession session) {
         Object obj = session.getAttribute(attributeNameOfChatRoom);
         if (null != obj) {
             return obj.toString();
@@ -66,7 +66,7 @@ public class AttributeOperate {
      * @param session
      * @param value
      */
-    public void setChatRoomNameOfAttribute(IoSession session, Object value) {
+    synchronized public void setChatRoomNameOfAttribute(IoSession session, Object value) {
         session.setAttribute(attributeNameOfChatRoom, value);
     }
 }

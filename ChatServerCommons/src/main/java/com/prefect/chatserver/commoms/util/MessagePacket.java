@@ -13,10 +13,11 @@ public class MessagePacket implements Serializable {
 
     /**
      * 消息包 构造函数
-     * @param command   命令
+     *
+     * @param command       命令
      * @param messageType   消息类型
      * @param messageLength 消息长度
-     * @param message   消息
+     * @param message       消息
      */
     public MessagePacket(int command, int messageType, int messageLength, String message) {
         this.command = command;
@@ -27,7 +28,7 @@ public class MessagePacket implements Serializable {
 
     private static final long serialVersionUID = -6744683316349472480L;
 
-    private final int packageHeadLength = 20; //包头长度 字节
+    private final int packageHeadLength = 16; //包头长度 字节
 
     private int command;//命令
 
@@ -75,7 +76,7 @@ public class MessagePacket implements Serializable {
 
     @Override
     public String toString() {
-        return String.format("Message : command[%s] messageType[%s] context[%s]",
-                getCommand(), getMessageType(), getMessage());
+        return String.format("Message : command[%s] messageType[%s] messageLength[%s] context[%s]",
+                getCommand(), getMessageType(), getMessageLength(), getMessage());
     }
 }
