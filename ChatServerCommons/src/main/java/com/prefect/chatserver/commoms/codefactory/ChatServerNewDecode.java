@@ -9,10 +9,11 @@ import org.apache.mina.filter.codec.ProtocolDecoderOutput;
 import java.nio.charset.Charset;
 
 /**
+ * 聊天服务器报文解码器
  * Created by zhangkai on 2017/1/4.
  */
 public class ChatServerNewDecode extends CumulativeProtocolDecoder {
-    Charset charset;
+    private Charset charset;
 
     public ChatServerNewDecode(Charset charSet) {
         this.charset = charSet;

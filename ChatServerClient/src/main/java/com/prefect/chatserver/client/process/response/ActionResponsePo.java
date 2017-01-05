@@ -20,14 +20,14 @@ public class ActionResponsePo implements ResponsePo{
         switch (messagePacket.getMessageType()){
             case MessageType.RESPONSE:
                 ActionResponseMessage actionResponseMessage = JSON.parseObject(messagePacket.getMessage(),ActionResponseMessage.class);
-                Interactive.getInstance().printlnToConsole(String.format("System:\n%s", actionResponseMessage.getMessage()));
+                Interactive.getInstance().printlnToConsole(String.format("System:\n    %s", actionResponseMessage.getMessage()));
                 break;
             case MessageType.STRING:
                 Interactive.getInstance().printlnToConsole("System:"+messagePacket.getMessage().toString());
                 break;
             case MessageType.MESSAGE:
                 ChatMessage chatMessage= JSON.parseObject(messagePacket.getMessage(),ChatMessage.class);
-                Interactive.getInstance().printlnToConsole(chatMessage.getSendAccount()+":\n"+chatMessage.getMessage());
+                Interactive.getInstance().printlnToConsole(chatMessage.getSendAccount()+":\n    "+chatMessage.getMessage());
         }
 
     }

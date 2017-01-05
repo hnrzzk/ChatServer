@@ -2,8 +2,11 @@ package com.prefect.chatserver.client.handler;
 
 import com.alibaba.fastjson.JSON;
 import com.prefect.chatserver.client.Robot;
+import com.prefect.chatserver.client.process.RobotPo;
 import com.prefect.chatserver.client.process.interactive.UserInteractive;
 import com.prefect.chatserver.client.process.request.account.AccountManagePo;
+import com.prefect.chatserver.client.process.response.ResponsePo;
+import com.prefect.chatserver.client.process.response.ResponsePoFactory;
 import com.prefect.chatserver.client.util.Interactive;
 import com.prefect.chatserver.commoms.util.AttributeOperate;
 import com.prefect.chatserver.commoms.util.CommandType;
@@ -38,32 +41,13 @@ public class RobotHandler implements IoHandler {
         timer.schedule(new TimerTask() {
             @Override
             public void run() {
+                //判断连接是否建立
                 if (ioSession.isConnected()) {
-
                     logger.info(Thread.currentThread().getName() + " 已建立连接，当前连接数:" + Robot.sessionConcurrentHashMap.size());
 
-                    String account = "";
-                    while (account.equals("")) {
-                        account = AttributeOperate.getInstance().getAccountOfAttribute(ioSession);
-                    }
+                    RobotPo.getInstance().login(ioSession);
 
-                    Interactive.getInstance().printlnToConsole("get account: " + account);
-
-                    MessagePacket messagePacket = new MessagePacket();
-                    messagePacket.setCommand(CommandType.USER_SIGN_IN);
-                    messagePacket.setMessageType(MessageType.USER_MANAGE);
-
-                    UserInfo userInfo = new UserInfo();
-                    userInfo.setAccount(account);
-                    userInfo.setPassword(account);
-                    userInfo.setNickname(account);
-
-                    String json = JSON.toJSONString(userInfo);
-                    messagePacket.setMessageLength(json.getBytes().length);
-                    messagePacket.setMessage(json);
-
-                    ioSession.write(messagePacket);
-
+                    //取消定时任务
                     this.cancel();
                 }
             }
@@ -72,7 +56,7 @@ public class RobotHandler implements IoHandler {
 
     @Override
     public void sessionClosed(IoSession ioSession) throws Exception {
-        Robot.sessionConcurrentHashMap.remove(ioSession.getAttribute("account"));
+        Robot.sessionConcurrentHashMap.remove(ioSession.getAttribute("account").toString());
         logger.info(Thread.currentThread().getName() + " 连接已关闭，当前连接数:" + Robot.sessionConcurrentHashMap.size());
 
     }
@@ -89,7 +73,15 @@ public class RobotHandler implements IoHandler {
 
     @Override
     public void messageReceived(IoSession ioSession, Object o) throws Exception {
+        if (o instanceof MessagePacket) {
+            MessagePacket messagePacket = (MessagePacket) o;
 
+            ResponsePo responsePo = ResponsePoFactory.getClass(messagePacket.getCommand());
+
+            if (responsePo!=null){
+                responsePo.process(messagePacket);
+            }
+        }
     }
 
     @Override

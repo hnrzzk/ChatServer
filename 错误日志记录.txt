@@ -1,0 +1,20 @@
+测试5k个连接登录时出现异常：
+org.apache.commons.dbcp.SQLNestedException: Cannot get a connection, pool error Timeout waiting for idle object
+	at org.apache.commons.dbcp.PoolingDataSource.getConnection(PoolingDataSource.java:114)
+	at org.apache.commons.dbcp.BasicDataSource.getConnection(BasicDataSource.java:1044)
+	at com.prefect.chatserver.server.db.DBManager.getConnection(DBManager.java:46)
+	at com.prefect.chatserver.server.db.DBUtil.executeQuery(DBUtil.java:45)
+	at com.prefect.chatserver.server.db.DBUtil.isExit(DBUtil.java:125)
+	at com.prefect.chatserver.server.process.LogInPo.process(LogInPo.java:29)
+	at com.prefect.chatserver.server.handle.MultiThreadHandler.run(MultiThreadHandler.java:46)
+	at java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1142)
+	at java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:617)
+	at java.lang.Thread.run(Thread.java:745)
+网上解决方案：
+这个是dbcp1.x版本在创建新的连接对象时会把整个连接工厂类对象锁了，一旦创建过程中发生阻塞就会导致整个池都死掉。这个问题很大。
+解决方案，升级dbcp2.x版本或tomcat jdbc或druid连接池，推荐druid连接池，功能强大自带监控。
+
+问题解决办法：
+将dbcp版本升到2.x后发现异常不会出现了，但是每次只有8个左右的账户登录状态被改变。
+经过code review 发现，是由于DBDao类中的修改在线状态的代码changeAccountOnlineStatus(),在数据库操作后没有释放连接。
+再次引以为戒。

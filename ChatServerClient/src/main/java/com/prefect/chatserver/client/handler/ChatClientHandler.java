@@ -41,8 +41,6 @@ public class ChatClientHandler implements IoHandler {
 
     @Override
     public void messageSent(IoSession session, Object message) throws Exception {
-        System.out.println(message.toString());
-
     }
 
     @Override
@@ -70,7 +68,10 @@ public class ChatClientHandler implements IoHandler {
             public void run() {
                 if (session.isConnected()) {
 
+                    //建立连接时做出注册或者登录操作
                     new AccountManagePo().manangeUser(session);
+
+                    //新建一个线程接受用户输入
                     UserInteractive userInteractive = new UserInteractive();
                     Thread thread = new Thread(userInteractive);
                     thread.start();

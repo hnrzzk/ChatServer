@@ -30,13 +30,13 @@ public class LogInPo extends ActionPo {
                 UserTable.name,
                 new String[]{UserTable.Field.account, UserTable.Field.password},
                 new Object[]{account, password})) { //用户不存在
-            super.response(ioSession, CommandType.USER_LOGIN_ACK, false, "ERROR LOGIN: Account does not exist or Incorrect password.");
+            super.response(ioSession, CommandType.USER_LOGIN_ACK, false, "登录失败: Account does not exist or Incorrect password.");
             return;
         } else if (DBUtil.getInstance().isExit(
                 UserTable.name,
                 new String[]{UserTable.Field.account, UserTable.Field.isOnline},
                 new Object[]{account, 1})) { //用户已登录
-            super.response(ioSession, CommandType.USER_LOGIN_ACK, false, "ERROR LOGIN: Account is logged in.");
+            super.response(ioSession, CommandType.USER_LOGIN_ACK, false, "登录失败: Account is logged in.");
             return;
         }
 
@@ -46,10 +46,10 @@ public class LogInPo extends ActionPo {
             //在session中记录account名称
             AttributeOperate.getInstance().setAccountOfAttribute(ioSession,account);
 
-            super.response(ioSession, CommandType.USER_LOGIN_ACK, true, "SUCCESS LOGIN: Welcome!");
+            super.response(ioSession, CommandType.USER_LOGIN_ACK, true, "登录成功: Welcome!");
         } else {
             //更新在线状态失败
-            super.response(ioSession, CommandType.USER_LOGIN_ACK, false, "ERROR LOGIN: Account does not exist or Incorrect password.");
+            super.response(ioSession, CommandType.USER_LOGIN_ACK, false, "登录失败: Account does not exist or Incorrect password.");
             return;
         }
 
