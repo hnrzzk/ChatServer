@@ -18,6 +18,8 @@ import java.util.Properties;
  * Created by zhangkai on 2016/12/26.
  */
 public class DBManager {
+    String filePath = "../config/dbcpconfig.properties";
+
     private final static Logger logger = LoggerFactory.getLogger(DBManager.class);
 
     private static class DBUtilHandler {
@@ -34,7 +36,7 @@ public class DBManager {
         Properties properties = new Properties();
 
         try {
-            properties.load(DBManager.class.getClassLoader().getResourceAsStream("dbcpconfig.properties"));
+            properties.load(DBManager.class.getClassLoader().getResourceAsStream("filePath"));
             ds = BasicDataSourceFactory.createDataSource(properties);
         } catch (Exception e) {
             logger.error(e.getMessage(), e);
@@ -44,7 +46,7 @@ public class DBManager {
     }
 
     public Connection getConnection() throws SQLException {
-        Connection connection=ds.getConnection();
+        Connection connection = ds.getConnection();
         return connection;
     }
 

@@ -9,7 +9,7 @@ import java.util.Properties;
  * Created by zhangkai on 2016/12/27.
  */
 public class Config {
-    private String filePath;
+    private String filePath = "ChatServerConfig.properties";
 
     public Config() {
         this("ChatServerConfig.properties");
@@ -27,13 +27,13 @@ public class Config {
 
         ClassLoader classLoader = Config.class.getClassLoader();
         if (classLoader != null) {
-            System.out.println("项目路径：" + classLoader.getResource("ChatServerConfig.properties").toString());
+            System.out.println("项目路径：" + classLoader.getResource(filePath).toString());
         } else {
-            System.out.println("项目路径：" + ClassLoader.getSystemResource("ChatServerConfig.properties").getPath());
+            System.out.println("项目路径：" + ClassLoader.getSystemResource(filePath).getPath());
         }
 
         Properties properties = new Properties();
-        properties.load(Config.class.getClassLoader().getResourceAsStream("ChatServerConfig.properties"));
+        properties.load(Config.class.getClassLoader().getResourceAsStream(filePath));
 
         ServerInfo serverInfo = new ServerInfo();
 

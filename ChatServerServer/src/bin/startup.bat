@@ -1,0 +1,1 @@
+java -cp %~dp0..\libs\* com.prefect.chatserver.server.ChatServer
