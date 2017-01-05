@@ -1,6 +1,7 @@
 package com.prefect.chatserver.server.db;
 
-import org.apache.commons.dbcp.BasicDataSourceFactory;
+
+import org.apache.commons.dbcp2.BasicDataSourceFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

@@ -168,6 +168,8 @@ public class DBDao {
      * @return
      */
     public boolean changeAccountOnlineStatus(String account, int onlineStatus) {
+        boolean result = false;
+
         //update $tableName set $filed = 0 where $field1 = ?
         String sql = new StringBuilder()
                 .append("update ").append(UserTable.name)
@@ -175,11 +177,14 @@ public class DBDao {
                 .append(UserTable.Field.account).append("=?")
                 .toString();
 
-        if (DBUtil.getInstance().executeUpdate(sql, new Object[]{account}) != null) {
-            return true;
-        } else {
-            return false;
+        ChatServerDbConnectUnit chatServerDbConnectUnit = DBUtil.getInstance().executeUpdate(sql, new Object[]{account});
+        if (chatServerDbConnectUnit != null) {
+            result = true;
         }
+        //关闭数据库连接
+        chatServerDbConnectUnit.close();
+
+        return result;
     }
 
     /**
@@ -241,12 +246,13 @@ public class DBDao {
 
     /**
      * 检查该用户是否是管理员
-     * @param userAccount   用户帐号
+     *
+     * @param userAccount 用户帐号
      * @return
      */
-    public boolean authorityCheck(String userAccount){
+    public boolean authorityCheck(String userAccount) {
         return DBUtil.getInstance().isExit(UserTable.name,
-                new String[]{UserTable.Field.account,UserTable.Field.identify},
+                new String[]{UserTable.Field.account, UserTable.Field.identify},
                 new Object[]{userAccount, AuthorityTable.ADMINISTER});
     }
 
