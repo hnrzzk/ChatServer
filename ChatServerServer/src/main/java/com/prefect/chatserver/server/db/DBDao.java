@@ -1,6 +1,7 @@
 package com.prefect.chatserver.server.db;
 
 import com.prefect.chatserver.commoms.utils.TimeUtil;
+import com.prefect.chatserver.commoms.utils.moudel.UserInfo;
 import com.prefect.chatserver.server.db.TableInfo.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -29,7 +30,7 @@ public class DBDao {
     }
 
     public static DBDao getInstance() {
-        return DBDaoHandle.instance;
+         return DBDaoHandle.instance;
     }
 
     /**
@@ -130,13 +131,13 @@ public class DBDao {
     }
 
     /**
-     * 查找指定用户的朋友类表
+     * 根据在线状态查找指定用户的朋友列表
      *
      * @param uesrAccount  账号
      * @param onLineStatue (1在线用户 0离线用户 -1所有用户)
      * @return
      */
-    public List<String> getFriendLIst(String uesrAccount, int onLineStatue) {
+    public List<String> getFriendListForOnlineStatus(String uesrAccount, int onLineStatue) {
 
         //select friends.friend_account from friends left join user on friends.friend_account=user.account where friend.user_account=? and user.is_online = ?;
         String sql = new StringBuilder().append("select ").append(FriendsTable.name).append(".").append(FriendsTable.Field.friendAccount)
@@ -287,16 +288,18 @@ public class DBDao {
      * @return 影响的行数，-1 执行失败
      */
     public int cancelGagAccount(String account) {
+        //update user_gag set cancel=1 , cancel_time=? where account=? and cancel=?;
         String sql = new StringBuilder()
                 .append("update ").append(UserGagTable.name)
                 .append(" set ").append(UserGagTable.Field.cancel).append("=").append(UserGagTable.Status.CANCEL)
                 .append(",").append(UserGagTable.Field.cancelTime).append("=?")
                 .append(" where ").append(UserGagTable.Field.account).append("=?")
+                .append(" and ").append(UserGagTable.Field.cancel).append("=?")
                 .toString();
 
         ChatServerDbConnectUnit chatServerDbConnectUnit = DBUtil.getInstance().executeUpdate(
                 sql,
-                new Object[]{TimeUtil.getInstance().getTimeStampNow(), account});
+                new Object[]{TimeUtil.getInstance().getTimeStampNow(), account, UserNoLoginTable.Status.NO_LOGIN});
 
         if (chatServerDbConnectUnit != null) {
             return chatServerDbConnectUnit.getSuccessRow();
@@ -347,17 +350,19 @@ public class DBDao {
      * @param account
      * @return 影响的行数，-1 执行失败
      */
-    public int cancelNoLginAccount(String account) {
+    public int cancelNoLoginAccount(String account) {
+        //update user_no_login set cancel=1 , cancel_time=? where account=? and cancel=?;
         String sql = new StringBuilder()
                 .append("update ").append(UserNoLoginTable.name)
                 .append(" set ").append(UserNoLoginTable.Field.cancel).append("=").append(UserNoLoginTable.Status.CANCEL)
                 .append(",").append(UserNoLoginTable.Field.cancelTime).append("=?")
                 .append(" where ").append(UserNoLoginTable.Field.account).append("=?")
+                .append(" and ").append(UserNoLoginTable.Field.cancel).append("=?")
                 .toString();
 
         ChatServerDbConnectUnit chatServerDbConnectUnit = DBUtil.getInstance().executeUpdate(
                 sql,
-                new Object[]{TimeUtil.getInstance().getTimeStampNow(), account});
+                new Object[]{TimeUtil.getInstance().getTimeStampNow(), account, UserNoLoginTable.Status.NO_LOGIN});
 
         if (chatServerDbConnectUnit != null) {
             return chatServerDbConnectUnit.getSuccessRow();
@@ -379,5 +384,58 @@ public class DBDao {
                 new Object[]{account, UserNoLoginTable.Status.NO_LOGIN});
     }
 
+    /**
+     * 根据昵称查找符合条件的用户
+     *
+     * @param nickName 昵称
+     * @return
+     */
+    public List<UserInfo> findUserForNickName(String nickName) {
+        return findUser(UserTable.Field.nickName, nickName);
+    }
+
+    /**
+     * 根据账号查找符合条件的用户
+     *
+     * @param account
+     * @return
+     */
+    public List<UserInfo> findUserForAccount(String account) {
+        return findUser(UserTable.Field.account, account);
+    }
+
+    private List<UserInfo> findUser(String columnName, String nickName) {
+        //select id,account,nick_name,sex from user where nick_name = ?
+        String sql = new StringBuilder()
+                .append("select ")
+                .append(UserTable.Field.id).append(",")
+                .append(UserTable.Field.account).append(",")
+                .append(UserTable.Field.nickName).append(",")
+                .append(UserTable.Field.sex)
+                .append(" from ")
+                .append(UserTable.name)
+                .append(" where ")
+                .append(columnName).append(" like ?")
+                .toString();
+
+        List<UserInfo> resultList = new ArrayList<>();
+
+        ChatServerDbConnectUnit chatServerDbConnectUnit = DBUtil.getInstance().executeQuery(sql, new Object[]{"%" + nickName + "%"});
+        ResultSet resultSet = chatServerDbConnectUnit.getResultSet();
+        try {
+            while (resultSet.next()) {
+                UserInfo userInfo = new UserInfo();
+                userInfo.setId(resultSet.getLong(1));
+                userInfo.setAccount(resultSet.getString(2));
+                userInfo.setNickname(resultSet.getString(3));
+                userInfo.setSex(resultSet.getString(4));
+                resultList.add(userInfo);
+            }
+        } catch (SQLException e) {
+            logger.error(e.getMessage(), e);
+        }
+
+        return resultList;
+    }
 }
 

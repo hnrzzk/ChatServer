@@ -1,4 +1,4 @@
-package com.prefect.chatserver.server.process;
+package com.prefect.chatserver.server.process.relationship;
 
 import com.alibaba.fastjson.JSON;
 import com.prefect.chatserver.commoms.utils.CommandType;
@@ -6,6 +6,7 @@ import com.prefect.chatserver.commoms.utils.MessagePacket;
 import com.prefect.chatserver.commoms.utils.moudel.RelationShipMessage;
 import com.prefect.chatserver.server.db.DBUtil;
 import com.prefect.chatserver.server.db.TableInfo.BlackListTable;
+import com.prefect.chatserver.server.process.ActionPo;
 import org.apache.mina.core.session.IoSession;
 
 import java.util.HashMap;
@@ -15,7 +16,7 @@ import java.util.Map;
  * 移除黑名单类
  * Created by zhangkai on 2017/1/3.
  */
-public class BlackListRemovePo extends ActionPo{
+public class BlackListRemovePo extends ActionPo {
     @Override
     public void process(IoSession ioSession, MessagePacket messageObj) {
         //类型转换 从json到object

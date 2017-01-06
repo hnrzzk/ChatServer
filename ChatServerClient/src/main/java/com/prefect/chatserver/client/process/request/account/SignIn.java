@@ -18,7 +18,7 @@ class SignIn {
     public void requestSiginIn(IoSession ioSession) {
         MessagePacket message = new MessagePacket();
 
-        message.setMessageType(MessageType.USER_MANAGE);
+        message.setMessageType(MessageType.USER_INFO);
         message.setCommand(CommandType.USER_SIGN_IN);
 
         String jsonObject = JSON.toJSONString(getUserInfo());

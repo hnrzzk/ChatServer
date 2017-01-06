@@ -36,6 +36,9 @@ public class ResponsePoFactory {
             case CommandType.CHAT_ROOM_QUIT_ACK:
             case CommandType.CHAT_ROOM_SEND_ACK:
                 return new ChatRoomResponsePo();
+
+            case CommandType.USER_FIND_ACK:
+                return new FindFriendListResponsePo();
             default:
                 return null;
         }

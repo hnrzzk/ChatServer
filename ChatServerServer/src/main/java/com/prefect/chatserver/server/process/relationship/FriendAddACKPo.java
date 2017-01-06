@@ -1,4 +1,4 @@
-package com.prefect.chatserver.server.process;
+package com.prefect.chatserver.server.process.relationship;
 
 import com.alibaba.fastjson.JSON;
 import com.prefect.chatserver.commoms.utils.CommandType;
@@ -6,6 +6,7 @@ import com.prefect.chatserver.commoms.utils.MessagePacket;
 import com.prefect.chatserver.commoms.utils.moudel.RelationShipMessage;
 import com.prefect.chatserver.server.handle.ChatServerHandler;
 import com.prefect.chatserver.server.db.DBDao;
+import com.prefect.chatserver.server.process.ActionPo;
 import org.apache.mina.core.session.IoSession;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

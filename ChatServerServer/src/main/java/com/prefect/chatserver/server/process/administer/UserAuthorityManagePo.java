@@ -9,7 +9,6 @@ import com.prefect.chatserver.server.db.DBDao;
 import org.apache.mina.core.session.IoSession;
 
 import java.sql.Timestamp;
-import java.util.List;
 
 /**
  * 用户禁言逻辑
@@ -129,7 +128,7 @@ public class UserAuthorityManagePo extends AdministerPo {
         boolean processResult;
         String message;
 
-        int successRows = DBDao.getInstance().cancelNoLginAccount(account);
+        int successRows = DBDao.getInstance().cancelNoLoginAccount(account);
         if (successRows > 0) {
             processResult = true;
             message = "Cancel No Login Success, account:" + account;

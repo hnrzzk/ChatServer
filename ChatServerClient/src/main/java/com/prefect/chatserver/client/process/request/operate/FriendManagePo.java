@@ -7,13 +7,18 @@ import com.prefect.chatserver.commoms.utils.CommandType;
 import com.prefect.chatserver.commoms.utils.MessagePacket;
 import com.prefect.chatserver.commoms.utils.MessageType;
 import com.prefect.chatserver.commoms.utils.moudel.RelationShipMessage;
+import com.prefect.chatserver.commoms.utils.moudel.UserInfo;
 
 /**
+ * 好友管理请求
  * Created by liuxiaonan on 2016/12/31.
  */
-public class FriendManagePo extends OperatePo{
+public class FriendManagePo extends OperatePo {
     public final String addFriend = "add";
     public final String removeFriend = "remove";
+    public final String find = "find";
+    public final String findNickName = "nickName";
+    public final String findAccount = "account";
 
     public FriendManagePo(String[] strings) {
         super(strings);
@@ -37,15 +42,25 @@ public class FriendManagePo extends OperatePo{
                     //-friend remove userAccount
                     requestRemoveFriend(userAccount);
                     break;
+                case find:
+                    String type = strings[2];
+                    String info = strings[3];
+                    requestFindFriend(type, info);
+                    break;
                 default:
                     printHelpInfo();
             }
-        }catch (ArrayIndexOutOfBoundsException e){
+        } catch (ArrayIndexOutOfBoundsException e) {
             Interactive.getInstance().printlnToConsole("命令错误");
             printHelpInfo();
         }
     }
 
+    /**
+     * 请求增加好友
+     *
+     * @param friendAccount
+     */
     private void requestAddFriend(String friendAccount) {
         RelationShipMessage relationShipMessage = new RelationShipMessage();
         relationShipMessage.setUserAccount(ChatClient.account);
@@ -63,6 +78,11 @@ public class FriendManagePo extends OperatePo{
         ChatClient.session.write(messagePacket);
     }
 
+    /**
+     * 请求删除好友
+     *
+     * @param account
+     */
     private void requestRemoveFriend(String account) {
         RelationShipMessage relationShipMessage = new RelationShipMessage();
         relationShipMessage.setUserAccount(ChatClient.account);
@@ -79,10 +99,39 @@ public class FriendManagePo extends OperatePo{
         ChatClient.session.write(messagePacket);
     }
 
+    /**
+     * 请求查找好友
+     *
+     * @param type
+     * @param info
+     */
+    private void requestFindFriend(String type, String info) {
+        MessagePacket messagePacket = new MessagePacket();
+        messagePacket.setCommand(CommandType.USER_FIND);
+        messagePacket.setMessageType(MessageType.USER_INFO);
+
+        UserInfo userInfo = new UserInfo();
+        switch (type) {
+            case findNickName:
+                userInfo.setNickname(info);
+                break;
+            case findAccount:
+                userInfo.setAccount(info);
+                break;
+        }
+        String json = JSON.toJSONString(userInfo);
+        messagePacket.setMessageLength(json.getBytes().length);
+        messagePacket.setMessage(json);
+
+        ChatClient.session.write(messagePacket);
+    }
+
     private void printHelpInfo() {
         String string = new StringBuilder()
                 .append("-friend add [UserAccount] 增加好友\n")
-                .append("-friend remove [UserAccount] 移除好友")
+                .append("-friend remove [UserAccount] 移除好友\n")
+                .append("-friend find nickName [UserNickName] 按照昵称查找好友\n")
+                .append("-friend find account [UserNickName] 按照账户查找好友\n")
                 .toString();
         Interactive.getInstance().printlnToConsole(string);
     }

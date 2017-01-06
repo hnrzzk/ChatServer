@@ -12,7 +12,7 @@ public class MessageType {
     /**
      * 用户管理消息 对应 UserInfo
      */
-    public static final int USER_MANAGE = 0x0003;
+    public static final int USER_INFO = 0x0003;
 
     /**
      * 聊天消息 对应  ChatMessage
@@ -43,4 +43,9 @@ public class MessageType {
      * 用户权限管理 对应 UserAuthorityManageMessage
      */
     public static final int USER_AUTHORITY_MANAGE=0x0009;
+
+    /**
+     * 用户列表 对应UserListInfo
+     */
+    public static final int USER_LIST=0x000A;
 }

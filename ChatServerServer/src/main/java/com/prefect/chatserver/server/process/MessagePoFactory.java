@@ -6,8 +6,7 @@ import com.prefect.chatserver.server.process.administer.UserAuthorityManagePo;
 import com.prefect.chatserver.server.process.chatroom.ChatRoomEnterPo;
 import com.prefect.chatserver.server.process.chatroom.ChatRoomQuit;
 import com.prefect.chatserver.server.process.chatroom.ChatRoomSend;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import com.prefect.chatserver.server.process.relationship.*;
 
 /**
  * 业务处理类工厂
@@ -45,6 +44,8 @@ public class MessagePoFactory {
             case CommandType.USER_NO_LOGIN:
             case CommandType.USER_NO_LOGIN_CANCEL:
                 return new UserAuthorityManagePo();
+            case CommandType.USER_FIND:
+                return new FindUser();
             default:
                 return null;
         }

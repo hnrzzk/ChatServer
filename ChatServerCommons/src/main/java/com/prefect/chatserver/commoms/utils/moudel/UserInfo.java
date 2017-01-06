@@ -27,7 +27,7 @@ public class UserInfo {
      */
     int isOnline;
 
-    byte sex;
+    String sex;
 
     Timestamp registerTime;
 
@@ -71,11 +71,11 @@ public class UserInfo {
         this.isOnline = isOnline;
     }
 
-    public byte getSex() {
+    public String getSex() {
         return sex;
     }
 
-    public void setSex(byte sex) {
+    public void setSex(String sex) {
         this.sex = sex;
     }
 

@@ -19,7 +19,7 @@ class LoginPo {
     public void requestLoginIn(IoSession ioSession) {
         MessagePacket message = new MessagePacket();
 
-        message.setMessageType(MessageType.USER_MANAGE);
+        message.setMessageType(MessageType.USER_INFO);
         message.setCommand(CommandType.USER_LOGIN);
 
         String jsonObject = JSON.toJSONString(getUserInfo());

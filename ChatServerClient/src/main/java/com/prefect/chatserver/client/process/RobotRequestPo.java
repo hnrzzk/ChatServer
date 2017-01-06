@@ -41,7 +41,7 @@ public class RobotRequestPo {
         //编辑报文
         MessagePacket messagePacket = new MessagePacket();
         messagePacket.setCommand(CommandType.USER_SIGN_IN);
-        messagePacket.setMessageType(MessageType.USER_MANAGE);
+        messagePacket.setMessageType(MessageType.USER_INFO);
 
         UserInfo userInfo = new UserInfo();
         userInfo.setAccount(account);
@@ -67,7 +67,7 @@ public class RobotRequestPo {
 
         MessagePacket messagePacket = new MessagePacket();
         messagePacket.setCommand(CommandType.USER_LOGIN);
-        messagePacket.setMessageType(MessageType.USER_MANAGE);
+        messagePacket.setMessageType(MessageType.USER_INFO);
 
         UserInfo userInfo = new UserInfo();
         userInfo.setAccount(account);

@@ -56,7 +56,7 @@ public class LogOutPo extends ActionPo {
     private void sendOfflineNotice(String account) {
 
         //根据得到该账号的在线好友列表
-        List<String> accountList = DBDao.getInstance().getFriendLIst(account, 1);
+        List<String> accountList = DBDao.getInstance().getFriendListForOnlineStatus(account, 1);
 
         //生产消息字符串
         String message = new StringBuilder().append("您的好友").append(account).append("已下线").toString();

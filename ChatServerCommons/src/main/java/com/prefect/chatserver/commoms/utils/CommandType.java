@@ -73,6 +73,10 @@ public class CommandType {
     public final static int USER_NO_LOGIN_CANCEL=0x000E;
     public final static int USER_NO_LOGIN_CANCEL_ACK=0x010E;
 
+    //查找用户
+    public final static int USER_FIND=0x000F;
+    public final static int USER_FIND_ACK=0x010F;
+
 //    //好友列表请求
 //    public final static int FRIEND_LIST_GET= 0x2010;
 //    public final static int FRIEND_LIST_GET_ACK= 0x0003;
