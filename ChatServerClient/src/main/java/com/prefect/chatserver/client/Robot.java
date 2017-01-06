@@ -2,7 +2,7 @@ package com.prefect.chatserver.client;
 
 import com.prefect.chatserver.client.handler.RobotHandler;
 import com.prefect.chatserver.commoms.codefactory.ChatServerCodecFactory;
-import com.prefect.chatserver.commoms.util.AttributeOperate;
+import com.prefect.chatserver.commoms.utils.AttributeOperate;
 import org.apache.mina.core.RuntimeIoException;
 import org.apache.mina.core.future.ConnectFuture;
 import org.apache.mina.core.session.IoSession;

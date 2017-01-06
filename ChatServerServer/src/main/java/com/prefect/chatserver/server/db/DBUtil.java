@@ -70,6 +70,8 @@ public class DBUtil {
         Connection connection = null;
         PreparedStatement statement = null;
         ResultSet resultSet = null;
+        int successRow = -1;
+
         try {
             connection = this.dbManager.getConnection();
             statement = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
@@ -77,7 +79,7 @@ public class DBUtil {
                 statement.setObject(i + 1, values[i]);
             }
 
-            statement.executeUpdate();
+            successRow = statement.executeUpdate();
             resultSet = statement.getGeneratedKeys();
         } catch (SQLException e) {
             DBManager.closeResultSet(resultSet);
@@ -87,7 +89,7 @@ public class DBUtil {
             return null;
         }
 
-        return new ChatServerDbConnectUnit(resultSet, statement, connection);
+        return new ChatServerDbConnectUnit(resultSet, statement, connection, successRow);
     }
 
     /**
@@ -153,9 +155,9 @@ public class DBUtil {
      *
      * @param tableName 数据表
      * @param data      要插入的数据
-     * @return 返回一个ResultSet里面保存了受影响的key
+     * @return 返回一个ResultSet里面保存了受影响的key 如果没有则返回null
      */
-    public Object executeInsert(String tableName, Map<String, Object> data) {
+    public Object insert(String tableName, Map<String, Object> data) {
         if (data.isEmpty()) {
             return null;
         }
@@ -202,11 +204,12 @@ public class DBUtil {
 
     /**
      * 删除数据库的数据
-     * @param table 表名
+     *
+     * @param table     表名
      * @param condition 条件
      * @return 受影响的id列表
      */
-    public List<Long>  deleteRow(String table, Map<String, Object> condition) {
+    public List<Long> deleteRow(String table, Map<String, Object> condition) {
         Object[] values = new Object[condition.size()];
 
         StringBuilder conditionSql = new StringBuilder("");
@@ -224,7 +227,7 @@ public class DBUtil {
 
         ChatServerDbConnectUnit chatServerDbConnectUnit = this.executeUpdate(sql, values);
         ResultSet resultSet = chatServerDbConnectUnit.getResultSet();
-        List<Long> list=new ArrayList<>();
+        List<Long> list = new ArrayList<>();
 
         try {
             while (resultSet.next()) {

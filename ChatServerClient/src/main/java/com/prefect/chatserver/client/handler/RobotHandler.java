@@ -3,7 +3,7 @@ package com.prefect.chatserver.client.handler;
 import com.prefect.chatserver.client.Robot;
 import com.prefect.chatserver.client.process.RobotRequestPo;
 import com.prefect.chatserver.client.process.RobotResponsePo;
-import com.prefect.chatserver.commoms.util.MessagePacket;
+import com.prefect.chatserver.commoms.utils.MessagePacket;
 import org.apache.mina.core.service.IoHandler;
 import org.apache.mina.core.session.IdleStatus;
 import org.apache.mina.core.session.IoSession;

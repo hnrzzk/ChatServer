@@ -1,13 +1,13 @@
 package com.prefect.chatserver.server.process;
 
 import com.alibaba.fastjson.JSON;
-import com.prefect.chatserver.commoms.util.AttributeOperate;
-import com.prefect.chatserver.commoms.util.CommandType;
-import com.prefect.chatserver.commoms.util.MessagePacket;
-import com.prefect.chatserver.commoms.util.MessageType;
+import com.prefect.chatserver.commoms.utils.AttributeOperate;
+import com.prefect.chatserver.commoms.utils.CommandType;
+import com.prefect.chatserver.commoms.utils.MessagePacket;
+import com.prefect.chatserver.commoms.utils.MessageType;
 import com.prefect.chatserver.server.db.DBDao;
 import com.prefect.chatserver.server.db.DBUtil;
-import com.prefect.chatserver.commoms.util.moudel.UserInfo;
+import com.prefect.chatserver.commoms.utils.moudel.UserInfo;
 import com.prefect.chatserver.server.handle.ChatServerHandler;
 import com.prefect.chatserver.server.db.TableInfo.UserTable;
 import org.apache.mina.core.session.IoSession;
@@ -28,6 +28,7 @@ public class LogInPo extends ActionPo {
         String account = userInfo.getAccount();
         String password = userInfo.getPassword();
 
+        //判断用户是否可以登录
         if (!DBUtil.getInstance().isExit(
                 UserTable.name,
                 new String[]{UserTable.Field.account, UserTable.Field.password},
@@ -40,8 +41,12 @@ public class LogInPo extends ActionPo {
                 new Object[]{account, 1})) { //用户已登录
             super.response(ioSession, CommandType.USER_LOGIN_ACK, false, "登录失败: Account is logged in.");
             return;
+        } else if (DBDao.getInstance().isNoLogin(account)){
+            super.response(ioSession, CommandType.USER_LOGIN_ACK, false, "登录失败: Account are prohibited to log on");
+            return;
         }
 
+        //更新在线状态
         if (DBDao.getInstance().changeAccountOnlineStatus(account, 1)) { //更新在线状态 成功
             //将已建立的连接保存在内存中
             ChatServerHandler.sessionMap.put(account, ioSession);

@@ -1,6 +1,6 @@
 package com.prefect.chatserver.client.process.response;
 
-import com.prefect.chatserver.commoms.util.MessagePacket;
+import com.prefect.chatserver.commoms.utils.MessagePacket;
 
 /**
  * Created by zhangkai on 2016/12/28.

@@ -1,6 +1,6 @@
 package com.prefect.chatserver.server.process;
 
-import com.prefect.chatserver.commoms.util.MessagePacket;
+import com.prefect.chatserver.commoms.utils.MessagePacket;
 import org.apache.mina.core.session.IoSession;
 
 

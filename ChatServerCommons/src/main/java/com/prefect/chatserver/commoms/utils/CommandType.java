@@ -1,4 +1,4 @@
-package com.prefect.chatserver.commoms.util;
+package com.prefect.chatserver.commoms.utils;
 
 /**
  * 命令类型
@@ -56,6 +56,22 @@ public class CommandType {
     //用户发送广播请求
     public final static int SEND_BROADCAST = 0x000A;
     public final static int SEND_BROADCAST_ACK=0x010A;
+
+    //用户禁言
+    public final static int USER_GAG=0x000B;
+    public final static int USER_GAG_ACK=0x010B;
+
+    //用户禁言取消
+    public final static int USER_GAG_CANCEL=0x000C;
+    public final static int USER_GAG_CANCEL_ACK=0x010C;
+
+    //禁封用户登录
+    public final static int USER_NO_LOGIN=0x000D;
+    public final static int USER_NO_LOGIN_ACK=0x010D;
+
+    //禁封用户登录取消
+    public final static int USER_NO_LOGIN_CANCEL=0x000E;
+    public final static int USER_NO_LOGIN_CANCEL_ACK=0x010E;
 
 //    //好友列表请求
 //    public final static int FRIEND_LIST_GET= 0x2010;

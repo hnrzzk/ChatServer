@@ -1,11 +1,9 @@
 package com.prefect.chatserver.server.process;
 
 import com.alibaba.fastjson.JSON;
-import com.prefect.chatserver.commoms.util.CommandType;
-import com.prefect.chatserver.commoms.util.MessagePacket;
-import com.prefect.chatserver.commoms.util.MessageType;
-import com.prefect.chatserver.commoms.util.moudel.ActionResponseMessage;
-import com.prefect.chatserver.commoms.util.moudel.ChatMessage;
+import com.prefect.chatserver.commoms.utils.MessagePacket;
+import com.prefect.chatserver.commoms.utils.MessageType;
+import com.prefect.chatserver.commoms.utils.moudel.ActionResponseMessage;
 import com.prefect.chatserver.server.handle.ChatServerHandler;
 import org.apache.mina.core.session.IoSession;
 
@@ -26,7 +24,7 @@ public abstract class ActionPo implements MessageProcess {
      * @param result      请求执行结果
      * @param message     详细信息
      */
-    void response(IoSession ioSession, int commandType, boolean result, String message) {
+    protected void response(IoSession ioSession, int commandType, boolean result, String message) {
         if (ioSession != null) {
             MessagePacket messagePacket = new MessagePacket();
             messagePacket.setMessageType(MessageType.RESPONSE);
@@ -50,7 +48,7 @@ public abstract class ActionPo implements MessageProcess {
      * @param accountList   需要发送通知的用户列表
      * @param messagePacket 发送的消息
      */
-    void sendNotice(List<String> accountList, MessagePacket messagePacket) {
+    protected void sendNotice(List<String> accountList, MessagePacket messagePacket) {
         for (IoSession itemSession : getSession(accountList)) {
             if (itemSession != null) {
                 itemSession.write(messagePacket);
@@ -63,7 +61,7 @@ public abstract class ActionPo implements MessageProcess {
      *
      * @param accountList
      */
-    List<IoSession> getSession(List<String> accountList) {
+    private List<IoSession> getSession(List<String> accountList) {
         //当前活动的IoSession列表
         List<IoSession> activeSessionList = new ArrayList<>();
 

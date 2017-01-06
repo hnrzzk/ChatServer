@@ -1,4 +1,4 @@
-package com.prefect.chatserver.commoms.util.moudel;
+package com.prefect.chatserver.commoms.utils.moudel;
 
 /**
  * 服务器对客户端请求的响应消息

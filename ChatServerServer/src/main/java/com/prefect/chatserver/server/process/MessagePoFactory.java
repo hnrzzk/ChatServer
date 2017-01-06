@@ -1,6 +1,8 @@
 package com.prefect.chatserver.server.process;
 
-import com.prefect.chatserver.commoms.util.CommandType;
+import com.prefect.chatserver.commoms.utils.CommandType;
+import com.prefect.chatserver.server.process.administer.BroadcastPo;
+import com.prefect.chatserver.server.process.administer.UserAuthorityManagePo;
 import com.prefect.chatserver.server.process.chatroom.ChatRoomEnterPo;
 import com.prefect.chatserver.server.process.chatroom.ChatRoomQuit;
 import com.prefect.chatserver.server.process.chatroom.ChatRoomSend;
@@ -12,10 +14,8 @@ import org.slf4j.LoggerFactory;
  * Created by zhangkai on 2016/12/27.
  */
 public class MessagePoFactory {
-    private final static Logger logger = LoggerFactory.getLogger(MessagePoFactory.class);
 
     public static MessageProcess getClass(int commandType) {
-        MessageProcess messageProcess = null;
         switch (commandType) {
             case CommandType.USER_LOGIN:    //用户登录
                 return new LogInPo();
@@ -40,7 +40,13 @@ public class MessagePoFactory {
                 return new ChatRoomQuit();
             case CommandType.SEND_BROADCAST:    //用户请求发送广播
                 return new BroadcastPo();
+            case CommandType.USER_GAG:
+            case CommandType.USER_GAG_CANCEL:
+            case CommandType.USER_NO_LOGIN:
+            case CommandType.USER_NO_LOGIN_CANCEL:
+                return new UserAuthorityManagePo();
+            default:
+                return null;
         }
-        return messageProcess;
     }
 }

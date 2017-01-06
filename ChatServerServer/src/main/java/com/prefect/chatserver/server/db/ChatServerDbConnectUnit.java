@@ -9,10 +9,11 @@ import java.sql.ResultSet;
  * Created by zhangkai on 2016/12/28.
  */
 public class ChatServerDbConnectUnit {
-    public ChatServerDbConnectUnit(ResultSet resultSet, PreparedStatement statement, Connection connection) {
+    public ChatServerDbConnectUnit(ResultSet resultSet, PreparedStatement statement, Connection connection, int successRows) {
         this.resultSet = resultSet;
         this.statement = statement;
         this.connection = connection;
+        this.successRow = successRows;
     }
 
     private ResultSet resultSet;
@@ -20,6 +21,10 @@ public class ChatServerDbConnectUnit {
     private PreparedStatement statement;
 
     private int successRow;
+
+    public ChatServerDbConnectUnit(ResultSet resultSet, PreparedStatement statement, Connection connection) {
+        this(resultSet, statement, connection, 0);
+    }
 
     public ResultSet getResultSet() {
         return resultSet;
@@ -59,7 +64,7 @@ public class ChatServerDbConnectUnit {
         DBManager.closeConnection(this.connection);
     }
 
-    protected void finalize(){
+    protected void finalize() {
         this.close();
     }
 }

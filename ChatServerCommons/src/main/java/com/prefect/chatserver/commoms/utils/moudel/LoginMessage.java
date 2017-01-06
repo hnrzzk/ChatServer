@@ -1,4 +1,4 @@
-package com.prefect.chatserver.commoms.util.moudel;
+package com.prefect.chatserver.commoms.utils.moudel;
 
 /**
  * Created by zhangkai on 2016/12/26.

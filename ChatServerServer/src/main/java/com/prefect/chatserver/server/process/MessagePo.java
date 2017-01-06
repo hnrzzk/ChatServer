@@ -1,11 +1,11 @@
 package com.prefect.chatserver.server.process;
 
 import com.alibaba.fastjson.JSON;
-import com.prefect.chatserver.commoms.util.CommandType;
-import com.prefect.chatserver.commoms.util.MessagePacket;
-import com.prefect.chatserver.commoms.util.MessageType;
-import com.prefect.chatserver.commoms.util.moudel.ChatMessage;
-import com.prefect.chatserver.commoms.util.moudel.RelationShipMessage;
+import com.prefect.chatserver.commoms.utils.CommandType;
+import com.prefect.chatserver.commoms.utils.MessagePacket;
+import com.prefect.chatserver.commoms.utils.MessageType;
+import com.prefect.chatserver.commoms.utils.moudel.ChatMessage;
+import com.prefect.chatserver.commoms.utils.moudel.RelationShipMessage;
 import com.prefect.chatserver.server.handle.ChatServerHandler;
 import com.prefect.chatserver.server.db.DBDao;
 import org.apache.mina.core.session.IoSession;
@@ -32,8 +32,17 @@ public class MessagePo extends ActionPo {
     private void sendChatMessage(IoSession ioSession, MessagePacket messageObj) {
         ChatMessage chatMessage = JSON.parseObject(messageObj.getMessage(), ChatMessage.class);
 
+        String sendAccount = chatMessage.getSendAccount();
+        String receiveAccount = chatMessage.getReceiveAccount();
+
+        //判读是否被禁言
+        if (DBDao.getInstance().isGag(sendAccount)) {
+            response(ioSession, CommandType.MESSAGE_ACK, false, "Sorry, you have been gagged.");
+            return;
+        }
+
         //判断是否在黑名单中
-        if (!DBDao.getInstance().isInBlackList(chatMessage.getReceiveAccount(), chatMessage.getSendAccount())) {
+        if (!DBDao.getInstance().isInBlackList(receiveAccount, sendAccount)) {
             IoSession receiveSecession = ChatServerHandler.sessionMap.get(chatMessage.getReceiveAccount());
             if (receiveSecession != null) { //如果好友在线则发送消息
                 receiveSecession.write(messageObj);

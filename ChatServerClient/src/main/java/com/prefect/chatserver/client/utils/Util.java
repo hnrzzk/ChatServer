@@ -1,6 +1,6 @@
 package com.prefect.chatserver.client.utils;
 
-import com.prefect.chatserver.commoms.util.AttributeOperate;
+import com.prefect.chatserver.commoms.utils.AttributeOperate;
 import org.apache.mina.core.session.IoSession;
 
 /**

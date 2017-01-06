@@ -2,11 +2,10 @@ package com.prefect.chatserver.client.process.request.operate;
 
 import com.alibaba.fastjson.JSON;
 import com.prefect.chatserver.client.ChatClient;
-import com.prefect.chatserver.commoms.util.CommandType;
-import com.prefect.chatserver.commoms.util.MessagePacket;
-import com.prefect.chatserver.commoms.util.MessageType;
-import com.prefect.chatserver.commoms.util.moudel.ChatMessage;
-import org.apache.mina.core.session.IoSession;
+import com.prefect.chatserver.commoms.utils.CommandType;
+import com.prefect.chatserver.commoms.utils.MessagePacket;
+import com.prefect.chatserver.commoms.utils.MessageType;
+import com.prefect.chatserver.commoms.utils.moudel.ChatMessage;
 
 /**
  * 发送消息的处理逻辑

@@ -1,10 +1,10 @@
 package com.prefect.chatserver.server.process.chatroom;
 
 import com.alibaba.fastjson.JSON;
-import com.prefect.chatserver.commoms.util.CommandType;
-import com.prefect.chatserver.commoms.util.MessagePacket;
-import com.prefect.chatserver.commoms.util.MessageType;
-import com.prefect.chatserver.commoms.util.moudel.ChatRoomMessage;
+import com.prefect.chatserver.commoms.utils.CommandType;
+import com.prefect.chatserver.commoms.utils.MessagePacket;
+import com.prefect.chatserver.commoms.utils.MessageType;
+import com.prefect.chatserver.commoms.utils.moudel.ChatRoomMessage;
 import com.prefect.chatserver.server.ChatServer;
 import org.apache.mina.core.session.IoSession;
 import org.slf4j.Logger;

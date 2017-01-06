@@ -1,4 +1,4 @@
-package com.prefect.chatserver.commoms.util;
+package com.prefect.chatserver.commoms.utils;
 
 import org.apache.mina.core.session.IoSession;
 

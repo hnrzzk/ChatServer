@@ -1,10 +1,10 @@
 package com.prefect.chatserver.server.process;
 
 import com.alibaba.fastjson.JSON;
-import com.prefect.chatserver.commoms.util.MessagePacket;
-import com.prefect.chatserver.commoms.util.CommandType;
+import com.prefect.chatserver.commoms.utils.MessagePacket;
+import com.prefect.chatserver.commoms.utils.CommandType;
 import com.prefect.chatserver.server.db.DBUtil;
-import com.prefect.chatserver.commoms.util.moudel.UserInfo;
+import com.prefect.chatserver.commoms.utils.moudel.UserInfo;
 import com.prefect.chatserver.server.db.TableInfo.UserTable;
 import org.apache.mina.core.session.IoSession;
 import org.slf4j.Logger;
@@ -47,7 +47,7 @@ public class SignInPo extends ActionPo {
         dataMap.put(UserTable.Field.registerTime, date);
 
         Object key;
-        if ((key = DBUtil.getInstance().executeInsert(UserTable.name, dataMap)) != null) {
+        if ((key = DBUtil.getInstance().insert(UserTable.name, dataMap)) != null) {
             long id = Long.parseLong(key.toString());
 
             if (id >= 0) {

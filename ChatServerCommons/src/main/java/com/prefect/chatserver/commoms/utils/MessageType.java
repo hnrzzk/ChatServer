@@ -1,4 +1,4 @@
-package com.prefect.chatserver.commoms.util;
+package com.prefect.chatserver.commoms.utils;
 
 /**
  * Created by zhangkai on 2016/12/27.
@@ -38,4 +38,9 @@ public class MessageType {
      * 聊天室消息 对应ChatRoomMessage
      */
     public static final int CHATROOM_MANAGE =0x0008;
+
+    /**
+     * 用户权限管理 对应 UserAuthorityManageMessage
+     */
+    public static final int USER_AUTHORITY_MANAGE=0x0009;
 }

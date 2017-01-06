@@ -1,5 +1,6 @@
 package com.prefect.chatserver.server.db;
 
+import com.prefect.chatserver.commoms.utils.TimeUtil;
 import com.prefect.chatserver.server.db.TableInfo.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -60,7 +61,7 @@ public class DBDao {
             dataMap.put(CategoryTable.Field.userAccount, account);
             dataMap.put(CategoryTable.Field.name, category);
 
-            Object key = dbUtil.executeInsert(CategoryTable.name, dataMap);
+            Object key = dbUtil.insert(CategoryTable.name, dataMap);
 
             if (key == null) {
                 return -1;
@@ -118,7 +119,7 @@ public class DBDao {
                 if (friendAccount != null) {
                     friendRelationship.put(FriendsTable.Field.categoryId, categoryId);
                 }
-                Object key = DBUtil.getInstance().executeInsert(FriendsTable.name, friendRelationship);
+                Object key = DBUtil.getInstance().insert(FriendsTable.name, friendRelationship);
                 return Long.parseLong(key.toString());
             } else {
                 return -1;
@@ -208,7 +209,7 @@ public class DBDao {
             friendRelationship.put(BlackListTable.Field.blackAccount, friendAccount);
             friendRelationship.put(BlackListTable.Field.createTime, date);
 
-            Object key = DBUtil.getInstance().executeInsert(BlackListTable.name, friendRelationship);
+            Object key = DBUtil.getInstance().insert(BlackListTable.name, friendRelationship);
             return Long.parseLong(key.toString());
 
         } else {
@@ -254,6 +255,128 @@ public class DBDao {
         return DBUtil.getInstance().isExit(UserTable.name,
                 new String[]{UserTable.Field.account, UserTable.Field.identify},
                 new Object[]{userAccount, AuthorityTable.ADMINISTER});
+    }
+
+    /**
+     * 增加禁言用户
+     *
+     * @param account 账户
+     * @param reason  原因
+     * @return 禁言表该条数据对应的id 如果没有则返回-1
+     */
+    public long addGagAccount(String account, String reason, Timestamp startTime, Timestamp endTime) {
+        Map<String, Object> conditions = new HashMap<>();
+        conditions.put(UserGagTable.Field.account, account);
+        conditions.put(UserGagTable.Field.reason, reason);
+        conditions.put(UserGagTable.Field.startTime, startTime);
+        conditions.put(UserGagTable.Field.endTimne, endTime);
+
+        Object result = DBUtil.getInstance().insert(UserGagTable.name, conditions);
+        if (reason != null) {
+            return Long.parseLong(result.toString());
+        } else {
+            return -1;
+        }
+
+    }
+
+    /**
+     * 取消用户禁言
+     *
+     * @param account
+     * @return 影响的行数，-1 执行失败
+     */
+    public int cancelGagAccount(String account) {
+        String sql = new StringBuilder()
+                .append("update ").append(UserGagTable.name)
+                .append(" set ").append(UserGagTable.Field.cancel).append("=").append(UserGagTable.Status.CANCEL)
+                .append(",").append(UserGagTable.Field.cancelTime).append("=?")
+                .append(" where ").append(UserGagTable.Field.account).append("=?")
+                .toString();
+
+        ChatServerDbConnectUnit chatServerDbConnectUnit = DBUtil.getInstance().executeUpdate(
+                sql,
+                new Object[]{TimeUtil.getInstance().getTimeStampNow(), account});
+
+        if (chatServerDbConnectUnit != null) {
+            return chatServerDbConnectUnit.getSuccessRow();
+        } else {
+            return -1;
+        }
+    }
+
+    /**
+     * 用户是否处于禁言中
+     *
+     * @param account
+     * @return
+     */
+    public boolean isGag(String account) {
+        return DBUtil.getInstance().isExit(
+                UserGagTable.name,
+                new String[]{UserGagTable.Field.account, UserGagTable.Field.cancel},
+                new Object[]{account, UserGagTable.Status.GAG});
+    }
+
+    /**
+     * 增加禁封登录用户
+     *
+     * @param account 账户
+     * @param reason  原因
+     * @return 禁言表该条数据对应的id 如果没有则返回-1
+     */
+    public long addNoLoginAccount(String account, String reason, Timestamp startTime, Timestamp endTime) {
+        Map<String, Object> conditions = new HashMap<>();
+        conditions.put(UserNoLoginTable.Field.account, account);
+        conditions.put(UserNoLoginTable.Field.reason, reason);
+        conditions.put(UserNoLoginTable.Field.startTime, startTime);
+        conditions.put(UserNoLoginTable.Field.endTime, endTime);
+
+        Object result = DBUtil.getInstance().insert(UserNoLoginTable.name, conditions);
+        if (reason != null) {
+            return Long.parseLong(result.toString());
+        } else {
+            return -1;
+        }
+
+    }
+
+    /**
+     * 取消禁封登录
+     *
+     * @param account
+     * @return 影响的行数，-1 执行失败
+     */
+    public int cancelNoLginAccount(String account) {
+        String sql = new StringBuilder()
+                .append("update ").append(UserNoLoginTable.name)
+                .append(" set ").append(UserNoLoginTable.Field.cancel).append("=").append(UserNoLoginTable.Status.CANCEL)
+                .append(",").append(UserNoLoginTable.Field.cancelTime).append("=?")
+                .append(" where ").append(UserNoLoginTable.Field.account).append("=?")
+                .toString();
+
+        ChatServerDbConnectUnit chatServerDbConnectUnit = DBUtil.getInstance().executeUpdate(
+                sql,
+                new Object[]{TimeUtil.getInstance().getTimeStampNow(), account});
+
+        if (chatServerDbConnectUnit != null) {
+            return chatServerDbConnectUnit.getSuccessRow();
+        } else {
+            return -1;
+        }
+    }
+
+    /**
+     * 用户是否处于禁封登录中
+     *
+     * @param account
+     * @return
+     */
+    public boolean isNoLogin(String account) {
+        return DBUtil.getInstance().isExit(
+                UserNoLoginTable.name,
+                new String[]{UserNoLoginTable.Field.account, UserNoLoginTable.Field.cancel},
+                new Object[]{account, UserNoLoginTable.Status.NO_LOGIN});
     }
 
 }
