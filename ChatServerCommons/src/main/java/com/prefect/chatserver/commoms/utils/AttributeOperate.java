@@ -8,8 +8,10 @@ import org.apache.mina.core.session.IoSession;
  */
 public class AttributeOperate {
     //session存储账户的属性名
-    public String attributeNameOfAccount = "account";
-    public String attributeNameOfChatRoom = "chatRoom";
+    private String attributeNameOfAccount = "account";
+    private String attributeNameOfChatRoom = "chatRoom";
+    private String attributeNameOfPubKey = "RSAPubKey";
+    private String attributeNameOfPrivKey = "RSAPrivbKey";
 
     private AttributeOperate() {
     }
@@ -18,7 +20,7 @@ public class AttributeOperate {
         private static AttributeOperate attributeOperate = new AttributeOperate();
     }
 
-    synchronized public static AttributeOperate getInstance() {
+    public static AttributeOperate getInstance() {
         return AttributeOperateHandle.attributeOperate;
     }
 
@@ -28,7 +30,7 @@ public class AttributeOperate {
      * @param session
      * @return
      */
-    synchronized public String getAccountOfAttribute(IoSession session) {
+    public String getAccountOfAttribute(IoSession session) {
         Object obj = session.getAttribute(attributeNameOfAccount);
         if (null != obj) {
             return obj.toString();
@@ -39,10 +41,11 @@ public class AttributeOperate {
 
     /**
      * 在session的属性中设置用户名字
+     *
      * @param session
      * @param value
      */
-    synchronized public void setAccountOfAttribute(IoSession session, Object value) {
+    public void setAccountOfAttribute(IoSession session, Object value) {
         session.setAttribute(attributeNameOfAccount, value);
     }
 
@@ -52,7 +55,7 @@ public class AttributeOperate {
      * @param session
      * @return
      */
-    synchronized public String getChatRoomNameOfAttribute(IoSession session) {
+    public String getChatRoomNameOfAttribute(IoSession session) {
         Object obj = session.getAttribute(attributeNameOfChatRoom);
         if (null != obj) {
             return obj.toString();
@@ -63,10 +66,60 @@ public class AttributeOperate {
 
     /**
      * 在session的属性中设置聊天室名字
+     *
      * @param session
      * @param value
      */
-    synchronized public void setChatRoomNameOfAttribute(IoSession session, Object value) {
+    public void setChatRoomNameOfAttribute(IoSession session, Object value) {
         session.setAttribute(attributeNameOfChatRoom, value);
     }
+
+    /**
+     * 将密钥对存入session中
+     *
+     * @param session
+     * @param pubKey
+     */
+    public void setPubKey(IoSession session, String pubKey) {
+        session.setAttribute(attributeNameOfPubKey, pubKey);
+    }
+
+    /**
+     * 将私钥存入session中
+     *
+     * @param session
+     * @param privKey
+     */
+    public void setPrivKey(IoSession session, String privKey) {
+        session.setAttribute(attributeNameOfPrivKey, privKey);
+    }
+
+    /**
+     * 从session中获取公钥
+     * @param session
+     * @return
+     */
+    public String getPubKey(IoSession session) {
+        Object obj = session.getAttribute(attributeNameOfPubKey);
+        if (obj != null) {
+            return obj.toString();
+        } else {
+            return null;
+        }
+    }
+
+    /**
+     * 从session中获取私钥
+     * @param session
+     * @return
+     */
+    public String getPrivKey(IoSession session) {
+        Object obj = session.getAttribute(attributeNameOfPrivKey);
+        if (obj != null) {
+            return obj.toString();
+        } else {
+            return null;
+        }
+    }
+
 }

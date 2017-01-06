@@ -6,6 +6,9 @@ import com.prefect.chatserver.client.utils.Interactive;
 import com.prefect.chatserver.client.utils.ServerInfo;
 import com.prefect.chatserver.commoms.codefactory.ChatServerCodecFactory;
 
+import com.prefect.chatserver.commoms.utils.AttributeOperate;
+import com.prefect.chatserver.commoms.utils.MathUtil;
+import com.prefect.chatserver.commoms.utils.RSA;
 import org.apache.mina.core.RuntimeIoException;
 import org.apache.mina.core.future.ConnectFuture;
 import org.apache.mina.core.session.IoSession;
@@ -16,6 +19,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.net.InetSocketAddress;
+import java.util.Map;
 
 /**
  * 客户端类
@@ -73,22 +77,33 @@ public class ChatClient {
                 ConnectFuture future = connector.connect(new InetSocketAddress(serverInfo.getHostName(), serverInfo.getPort()));
                 future.awaitUninterruptibly();
                 session = future.getSession();
+                setKeyPair(session);
+
                 break;
-            } catch (RuntimeIoException e) {
+            } catch (Exception e) {
+                if (session != null) {
+                    session.closeNow();
+                }
                 logger.error("Failed to connect." + e.getMessage(), e);
                 Thread.sleep(1000);
             }
         }
 
         Interactive.getInstance().printlnToConsole("服务器连接成功");
-
-        // Wait until the connection is closed or the connection attempt fails.
-//        session.getCloseFuture().awaitUninterruptibly();
-//        connector.dispose();
     }
 
-    public void close() {
-        this.session.closeNow();
+    /**
+     * 在session中设置RSA密钥
+     *
+     * @param session
+     */
+    private void setKeyPair(IoSession session) throws Exception {
+        Map<String, Object> keyMap = RSA.genKeyPair();
+        String publicKey = RSA.getPublicKey(keyMap);
+        String privateKey = RSA.getPrivateKey(keyMap);
+        AttributeOperate.getInstance().setPubKey(session, publicKey);
+        AttributeOperate.getInstance().setPrivKey(session, privateKey);
+
     }
 
 
