@@ -4,6 +4,7 @@ import com.alibaba.fastjson.JSON;
 import com.prefect.chatserver.commoms.utils.CommandType;
 import com.prefect.chatserver.commoms.utils.MessagePacket;
 import com.prefect.chatserver.commoms.utils.moudel.ChatRoomMessage;
+import com.prefect.chatserver.server.db.DBDao;
 import org.apache.mina.core.session.IoSession;
 
 /**
@@ -14,6 +15,12 @@ public class ChatRoomSend extends ChatRoomPo {
     @Override
     public void process(IoSession ioSession, MessagePacket messageObj) {
         ChatRoomMessage chatRoomMessage = JSON.parseObject(messageObj.getMessage(), ChatRoomMessage.class);
+
+        //判读是否被禁言
+        if (DBDao.getInstance().isGag(chatRoomMessage.getAccount())) {
+            response(ioSession, CommandType.MESSAGE_ACK, false, "Sorry, you have been gagged.");
+            return;
+        }
 
         String chatRoomName = chatRoomMessage.getChatRoomName();
 

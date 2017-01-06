@@ -4,6 +4,7 @@ import com.alibaba.fastjson.JSON;
 import com.prefect.chatserver.commoms.utils.MessagePacket;
 import com.prefect.chatserver.commoms.utils.moudel.ChatRoomMessage;
 import com.prefect.chatserver.server.ChatServer;
+import com.prefect.chatserver.server.process.ActionPo;
 import com.prefect.chatserver.server.process.MessageProcess;
 import org.apache.mina.core.session.IoSession;
 
@@ -12,7 +13,7 @@ import java.util.concurrent.CopyOnWriteArraySet;
 /**
  * Created by zhangkai on 2017/1/3.
  */
-public abstract class ChatRoomPo implements MessageProcess {
+public abstract class ChatRoomPo extends ActionPo {
 
     /**
      * 向聊天室发送消息
