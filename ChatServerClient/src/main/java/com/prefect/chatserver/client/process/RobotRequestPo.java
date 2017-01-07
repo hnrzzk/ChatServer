@@ -2,6 +2,7 @@ package com.prefect.chatserver.client.process;
 
 import com.alibaba.fastjson.JSON;
 import com.prefect.chatserver.client.utils.Util;
+import com.prefect.chatserver.commoms.utils.AttributeOperate;
 import com.prefect.chatserver.commoms.utils.CommandType;
 import com.prefect.chatserver.commoms.utils.MessagePacket;
 import com.prefect.chatserver.commoms.utils.MessageType;
@@ -62,23 +63,20 @@ public class RobotRequestPo {
      * @param session
      */
     public void login(IoSession session) {
-//        //判断session中是否有account属性，如果没有等待一下
-//        String account = Util.getInstance().getAccount(session);
-//
-//        MessagePacket messagePacket = new MessagePacket();
-//        messagePacket.setCommand(CommandType.USER_LOGIN);
-//        messagePacket.setMessageType(MessageType.USER_INFO);
-//
-//        UserInfo userInfo = new UserInfo();
-//        userInfo.setAccount(account);
-//        userInfo.setPassword(account);
-//
-//        String json = JSON.toJSONString(userInfo);
-//
-//        messagePacket.setMessageLength(json.getBytes().length);
-//        messagePacket.setMessage(json);
-//
-//        session.write(messagePacket);
+        MessagePacket message = new MessagePacket();
+
+        message.setMessageType(MessageType.MESSAGE);
+        message.setCommand(CommandType.USER_LOGIN_REQUEST);
+
+        String pubKsy= AttributeOperate.getInstance().getPubKey(session);
+        while(null==pubKsy){
+            pubKsy=AttributeOperate.getInstance().getPubKey(session);
+        }
+
+        message.setMessage(pubKsy);
+        message.setMessageLength(pubKsy.getBytes().length);
+
+        session.write(message);
     }
 
 

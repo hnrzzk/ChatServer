@@ -3,6 +3,7 @@ package com.prefect.chatserver.client;
 import com.prefect.chatserver.client.handler.RobotHandler;
 import com.prefect.chatserver.commoms.codefactory.ChatServerCodecFactory;
 import com.prefect.chatserver.commoms.utils.AttributeOperate;
+import com.prefect.chatserver.commoms.utils.RSA;
 import org.apache.mina.core.RuntimeIoException;
 import org.apache.mina.core.future.ConnectFuture;
 import org.apache.mina.core.session.IoSession;
@@ -11,6 +12,7 @@ import org.apache.mina.filter.logging.LoggingFilter;
 import org.apache.mina.transport.socket.nio.NioSocketConnector;
 
 import java.net.InetSocketAddress;
+import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
@@ -57,11 +59,12 @@ public class Robot {
                     future.awaitUninterruptibly();
                     String account = String.format("%04d", i);
                     IoSession session = future.getSession();
+                    setKeyPair(session);
                     System.out.println("get session: "+session);
                     AttributeOperate.getInstance().setAccountOfAttribute(session, account);
                     this.sessionConcurrentHashMap.put(account, session);
                     break;
-                } catch (RuntimeIoException e) {
+                } catch (Exception e) {
                     try {
                         Thread.sleep(1000);
                     } catch (InterruptedException e1) {
@@ -71,8 +74,17 @@ public class Robot {
         }
     }
 
+    private void setKeyPair(IoSession session) throws Exception {
+        Map<String, Object> keyMap = RSA.genKeyPair();
+        String publicKey = RSA.getPublicKey(keyMap);
+        String privateKey = RSA.getPrivateKey(keyMap);
+        AttributeOperate.getInstance().setPubKey(session, publicKey);
+        AttributeOperate.getInstance().setPrivKey(session, privateKey);
+
+    }
+
     public static void main(String[] args) {
-        Robot robot = new Robot(5000);
+        Robot robot = new Robot(100);
         robot.start();
     }
 }

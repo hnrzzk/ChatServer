@@ -457,16 +457,19 @@ public class DBDao {
                 .toString();
 
         ChatServerDbConnectUnit chatServerDbConnectUnit = DBUtil.getInstance().executeQuery(sql, new Object[]{account});
-        ResultSet resultSet=chatServerDbConnectUnit.getResultSet();
+        ResultSet resultSet = chatServerDbConnectUnit.getResultSet();
+
+        String password = null;
         try {
-            while (resultSet.next()){
-                return resultSet.getString(1);
+            while (resultSet.next()) {
+                password = resultSet.getString(1);
             }
         } catch (SQLException e) {
-            logger.error(e.getMessage(),e);
-            return null;
+            logger.error(e.getMessage(), e);
+        } finally {
+            chatServerDbConnectUnit.close();
         }
-        return null;
+        return password;
     }
 }
 

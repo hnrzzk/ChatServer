@@ -1,16 +1,21 @@
 package com.prefect.chatserver.client.process;
 
 import com.alibaba.fastjson.JSON;
+import com.prefect.chatserver.client.ChatClient;
 import com.prefect.chatserver.client.utils.Interactive;
 import com.prefect.chatserver.client.utils.Util;
-import com.prefect.chatserver.commoms.utils.CommandType;
-import com.prefect.chatserver.commoms.utils.MessagePacket;
-import com.prefect.chatserver.commoms.utils.MessageType;
+import com.prefect.chatserver.commoms.utils.*;
 import com.prefect.chatserver.commoms.utils.moudel.ACKMessage;
 import com.prefect.chatserver.commoms.utils.moudel.ChatMessage;
+import com.prefect.chatserver.commoms.utils.moudel.UserInfo;
+import com.prefect.chatserver.commoms.utils.moudel.UserLogin;
+import org.apache.log4j.spi.LoggerFactory;
 import org.apache.mina.core.session.IoSession;
+import org.slf4j.Logger;
 
 import java.sql.Date;
+import java.util.Base64;
+import java.util.Scanner;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -18,6 +23,7 @@ import java.util.TimerTask;
  * Created by zhangkai on 2017/1/5.
  */
 public class RobotResponsePo implements Runnable {
+    private static Logger logger= org.slf4j.LoggerFactory.getLogger(RobotResponsePo.class);
 
     MessagePacket messagePacket;
     IoSession session;
@@ -29,27 +35,79 @@ public class RobotResponsePo implements Runnable {
 
     @Override
     public void run() {
-//        int command = messagePacket.getCommand();
-//
-//        switch (command) {
-//            case CommandType.USER_LOGIN_ACK:
-//                System.out.println("登录成功!!");
-////                processLogin();
-//                break;
-//            case CommandType.MESSAGE:
-//            case CommandType.SEND_BROADCAST_ACK:
-//                processMessage();
-//                break;
-//        }
+        int command = messagePacket.getCommand();
+
+        switch (command) {
+            case CommandType.USER_LOGIN_REQUEST_ACK:
+                verify();
+                break;
+            case CommandType.USER_LOGIN_VERIFY_ACK:
+                processLogin();
+                break;
+            case CommandType.MESSAGE:
+            case CommandType.SEND_BROADCAST_ACK:
+                processMessage();
+                break;
+        }
+    }
+
+    private void verify(){
+        ACKMessage ackMessage = JSON.parseObject(messagePacket.getMessage(),ACKMessage.class);
+        String ackStr=ackMessage.getMessage();
+
+        if (!ackMessage.getActionResult()){
+            Interactive.getInstance().printlnToConsole(ackStr);
+            return;
+        }
+
+        String privateKey = AttributeOperate.getInstance().getPrivKey(session);
+
+        try {
+            byte[] bytes = Base64.getDecoder().decode(ackStr);
+
+            String randomStr = new String(RSA.decryptByPrivateKey(bytes, privateKey));
+
+            UserLogin userLogin = getUserInfo(randomStr);
+
+            String json = JSON.toJSONString(userLogin);
+
+            session.write(new MessagePacket(
+                    CommandType.USER_LOGIN_VERIFY,
+                    MessageType.USER_LOGIN,
+                    json.getBytes().length,
+                    json));
+        } catch (Exception e) {
+            logger.error(e.getMessage(), e);
+        }
+    }
+
+    private UserLogin getUserInfo(String randomStr) {
+
+        UserLogin userInfo = new UserLogin();
+
+        String account = AttributeOperate.getInstance().getAccountOfAttribute(session);
+
+        String password = account;
+
+        userInfo.setAccount(account);
+
+        String verify = MathUtil.getInstance().getMD5(password + randomStr);
+
+        userInfo.setVerifyStr(verify);
+
+        ChatClient.account = account;
+
+        return userInfo;
     }
 
     /**
      * 处理服务器的登录反馈
      */
     private void processLogin() {
-        ACKMessage ACKMessage = JSON.parseObject(messagePacket.getMessage(), ACKMessage.class);
+        ACKMessage ackMessage = JSON.parseObject(messagePacket.getMessage(), ACKMessage.class);
         //如果登录成功
-        if (ACKMessage.getActionResult()) {
+        if (ackMessage.getActionResult()) {
+            Interactive.getInstance().printlnToConsole("登录成功");
             Timer timer = new Timer();
             timer.schedule(new TimerTask() {
                 @Override
@@ -76,6 +134,8 @@ public class RobotResponsePo implements Runnable {
                     session.write(messagePacket);
                 }
             }, 500, 1000);
+        }else{
+            Interactive.getInstance().printlnToConsole(ackMessage.getMessage());
         }
     }
 
