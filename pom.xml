@@ -10,9 +10,10 @@
     <version>1.0</version>
 
     <modules>
-        <module>ChatServerServer</module>
-        <module>ChatServerClient</module>
-        <module>ChatServerCommons</module>
+        <module>ChatServer-Server</module>
+        <module>ChatServer-Client</module>
+        <module>ChatServer-Commons</module>
+        <module>DBPool</module>
     </modules>
 
     <build>
