@@ -11,7 +11,8 @@ public class AttributeOperate {
     private String attributeNameOfAccount = "account";
     private String attributeNameOfChatRoom = "chatRoom";
     private String attributeNameOfPubKey = "RSAPubKey";
-    private String attributeNameOfPrivKey = "RSAPrivbKey";
+    private String attributeNameOfPrivKey = "RSAPrivKey";
+    private String attributeNameOfVerifyStr = "verifyStr";
 
     private AttributeOperate() {
     }
@@ -115,6 +116,19 @@ public class AttributeOperate {
      */
     public String getPrivKey(IoSession session) {
         Object obj = session.getAttribute(attributeNameOfPrivKey);
+        if (obj != null) {
+            return obj.toString();
+        } else {
+            return null;
+        }
+    }
+
+    public void setVerifyStr(IoSession session,String verityStr){
+        session.setAttribute(attributeNameOfVerifyStr,verityStr);
+    }
+
+    public String getVerifyStr(IoSession session){
+        Object obj = session.getAttribute(attributeNameOfVerifyStr);
         if (obj != null) {
             return obj.toString();
         } else {

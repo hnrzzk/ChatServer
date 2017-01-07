@@ -3,9 +3,11 @@ package com.prefect.chatserver.server.process;
 import com.alibaba.fastjson.JSON;
 import com.prefect.chatserver.commoms.utils.MessagePacket;
 import com.prefect.chatserver.commoms.utils.MessageType;
-import com.prefect.chatserver.commoms.utils.moudel.ActionResponseMessage;
+import com.prefect.chatserver.commoms.utils.moudel.ACKMessage;
 import com.prefect.chatserver.server.handle.ChatServerHandler;
 import org.apache.mina.core.session.IoSession;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -15,7 +17,7 @@ import java.util.List;
  * Created by zhangkai on 2016/12/28.
  */
 public abstract class ActionPo implements MessageProcess {
-
+    protected static Logger logger= LoggerFactory.getLogger(ActionPo.class);
     /**
      * 服务器向客户端发送响应消息的逻辑
      *
@@ -30,11 +32,11 @@ public abstract class ActionPo implements MessageProcess {
             messagePacket.setMessageType(MessageType.RESPONSE);
             messagePacket.setCommand(commandType);
 
-            ActionResponseMessage actionResponseMessage = new ActionResponseMessage();
-            actionResponseMessage.setActionResult(result);
-            actionResponseMessage.setMessage(message);
+            ACKMessage ACKMessage = new ACKMessage();
+            ACKMessage.setActionResult(result);
+            ACKMessage.setMessage(message);
 
-            String json = JSON.toJSONString(actionResponseMessage);
+            String json = JSON.toJSONString(ACKMessage);
             messagePacket.setMessage(json);
             messagePacket.setMessageLength(json.getBytes().length);
 

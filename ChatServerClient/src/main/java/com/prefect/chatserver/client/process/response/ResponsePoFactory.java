@@ -11,7 +11,7 @@ public class ResponsePoFactory {
             case CommandType.MESSAGE:
                 return new MessagePo();
 
-            case CommandType.USER_LOGIN_ACK:
+            case CommandType.USER_LOGIN_VERIFY_ACK://用户登录验证响应
             case CommandType.USER_SIGN_IN_ACK:
             case CommandType.MESSAGE_ACK:
             case CommandType.FRIEND_LIST_ADD_ACK:
@@ -39,6 +39,9 @@ public class ResponsePoFactory {
 
             case CommandType.USER_FIND_ACK:
                 return new FindFriendListResponsePo();
+
+            case CommandType.USER_LOGIN_REQUEST_ACK:
+                return new LoginReponsePo();
             default:
                 return null;
         }

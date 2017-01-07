@@ -16,8 +16,10 @@ public class MessagePoFactory {
 
     public static MessageProcess getClass(int commandType) {
         switch (commandType) {
-            case CommandType.USER_LOGIN:    //用户登录
-                return new LogInPo();
+            case CommandType.USER_LOGIN_REQUEST:    //用户登录请求
+                return new LoginRequestPo();
+            case CommandType.USER_LOGIN_VERIFY:    //用户登录验证
+                return new LoginVerifyPo();
             case CommandType.USER_SIGN_IN:  //用户注册
                 return new SignInPo();
             case CommandType.MESSAGE:   //消息信息

@@ -25,27 +25,32 @@ public class MessageType {
     public static final int LOGIN_MESSAGE = 0x0005;
 
     /**
-     * 请求响应结果 对应ActionResponseMessage
+     * 请求响应结果 对应ACKMessage
      */
     public static final int RESPONSE = 0x0006;
 
     /**
      * 字符串
      */
-    public static final int STRING =0x0007;
+    public static final int STRING = 0x0007;
 
     /**
      * 聊天室消息 对应ChatRoomMessage
      */
-    public static final int CHATROOM_MANAGE =0x0008;
+    public static final int CHATROOM_MANAGE = 0x0008;
 
     /**
      * 用户权限管理 对应 UserAuthorityManageMessage
      */
-    public static final int USER_AUTHORITY_MANAGE=0x0009;
+    public static final int USER_AUTHORITY_MANAGE = 0x0009;
 
     /**
      * 用户列表 对应UserListInfo
      */
-    public static final int USER_LIST=0x000A;
+    public static final int USER_LIST = 0x000A;
+
+    /**
+     * 用户登录信息 对应UserLogin
+     */
+    public static final int USER_LOGIN = 0x0010;
 }

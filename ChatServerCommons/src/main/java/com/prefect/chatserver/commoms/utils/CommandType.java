@@ -17,9 +17,13 @@ public class CommandType {
     public final static int USER_SIGN_IN = 0x0001;
     public final static int USER_SIGN_IN_ACK = 0x0101;
 
-    //用户登录
-    public final static int USER_LOGIN = 0x0002;
-    public final static int USER_LOGIN_ACK = 0x0102;
+    //用户登录请求
+    public final static int USER_LOGIN_REQUEST = 0x0002;
+    public final static int USER_LOGIN_REQUEST_ACK = 0x0102;
+
+    //用户登录验证
+    public final static int USER_LOGIN_VERIFY = 0x0010;
+    public final static int USER_LOGIN_VERIFY_ACK = 0x0110;
 
     //新增好友
     public final static int FRIEND_LIST_ADD = 0x0003;

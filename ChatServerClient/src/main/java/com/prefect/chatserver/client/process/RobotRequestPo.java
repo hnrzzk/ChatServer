@@ -62,23 +62,23 @@ public class RobotRequestPo {
      * @param session
      */
     public void login(IoSession session) {
-        //判断session中是否有account属性，如果没有等待一下
-        String account = Util.getInstance().getAccount(session);
-
-        MessagePacket messagePacket = new MessagePacket();
-        messagePacket.setCommand(CommandType.USER_LOGIN);
-        messagePacket.setMessageType(MessageType.USER_INFO);
-
-        UserInfo userInfo = new UserInfo();
-        userInfo.setAccount(account);
-        userInfo.setPassword(account);
-
-        String json = JSON.toJSONString(userInfo);
-
-        messagePacket.setMessageLength(json.getBytes().length);
-        messagePacket.setMessage(json);
-
-        session.write(messagePacket);
+//        //判断session中是否有account属性，如果没有等待一下
+//        String account = Util.getInstance().getAccount(session);
+//
+//        MessagePacket messagePacket = new MessagePacket();
+//        messagePacket.setCommand(CommandType.USER_LOGIN);
+//        messagePacket.setMessageType(MessageType.USER_INFO);
+//
+//        UserInfo userInfo = new UserInfo();
+//        userInfo.setAccount(account);
+//        userInfo.setPassword(account);
+//
+//        String json = JSON.toJSONString(userInfo);
+//
+//        messagePacket.setMessageLength(json.getBytes().length);
+//        messagePacket.setMessage(json);
+//
+//        session.write(messagePacket);
     }
 
 

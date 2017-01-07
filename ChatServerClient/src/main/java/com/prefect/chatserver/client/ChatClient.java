@@ -77,6 +77,7 @@ public class ChatClient {
                 ConnectFuture future = connector.connect(new InetSocketAddress(serverInfo.getHostName(), serverInfo.getPort()));
                 future.awaitUninterruptibly();
                 session = future.getSession();
+                //在session中存储密钥
                 setKeyPair(session);
 
                 break;

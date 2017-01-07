@@ -6,7 +6,7 @@ import com.prefect.chatserver.client.utils.Util;
 import com.prefect.chatserver.commoms.utils.CommandType;
 import com.prefect.chatserver.commoms.utils.MessagePacket;
 import com.prefect.chatserver.commoms.utils.MessageType;
-import com.prefect.chatserver.commoms.utils.moudel.ActionResponseMessage;
+import com.prefect.chatserver.commoms.utils.moudel.ACKMessage;
 import com.prefect.chatserver.commoms.utils.moudel.ChatMessage;
 import org.apache.mina.core.session.IoSession;
 
@@ -29,29 +29,27 @@ public class RobotResponsePo implements Runnable {
 
     @Override
     public void run() {
-        int command = messagePacket.getCommand();
-
-        switch (command) {
-            case CommandType.USER_LOGIN_ACK:
-                System.out.println("登录成功!!");
-//                processLogin();
-                break;
-            case CommandType.MESSAGE:
-            case CommandType.SEND_BROADCAST_ACK:
-                processMessage();
-                break;
-
-
-        }
+//        int command = messagePacket.getCommand();
+//
+//        switch (command) {
+//            case CommandType.USER_LOGIN_ACK:
+//                System.out.println("登录成功!!");
+////                processLogin();
+//                break;
+//            case CommandType.MESSAGE:
+//            case CommandType.SEND_BROADCAST_ACK:
+//                processMessage();
+//                break;
+//        }
     }
 
     /**
      * 处理服务器的登录反馈
      */
     private void processLogin() {
-        ActionResponseMessage actionResponseMessage = JSON.parseObject(messagePacket.getMessage(), ActionResponseMessage.class);
+        ACKMessage ACKMessage = JSON.parseObject(messagePacket.getMessage(), ACKMessage.class);
         //如果登录成功
-        if (actionResponseMessage.getActionResult()) {
+        if (ACKMessage.getActionResult()) {
             Timer timer = new Timer();
             timer.schedule(new TimerTask() {
                 @Override

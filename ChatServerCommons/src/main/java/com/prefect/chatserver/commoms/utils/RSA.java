@@ -187,9 +187,7 @@ public class RSA {
     }
 
     /**
-     * <p>
      * 公钥加密
-     * </p>
      *
      * @param data      源数据
      * @param publicKey 公钥(BASE64编码)
@@ -316,17 +314,21 @@ class RSATester {
 
     public static void main(String[] args) throws Exception {
         test();
-        testSign();
+//        testSign();
     }
 
     static void test() throws Exception {
         System.err.println("公钥加密——私钥解密");
+
         String source = "这是一行没有任何意义的文字，你看完了等于没看，不是吗？";
         System.out.println("加密前文字：\n" + source);
         byte[] data = source.getBytes();
         byte[] encodedData = RSA.encryptByPublicKey(data, publicKey);
-        System.out.println("加密后文字：\n" + new String(encodedData));
-        byte[] decodedData = RSA.decryptByPrivateKey(encodedData, privateKey);
+
+        String enStr=new String(Base64.getEncoder().encode(encodedData));
+        System.out.println("加密后文字：\n" + enStr);
+
+        byte[] decodedData = RSA.decryptByPrivateKey(Base64.getDecoder().decode(enStr), privateKey);
         String target = new String(decodedData);
         System.out.println("解密后文字: \n" + target);
     }

@@ -4,7 +4,7 @@ import com.alibaba.fastjson.JSON;
 import com.prefect.chatserver.client.utils.Interactive;
 import com.prefect.chatserver.commoms.utils.MessagePacket;
 import com.prefect.chatserver.commoms.utils.MessageType;
-import com.prefect.chatserver.commoms.utils.moudel.ActionResponseMessage;
+import com.prefect.chatserver.commoms.utils.moudel.ACKMessage;
 import com.prefect.chatserver.commoms.utils.moudel.ChatMessage;
 
 /**
@@ -18,8 +18,8 @@ public class ActionResponsePo implements ResponsePo{
     public void process(MessagePacket messagePacket) {
         switch (messagePacket.getMessageType()){
             case MessageType.RESPONSE:
-                ActionResponseMessage actionResponseMessage = JSON.parseObject(messagePacket.getMessage(),ActionResponseMessage.class);
-                Interactive.getInstance().printlnToConsole(String.format("System:\n    %s", actionResponseMessage.getMessage()));
+                ACKMessage ACKMessage = JSON.parseObject(messagePacket.getMessage(),ACKMessage.class);
+                Interactive.getInstance().printlnToConsole(String.format("System:\n    %s", ACKMessage.getMessage()));
                 break;
             case MessageType.STRING:
                 Interactive.getInstance().printlnToConsole("System:\n    "+messagePacket.getMessage().toString());

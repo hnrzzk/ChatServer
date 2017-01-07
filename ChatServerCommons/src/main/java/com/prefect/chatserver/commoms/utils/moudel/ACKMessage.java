@@ -4,7 +4,7 @@ package com.prefect.chatserver.commoms.utils.moudel;
  * 服务器对客户端请求的响应消息
  * Created by zhangkai on 2016/12/29.
  */
-public class ActionResponseMessage {
+public class ACKMessage {
 
     //执行结果
     private boolean actionResult;

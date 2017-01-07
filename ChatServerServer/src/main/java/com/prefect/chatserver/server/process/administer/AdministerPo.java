@@ -4,7 +4,7 @@ import com.alibaba.fastjson.JSON;
 import com.prefect.chatserver.commoms.utils.CommandType;
 import com.prefect.chatserver.commoms.utils.MessagePacket;
 import com.prefect.chatserver.commoms.utils.MessageType;
-import com.prefect.chatserver.commoms.utils.moudel.ActionResponseMessage;
+import com.prefect.chatserver.commoms.utils.moudel.ACKMessage;
 import com.prefect.chatserver.server.db.DBDao;
 import com.prefect.chatserver.server.process.ActionPo;
 import org.apache.mina.core.session.IoSession;
@@ -23,11 +23,11 @@ public abstract class AdministerPo extends ActionPo {
          boolean isAllow = DBDao.getInstance().authorityCheck(account);
 
         if (!isAllow) {
-            ActionResponseMessage actionResponseMessage = new ActionResponseMessage();
-            actionResponseMessage.setActionResult(false);
-            actionResponseMessage.setMessage("对不起，您没有权限!");
+            ACKMessage ACKMessage = new ACKMessage();
+            ACKMessage.setActionResult(false);
+            ACKMessage.setMessage("对不起，您没有权限!");
 
-            String json = JSON.toJSONString(actionResponseMessage);
+            String json = JSON.toJSONString(ACKMessage);
             ioSession.write(new MessagePacket(CommandType.SEND_BROADCAST_ACK, MessageType.RESPONSE, json.getBytes().length, json));
         }
 

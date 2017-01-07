@@ -30,7 +30,7 @@ public class DBDao {
     }
 
     public static DBDao getInstance() {
-         return DBDaoHandle.instance;
+        return DBDaoHandle.instance;
     }
 
     /**
@@ -404,6 +404,13 @@ public class DBDao {
         return findUser(UserTable.Field.account, account);
     }
 
+    /**
+     * 查找好友
+     *
+     * @param columnName
+     * @param nickName
+     * @return
+     */
     private List<UserInfo> findUser(String columnName, String nickName) {
         //select id,account,nick_name,sex from user where nick_name = ?
         String sql = new StringBuilder()
@@ -436,6 +443,30 @@ public class DBDao {
         }
 
         return resultList;
+    }
+
+    /**
+     * 根据账户查找密码
+     */
+    public String getPassWord(String account) {
+        //select password from user where account=?
+        String sql = new StringBuilder()
+                .append("select ").append(UserTable.Field.password)
+                .append(" from ").append(UserTable.name)
+                .append(" where ").append(UserTable.Field.account).append("=?")
+                .toString();
+
+        ChatServerDbConnectUnit chatServerDbConnectUnit = DBUtil.getInstance().executeQuery(sql, new Object[]{account});
+        ResultSet resultSet=chatServerDbConnectUnit.getResultSet();
+        try {
+            while (resultSet.next()){
+                return resultSet.getString(1);
+            }
+        } catch (SQLException e) {
+            logger.error(e.getMessage(),e);
+            return null;
+        }
+        return null;
     }
 }
 
