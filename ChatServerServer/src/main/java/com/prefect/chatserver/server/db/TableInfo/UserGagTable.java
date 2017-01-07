@@ -12,7 +12,7 @@ public class UserGagTable {
         public static String reason = "reason";
         public static String startTime = "start_time";
         public static String endTimne = "end_time";
-        public static String cancel = "CANCEL";
+        public static String cancel = "cancel";
         public static String cancelTime = "cancel_time";
     }
 

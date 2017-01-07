@@ -15,14 +15,13 @@ import java.util.Scanner;
 /**
  * Created by hnrzz on 2017/1/7.
  */
-public class LoginReponsePo implements ResponsePo {
-    private static Logger logger = LoggerFactory.getLogger(LoginReponsePo.class);
+public class LoginResponsePo implements ResponsePo {
+    private static Logger logger = LoggerFactory.getLogger(LoginResponsePo.class);
 
     @Override
     public void process(MessagePacket messagePacket) {
         ACKMessage ackMessage = JSON.parseObject(messagePacket.getMessage(),ACKMessage.class);
         String ackStr=ackMessage.getMessage();
-        System.out.println(ackStr);
 
         if (!ackMessage.getActionResult()){
             Interactive.getInstance().printlnToConsole(ackStr);

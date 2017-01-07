@@ -89,8 +89,6 @@ public class ChatClient {
                 Thread.sleep(1000);
             }
         }
-
-        Interactive.getInstance().printlnToConsole("服务器连接成功");
     }
 
     /**
