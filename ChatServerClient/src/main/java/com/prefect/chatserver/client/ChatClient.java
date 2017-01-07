@@ -76,15 +76,12 @@ public class ChatClient {
             try {
                 ConnectFuture future = connector.connect(new InetSocketAddress(serverInfo.getHostName(), serverInfo.getPort()));
                 future.awaitUninterruptibly();
-                session = future.getSession();
+                this.session = future.getSession();
                 //在session中存储密钥
                 setKeyPair(session);
 
                 break;
             } catch (Exception e) {
-                if (session != null) {
-                    session.closeNow();
-                }
                 logger.error("Failed to connect." + e.getMessage(), e);
                 Thread.sleep(1000);
             }

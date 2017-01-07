@@ -7,6 +7,7 @@ import com.prefect.chatserver.commoms.utils.CommandType;
 import com.prefect.chatserver.commoms.utils.MessagePacket;
 import com.prefect.chatserver.commoms.utils.MessageType;
 import com.prefect.chatserver.commoms.utils.moudel.RelationShipMessage;
+import org.apache.mina.core.session.IoSession;
 
 /**
  * 黑名单管理请求逻辑

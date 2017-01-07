@@ -61,8 +61,6 @@ public class ChatServerHandler extends IoHandlerAdapter {
     @Override
     public void messageReceived(IoSession ioSession, Object messageObj) throws Exception {
 
-        logger.info(ioSession.toString() + " 接收到数据:" + messageObj);
-
         MessagePacket message = null;
         if (messageObj instanceof MessagePacket) {
             message = (MessagePacket) messageObj;

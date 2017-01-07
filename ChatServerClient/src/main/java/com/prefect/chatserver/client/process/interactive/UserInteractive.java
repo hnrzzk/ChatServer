@@ -2,6 +2,7 @@ package com.prefect.chatserver.client.process.interactive;
 
 import com.prefect.chatserver.client.process.request.operate.*;
 import com.prefect.chatserver.client.utils.Interactive;
+import org.apache.mina.core.session.IoSession;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -15,12 +16,9 @@ import java.util.Scanner;
 public class UserInteractive implements Runnable {
     private final static Logger logger = LoggerFactory.getLogger(UserInteractive.class);
 
-    {
-        Interactive.getInstance().printlnToConsole("开始接受用户命令:");
-    }
-
     @Override
     public void run() {
+        Interactive.getInstance().printlnToConsole("开始接受用户命令:");
         Scanner scanner = new Scanner(System.in);
         while (scanner.hasNext()) {
             String inputStr = scanner.nextLine();

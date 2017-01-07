@@ -1,5 +1,6 @@
 package com.prefect.chatserver.server.db;
 
+import com.prefect.chatserver.commoms.utils.MessagePacket;
 import com.prefect.chatserver.commoms.utils.TimeUtil;
 import com.prefect.chatserver.commoms.utils.moudel.UserInfo;
 import com.prefect.chatserver.server.db.TableInfo.*;
@@ -9,10 +10,7 @@ import org.slf4j.LoggerFactory;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Timestamp;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * Created by zhangkai on 2016/12/29.
@@ -470,6 +468,77 @@ public class DBDao {
             chatServerDbConnectUnit.close();
         }
         return password;
+    }
+
+    /**
+     * 插入离线数据
+     *
+     * @param account
+     * @param messagePacket
+     * @return 是否插入成功
+     */
+    public boolean saveOfflineMessage(String account, MessagePacket messagePacket) {
+        Map<String, Object> sqlMap = new HashMap<>();
+        sqlMap.put(OfflineMessageTable.Field.account, account);
+        sqlMap.put(OfflineMessageTable.Field.messageType, messagePacket.getMessageType());
+        sqlMap.put(OfflineMessageTable.Field.commandType, messagePacket.getCommand());
+        sqlMap.put(OfflineMessageTable.Field.message, messagePacket.getMessage());
+        sqlMap.put(OfflineMessageTable.Field.createTime, TimeUtil.getInstance().getTimeStampNow());
+
+        Object data = DBUtil.getInstance().insert(OfflineMessageTable.name, sqlMap);
+
+        if (data != null) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    /**
+     * 获得离线数据
+     *
+     * @param account   账户
+     * @param loginTime 登录时间
+     * @return
+     */
+    public List<MessagePacket> getOfflineMessage(String account, Timestamp loginTime) {
+        //select command_type,message_type,message where account=? and create_time < ? and is_send =?
+        String sql = new StringBuilder()
+                .append("select ")
+                .append(OfflineMessageTable.Field.commandType).append(", ")
+                .append(OfflineMessageTable.Field.messageType).append(", ")
+                .append(OfflineMessageTable.Field.message)
+                .append(" from ").append(OfflineMessageTable.name)
+                .append(" where ")
+                .append(OfflineMessageTable.Field.account).append("=? and ")
+                .append(OfflineMessageTable.Field.createTime).append("<? and ")
+                .append(OfflineMessageTable.Field.isSend).append("=?")
+                .toString();
+
+        ChatServerDbConnectUnit chatServerDbConnectUnit =
+                DBUtil.getInstance().executeQuery(sql, new Object[]{account, loginTime, OfflineMessageTable.Status.NOT_SEND});
+
+        ResultSet resultSet = chatServerDbConnectUnit.getResultSet();
+
+        List<MessagePacket> messagePackets = new LinkedList<>();
+        try {
+            while (resultSet.next()) {
+                int commandType = resultSet.getInt(1);
+                int messageType = resultSet.getInt(2);
+                String json = resultSet.getString(3);
+
+                MessagePacket messagePacket = new MessagePacket();
+                messagePacket.setCommand(commandType);
+                messagePacket.setMessageType(messageType);
+                messagePacket.setMessage(json);
+                messagePacket.setMessageLength(json.getBytes().length);
+                messagePackets.add(messagePacket);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        return messagePackets;
     }
 }
 

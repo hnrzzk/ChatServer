@@ -4,6 +4,7 @@ import com.prefect.chatserver.client.process.request.operate.administer.BroadCas
 import com.prefect.chatserver.client.process.request.operate.administer.GagPo;
 import com.prefect.chatserver.client.process.request.operate.administer.NoLogin;
 import com.prefect.chatserver.client.utils.Interactive;
+import org.apache.mina.core.session.IoSession;
 
 /**
  * Created by zhangkai on 2017/1/3.
@@ -42,7 +43,7 @@ public class OperateFactory {
                 .append("-chatRoom 聊天室\n")
                 .append("-broadcast 广播\n")
                 .append("-gag 禁言\n")
-                .append("-noLogin 禁封等率\n")
+                .append("-noLogin 禁封登录\n")
                 .toString();
         Interactive.getInstance().printlnToConsole(string);
     }

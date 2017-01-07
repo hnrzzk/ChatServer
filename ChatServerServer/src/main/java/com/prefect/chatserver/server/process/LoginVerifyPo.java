@@ -9,6 +9,8 @@ import com.prefect.chatserver.server.db.TableInfo.UserTable;
 import com.prefect.chatserver.server.handle.ChatServerHandler;
 import org.apache.mina.core.session.IoSession;
 
+import java.sql.Timestamp;
+import java.util.Iterator;
 import java.util.List;
 
 /**
@@ -47,7 +49,6 @@ public class LoginVerifyPo extends ActionPo {
             ChatServerHandler.sessionMap.put(account, ioSession);
             //在session中记录account名称
             AttributeOperate.getInstance().setAccountOfAttribute(ioSession, account);
-
             super.response(ioSession, CommandType.USER_LOGIN_VERIFY_ACK, true, "登录成功: Welcome!");
         } else {
             //更新在线状态失败
@@ -57,6 +58,8 @@ public class LoginVerifyPo extends ActionPo {
 
         //发送上线通知
         sendOnlineNotice(account);
+        //发送离线消息
+        sendOfflineMessage(ioSession, account);
     }
 
     /**
@@ -88,9 +91,10 @@ public class LoginVerifyPo extends ActionPo {
 
     /**
      * 发送上线通知
+     *
      * @param account
      */
-    void sendOnlineNotice(String account) {
+    private void sendOnlineNotice(String account) {
         //根据得到该账号的在线好友列表
         List<String> accountList = DBDao.getInstance().getFriendListForOnlineStatus(account, 1);
 
@@ -102,5 +106,17 @@ public class LoginVerifyPo extends ActionPo {
 
         //发送通知
         sendNotice(accountList, messagePacket);
+    }
+
+    private void sendOfflineMessage(IoSession ioSession, String account) {
+        Timestamp now = TimeUtil.getInstance().getTimeStampNow();
+        List<MessagePacket> messagePacketList = DBDao.getInstance().getOfflineMessage(account, now);
+        Iterator<MessagePacket> iterator = messagePacketList.iterator();
+        while (iterator.hasNext()) {
+            MessagePacket item = iterator.next();
+            //根据message从工厂类生产对应的处理类
+            MessageProcess messageProcess = MessagePoFactory.getClass(item.getCommand());
+            messageProcess.process(ioSession, item);
+        }
     }
 }

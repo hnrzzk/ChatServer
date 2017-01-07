@@ -8,12 +8,14 @@ import com.prefect.chatserver.commoms.utils.CommandType;
 import com.prefect.chatserver.commoms.utils.MessagePacket;
 import com.prefect.chatserver.commoms.utils.MessageType;
 import com.prefect.chatserver.commoms.utils.moudel.ChatMessage;
+import org.apache.mina.core.session.IoSession;
 
 /**
  * 发送广播消息请求
  * Created by zhangkai on 2017/1/3.
  */
 public class BroadCastPo extends OperatePo {
+
 
     public BroadCastPo(String[] strings) {
         super(strings);

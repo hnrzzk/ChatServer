@@ -1,6 +1,6 @@
 package com.prefect.chatserver.client.handler;
 
-import com.prefect.chatserver.client.process.interactive.UserInteractive;
+import com.prefect.chatserver.client.ChatClient;
 import com.prefect.chatserver.client.process.request.account.AccountManagePo;
 import com.prefect.chatserver.client.process.response.ResponsePo;
 import com.prefect.chatserver.client.process.response.ResponsePoFactory;

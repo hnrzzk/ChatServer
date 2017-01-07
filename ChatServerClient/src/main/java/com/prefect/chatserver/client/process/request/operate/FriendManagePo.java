@@ -8,10 +8,11 @@ import com.prefect.chatserver.commoms.utils.MessagePacket;
 import com.prefect.chatserver.commoms.utils.MessageType;
 import com.prefect.chatserver.commoms.utils.moudel.RelationShipMessage;
 import com.prefect.chatserver.commoms.utils.moudel.UserInfo;
+import org.apache.mina.core.session.IoSession;
 
 /**
  * 好友管理请求
- * Created by liuxiaonan on 2016/12/31.
+ * Created by zhangkai on 2016/12/31.
  */
 public class FriendManagePo extends OperatePo {
     public final String addFriend = "add";
@@ -23,6 +24,7 @@ public class FriendManagePo extends OperatePo {
     public FriendManagePo(String[] strings) {
         super(strings);
     }
+
 
     /**
      * 管理用户的逻辑

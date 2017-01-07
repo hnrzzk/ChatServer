@@ -1,12 +1,16 @@
 package com.prefect.chatserver.client.utils;
 
+import java.util.Scanner;
+
 /**
  * 控制台交互相关工具类
  * Created by zhangkai on 2016/12/28.
  */
 public class Interactive {
+    Scanner scanner;
 
     private Interactive() {
+        this.scanner=new Scanner(System.in);
     }
 
     private static class InteractiveHandler {
@@ -39,6 +43,14 @@ public class Interactive {
     synchronized public void printlnToConsole(String[] strs) {
         for (String item : strs) {
             System.out.println(item);
+        }
+    }
+
+    synchronized public String getUserInto(){
+        if (scanner.hasNext()){
+            return scanner.nextLine();
+        }else {
+            return "";
         }
     }
 }

@@ -8,12 +8,15 @@ import com.prefect.chatserver.commoms.utils.CommandType;
 import com.prefect.chatserver.commoms.utils.MessagePacket;
 import com.prefect.chatserver.commoms.utils.MessageType;
 import com.prefect.chatserver.commoms.utils.moudel.UserAuthorityManageMessage;
+import org.apache.mina.core.session.IoSession;
 
 /**
  * 请求设置用户禁止登录
  * Created by zhangkai on 2017/1/6.
  */
 public class NoLogin extends OperatePo{
+
+
     public NoLogin(String[] strings) {
         super(strings);
     }

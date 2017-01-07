@@ -5,7 +5,7 @@ import org.apache.mina.core.session.IoSession;
 import java.util.Scanner;
 
 /**
- * Created by liuxiaonan on 2016/12/31.
+ * Created by zhangkai on 2016/12/31.
  */
 public class AccountManagePo {
     public void manangeUser(IoSession session){

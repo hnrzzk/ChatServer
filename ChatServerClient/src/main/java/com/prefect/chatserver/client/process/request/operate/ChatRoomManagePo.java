@@ -7,6 +7,7 @@ import com.prefect.chatserver.commoms.utils.CommandType;
 import com.prefect.chatserver.commoms.utils.MessagePacket;
 import com.prefect.chatserver.commoms.utils.MessageType;
 import com.prefect.chatserver.commoms.utils.moudel.ChatRoomMessage;
+import org.apache.mina.core.session.IoSession;
 
 /**
  * 聊天室
@@ -21,6 +22,7 @@ public class ChatRoomManagePo extends OperatePo{
     public ChatRoomManagePo(String[] strings) {
         super(strings);
     }
+
 
     @Override
     public void process() {

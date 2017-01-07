@@ -34,8 +34,6 @@ public class DBUtil {
     /**
      * 执行查询操作
      *
-     * @param sql
-     * @return 查询得到的结果集
      */
     public ChatServerDbConnectUnit executeQuery(String sql, Object[] values) {
         ResultSet resultSet = null;

@@ -36,5 +36,6 @@ public class SendMessagePo extends OperatePo {
         messagePacket.setMessageLength(json.getBytes().length);
 
         ChatClient.session.write(messagePacket);
+
     }
 }
