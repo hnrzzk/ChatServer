@@ -1,7 +1,9 @@
 package com.prefect.chatserver.client.process.response;
 
 import com.alibaba.fastjson.JSON;
+import com.prefect.chatserver.client.ChatClient;
 import com.prefect.chatserver.client.process.interactive.UserInteractive;
+import com.prefect.chatserver.client.process.request.account.AccountManagePo;
 import com.prefect.chatserver.client.utils.Interactive;
 import com.prefect.chatserver.commoms.utils.MessagePacket;
 import com.prefect.chatserver.commoms.utils.moudel.ACKMessage;
@@ -20,6 +22,8 @@ public class LoginVerifyResponsePo implements ResponsePo{
         if (ackMessage.getActionResult()){
             Thread thread=new Thread(new UserInteractive());
             thread.start();
+        }else {
+            new AccountManagePo().manangeUser(ChatClient.session);
         }
     }
 }
