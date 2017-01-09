@@ -25,8 +25,6 @@ public class ConnectionPool implements IConnectionPool {
     private List<Connection> freeConnection = new Vector<Connection>();
     // 活动连接
     private List<Connection> activeConnection = new Vector<Connection>();
-    // 将线程和连接绑定，保证事务能统一执行
-    private static ThreadLocal<Connection> threadLocal = new ThreadLocal<Connection>();
 
     public ConnectionPool(DBBean dbBean) {
         this.dbBean = dbBean;
@@ -50,66 +48,56 @@ public class ConnectionPool implements IConnectionPool {
                 }
             }
             isActive = true;
-        } catch (ClassNotFoundException e) {
-            logger.error(e.getMessage(), e);
-        } catch (SQLException e) {
+        } catch (ClassNotFoundException | SQLException e) {
             logger.error(e.getMessage(), e);
         }
-    }
-
-    /**
-     * 获得当前连接
-     * @return
-     */
-    public Connection getCurrentConnecton() {
-        // 默认线程里面取
-        Connection conn = threadLocal.get();
-        if (!isValid(conn)) {
-            conn = getConnection();
-        }
-        return conn;
     }
 
     /**
      * 获得连接
+     *
      * @return
      */
     public synchronized Connection getConnection() {
         Connection conn = null;
-        try {
-            // 判断是否超过最大连接数限制
-            if (contActive < this.dbBean.getMaxActiveConnections()) {
+        while (conn == null) {
+            try {
+                // 判断是否超过最大连接数限制 && 没有空闲连接
+                while (contActive > this.dbBean.getMaxActiveConnections() && freeConnection.size() <= 0) {
+                    cheackPool();
+                    this.wait();
+                }
+                this.notifyAll();
+
                 if (freeConnection.size() > 0) {
+                    //从空闲队列获取连接
                     conn = freeConnection.get(0);
-                    if (conn != null) {
-                        threadLocal.set(conn);
-                    }
                     freeConnection.remove(0);
                 } else {
+                    //新建连接
                     conn = newConnection();
+                    contActive++;
                 }
 
-            } else {
-                // 继续获得连接,直到从新获得连接
-                wait(this.dbBean.getConnTimeOut());
-                conn = getConnection();
+                //如果获取到的连接不可用
+                if (isValid(conn)) {
+                    activeConnection.add(conn);
+                } else {
+                    conn = null;
+                    contActive--;
+                }
+
+            } catch (SQLException | ClassNotFoundException | InterruptedException e) {
+                logger.error(e.getMessage(), e);
             }
-            if (isValid(conn)) {
-                activeConnection.add(conn);
-                contActive++;
-            }
-        } catch (SQLException e) {
-            e.printStackTrace();
-        } catch (ClassNotFoundException e) {
-            e.printStackTrace();
-        } catch (InterruptedException e) {
-            e.printStackTrace();
         }
+
         return conn;
     }
 
     /**
      * 获得新连接
+     *
      * @return
      * @throws ClassNotFoundException
      * @throws SQLException
@@ -119,34 +107,36 @@ public class ConnectionPool implements IConnectionPool {
         Connection conn = null;
         if (dbBean != null) {
             Class.forName(dbBean.getDriverName());
-            conn = DriverManager.getConnection(dbBean.getUrl(),
-                    dbBean.getUserName(), dbBean.getPassword());
+            conn = new ChatServerDbConnection(DriverManager.getConnection(dbBean.getUrl(),
+                    dbBean.getUserName(), dbBean.getPassword()));
         }
         return conn;
     }
 
     /**
      * 释放连接
+     *
      * @param conn
      * @throws SQLException
      */
     public synchronized void releaseConn(Connection conn) throws SQLException {
-        if (isValid(conn) && !(freeConnection.size() > dbBean.getMaxConnections())) {
+        if (isValid(conn)) {
             freeConnection.add(conn);
-            activeConnection.remove(conn);
+        } else {
             contActive--;
-            threadLocal.remove();
-            // 唤醒所有正待等待的线程，去抢连接
-            notifyAll();
         }
+        activeConnection.remove(conn);
+        // 唤醒所有正待等待的线程，去抢连接
+        notifyAll();
     }
 
     /**
      * 判断连接是否可用
+     *
      * @param conn
      * @return
      */
-    private boolean isValid(Connection conn) {
+    private boolean isValid(java.sql.Connection conn) {
         try {
             if (conn == null || conn.isClosed()) {
                 return false;
@@ -167,7 +157,7 @@ public class ConnectionPool implements IConnectionPool {
                     conn.close();
                 }
             } catch (SQLException e) {
-                logger.error(e.getMessage(),e);
+                logger.error(e.getMessage(), e);
             }
         }
         for (Connection conn : activeConnection) {
@@ -176,11 +166,10 @@ public class ConnectionPool implements IConnectionPool {
                     conn.close();
                 }
             } catch (SQLException e) {
-                e.printStackTrace();
+                logger.error(e.getMessage(), e);
             }
         }
         isActive = false;
-        contActive = 0;
     }
 
     // 连接池状态
@@ -192,18 +181,9 @@ public class ConnectionPool implements IConnectionPool {
     // 定时检查连接池情况
     @Override
     public void cheackPool() {
-        if (dbBean.isCheakPool()) {
-            new Timer().schedule(new TimerTask() {
-                @Override
-                public void run() {
-                    // 1.对线程里面的连接状态
-                    // 2.连接池最小 最大连接数
-                    // 3.其他状态进行检查，因为这里还需要写几个线程管理的类，暂时就不添加了
-                    System.out.println("空线池连接数：" + freeConnection.size());
-                    System.out.println("活动连接数：：" + activeConnection.size());
-                    System.out.println("总的连接数：" + contActive);
-                }
-            }, dbBean.getLazyCheck(), dbBean.getPeriodCheck());
-        }
+        System.out.println("空线池连接数：" + freeConnection.size());
+        System.out.println("活动连接数：：" + activeConnection.size());
+        System.out.println("总的连接数：" + contActive);
+        System.out.println("允许的最大连接数：" + dbBean.getMaxActiveConnections());
     }
 }

@@ -36,6 +36,7 @@ public class LoginVerifyPo extends ActionPo {
                 UserTable.name,
                 new String[]{UserTable.Field.account, UserTable.Field.isOnline},
                 new Object[]{account, 1})) { //用户已登录
+
             super.response(ioSession, CommandType.USER_LOGIN_VERIFY_ACK, false, "登录失败: Account is logged in.");
             return;
         } else if (DBDao.getInstance().isNoLogin(account)) { //验证是否禁封登录
@@ -45,7 +46,7 @@ public class LoginVerifyPo extends ActionPo {
 
         //更新在线状态
         if (DBDao.getInstance().changeAccountOnlineStatus(account, 1)) { //更新在线状态 成功
-            System.out.println("account" + account);
+
             //将已建立的连接保存在内存中
             ChatServerHandler.sessionMap.put(account, ioSession);
             //在session中记录account名称

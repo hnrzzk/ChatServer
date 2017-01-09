@@ -56,6 +56,11 @@
             <artifactId>ChatServerCommons</artifactId>
             <version>1.0</version>
         </dependency>
+        <dependency>
+            <groupId>com.prefect</groupId>
+            <artifactId>DBPool</artifactId>
+            <version>1.0</version>
+        </dependency>
     </dependencies>
 
 </project>

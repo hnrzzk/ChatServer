@@ -1,5 +1,10 @@
 package com.prefect.dbpool;
 
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+
 /**
  * Created by hnrzz on 2017/1/8.
  */
@@ -10,26 +15,38 @@ public class Client {
         t.start();
         t.join();
 
-        ThreadConnection a = new ThreadConnection();
-        ThreadConnection b = new ThreadConnection();
-        ThreadConnection c = new ThreadConnection();
-        Thread t1 = new Thread(a);
-        Thread t2 = new Thread(b);
-        Thread t3 = new Thread(c);
+        DBConnectionSource a = new DBConnectionSource();
+        DBConnectionSource b = new DBConnectionSource();
+        DBConnectionSource c = new DBConnectionSource();
 
 
-        // 设置优先级，先让初始化执行，模拟 线程池 先启动
-        // 这里仅仅表面控制了，因为即使t 线程先启动，也不能保证pool 初始化完成，为了简单模拟，这里先这样写了
-        t1.setPriority(10);
-        t2.setPriority(10);
-        t3.setPriority(10);
-        t1.start();
-        t2.start();
-        t3.start();
+        System.out.println("线程A-> " + a.getConnection());
+        System.out.println("线程B-> " + b.getConnection());
+        System.out.println("线程C-> " + c.getConnection());
 
-        System.out.println("线程A-> "+a.getConnection());
-        System.out.println("线程B-> "+b.getConnection());
-        System.out.println("线程C-> "+c.getConnection());
+        Connection connection1 = a.getConnection();
+        Connection connection2 = a.getConnection();
+
+        try {
+            PreparedStatement preparedStatement =
+                    connection1.prepareStatement("select count(*) from user where is_online=0 ");
+            ResultSet resultSet = preparedStatement.executeQuery();
+            while(resultSet.next()){
+                System.out.println(resultSet.getInt(1));
+            }
+
+            resultSet.close();
+            preparedStatement.close();
+            connection1.close();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+//        if (connection1 == connection2) {
+//            System.out.println("twice connection is same!");
+//        } else {
+//            System.out.println("twice connection is not same!");
+//        }
     }
 
     // 初始化
@@ -37,8 +54,8 @@ public class Client {
         Thread t = new Thread(new Runnable() {
             @Override
             public void run() {
-                IConnectionPool  pool = initPool();
-                while(pool == null || !pool.isActive()){
+                IConnectionPool pool = initPool();
+                while (pool == null || !pool.isActive()) {
                     pool = initPool();
                 }
             }
@@ -46,8 +63,8 @@ public class Client {
         return t;
     }
 
-    public static IConnectionPool initPool(){
-        return ConnectionPoolManager.getInstance().getPool("testPool");
+    public static IConnectionPool initPool() {
+        return ConnectionPoolManager.getInstance().getPool();
     }
 
 }

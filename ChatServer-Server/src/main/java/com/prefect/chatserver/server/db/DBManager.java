@@ -1,12 +1,10 @@
 package com.prefect.chatserver.server.db;
 
 
-import org.apache.commons.dbcp2.BasicDataSourceFactory;
+import com.prefect.dbpool.DBConnectionSource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.sql.DataSource;
-import java.io.FileInputStream;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -14,7 +12,7 @@ import java.sql.Statement;
 import java.util.Properties;
 
 /**
- * 通过dbcp管理数据库连接
+ * 通过dbcp管理数据库连接 单例
  * Created by zhangkai on 2016/12/26.
  */
 public class DBManager {
@@ -30,14 +28,16 @@ public class DBManager {
         return DBUtilHandler.instance;
     }
 
-    private DataSource ds = null;
+//        private DataSource ds = null;
+    private DBConnectionSource ds;
 
     private DBManager() {
         Properties properties = new Properties();
 
         try {
             properties.load(DBManager.class.getClassLoader().getResourceAsStream(filePath));
-            ds = BasicDataSourceFactory.createDataSource(properties);
+//            ds = BasicDataSourceFactory.createDataSource(properties);
+            ds = new DBConnectionSource();
         } catch (Exception e) {
             logger.error(e.getMessage(), e);
         }
@@ -50,6 +50,11 @@ public class DBManager {
         return connection;
     }
 
+    /**
+     * 关闭closeResultSet
+     *
+     * @param rs
+     */
     public static void closeResultSet(ResultSet rs) {
         try {
             if (rs != null && !rs.isClosed()) {
@@ -63,6 +68,11 @@ public class DBManager {
         rs = null;
     }
 
+    /**
+     * 关闭statement
+     *
+     * @param stm
+     */
     public static void closeStatement(Statement stm) {
         try {
             if (stm != null && !stm.isClosed()) {
@@ -76,6 +86,11 @@ public class DBManager {
         stm = null;
     }
 
+    /**
+     * 关闭connection
+     *
+     * @param conn
+     */
     public static void closeConnection(Connection conn) {
         try {
             if (conn != null && !conn.isClosed()) {

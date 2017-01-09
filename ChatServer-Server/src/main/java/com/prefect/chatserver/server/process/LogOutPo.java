@@ -36,7 +36,7 @@ public class LogOutPo extends ActionPo {
 
             //修改用户离线状态
             if (!DBDao.getInstance().changeAccountOnlineStatus(account, 0)) {
-                logger.error("修改离线操作失败：修改数据库状态失败");
+                logger.error("修改用户状态操作失败：修改数据库状态失败");
             }
 
             //将离线用户的session从在线sessionMap中移除

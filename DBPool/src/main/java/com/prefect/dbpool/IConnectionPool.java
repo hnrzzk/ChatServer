@@ -9,8 +9,7 @@ import java.sql.SQLException;
 public interface IConnectionPool {
     // 获得连接
     public Connection getConnection();
-    // 获得当前连接
-    public Connection getCurrentConnecton();
+
     // 回收连接
     public void releaseConn(Connection conn) throws SQLException;
     // 销毁清空
