@@ -64,7 +64,6 @@ public class ConnectionPool implements IConnectionPool {
             try {
                 // 判断是否超过最大连接数限制 && 没有空闲连接
                 while (contActive > this.dbBean.getMaxActiveConnections() && freeConnection.size() <= 0) {
-                    cheackPool();
                     this.wait();
                 }
                 this.notifyAll();
@@ -181,9 +180,9 @@ public class ConnectionPool implements IConnectionPool {
     // 定时检查连接池情况
     @Override
     public void cheackPool() {
-        System.out.println("空线池连接数：" + freeConnection.size());
-        System.out.println("活动连接数：：" + activeConnection.size());
-        System.out.println("总的连接数：" + contActive);
-        System.out.println("允许的最大连接数：" + dbBean.getMaxActiveConnections());
+        logger.info("空线池连接数：" + freeConnection.size());
+        logger.info("活动连接数：：" + activeConnection.size());
+        logger.info("总的连接数：" + contActive);
+        logger.info("允许的最大连接数：" + dbBean.getMaxActiveConnections());
     }
 }

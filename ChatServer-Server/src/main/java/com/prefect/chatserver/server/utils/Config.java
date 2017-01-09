@@ -25,12 +25,12 @@ public class Config {
         String SERVER_IDLE_TIME = "server.IdleTime";
         String SERVER_BUFFER_SIZE = "server.BufferSize";
 
-        ClassLoader classLoader = Config.class.getClassLoader();
-        if (classLoader != null) {
-            System.out.println("项目路径：" + classLoader.getResource(filePath).toString());
-        } else {
-            System.out.println("项目路径：" + ClassLoader.getSystemResource(filePath).getPath());
-        }
+//        ClassLoader classLoader = Config.class.getClassLoader();
+//        if (classLoader != null) {
+//            System.out.println("项目路径：" + classLoader.getResource(filePath).toString());
+//        } else {
+//            System.out.println("项目路径：" + ClassLoader.getSystemResource(filePath).getPath());
+//        }
 
         Properties properties = new Properties();
         properties.load(Config.class.getClassLoader().getResourceAsStream(filePath));

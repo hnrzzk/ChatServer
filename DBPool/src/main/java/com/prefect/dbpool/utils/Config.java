@@ -8,10 +8,10 @@ import java.util.Properties;
  * Created by zhangkai on 2017/1/9.
  */
 public class Config {
-    private String filePath = "ChatServerConfig.properties";
+    private String filePath = "dbpoolconfig.properties";
 
     public Config() {
-        this("ChatServerConfig.properties");
+        this("dbpoolconfig.properties");
     }
 
     public Config(String filePath) {
