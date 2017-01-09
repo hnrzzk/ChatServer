@@ -536,6 +536,8 @@ public class DBDao {
             }
         } catch (SQLException e) {
             e.printStackTrace();
+        }finally {
+            chatServerDbConnectUnit.close();
         }
 
         return messagePackets;

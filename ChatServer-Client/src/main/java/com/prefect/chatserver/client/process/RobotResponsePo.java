@@ -23,7 +23,7 @@ import java.util.TimerTask;
  * Created by zhangkai on 2017/1/5.
  */
 public class RobotResponsePo implements Runnable {
-    private static Logger logger= org.slf4j.LoggerFactory.getLogger(RobotResponsePo.class);
+    private static Logger logger = org.slf4j.LoggerFactory.getLogger(RobotResponsePo.class);
 
     MessagePacket messagePacket;
     IoSession session;
@@ -51,11 +51,11 @@ public class RobotResponsePo implements Runnable {
         }
     }
 
-    private void verify(){
-        ACKMessage ackMessage = JSON.parseObject(messagePacket.getMessage(),ACKMessage.class);
-        String ackStr=ackMessage.getMessage();
+    private void verify() {
+        ACKMessage ackMessage = JSON.parseObject(messagePacket.getMessage(), ACKMessage.class);
+        String ackStr = ackMessage.getMessage();
 
-        if (!ackMessage.getActionResult()){
+        if (!ackMessage.getActionResult()) {
             Interactive.getInstance().printlnToConsole(ackStr);
             return;
         }
@@ -85,11 +85,15 @@ public class RobotResponsePo implements Runnable {
 
         UserLogin userInfo = new UserLogin();
 
-        String account = AttributeOperate.getInstance().getAccountOfAttribute(session);
+        String account = "";
+        while (account.equals("")) {
+            account = AttributeOperate.getInstance().getAccountOfAttribute(session);
+        }
 
         String password = account;
 
         userInfo.setAccount(account);
+        System.out.println("account:" + account);
 
         String verify = MathUtil.getInstance().getMD5(password + randomStr);
 
@@ -108,33 +112,33 @@ public class RobotResponsePo implements Runnable {
         //如果登录成功
         if (ackMessage.getActionResult()) {
             Interactive.getInstance().printlnToConsole("登录成功");
-            Timer timer = new Timer();
-            timer.schedule(new TimerTask() {
-                @Override
-                public void run() {
-                    MessagePacket messagePacket = new MessagePacket();
-                    messagePacket.setCommand(CommandType.MESSAGE);
-                    messagePacket.setMessageType(MessageType.MESSAGE);
-
-                    String account = Util.getInstance().getAccount(session);
-                    ChatMessage chatMessage = new ChatMessage();
-                    chatMessage.setSendAccount(account);
-                    chatMessage.setReceiveAccount(account);
-
-                    String message = new StringBuilder()
-                            .append(session.toString())
-                            .append(" send: ")
-                            .append(new Date(System.currentTimeMillis())).toString();
-                    chatMessage.setMessage(message);
-
-                    String json = JSON.toJSONString(chatMessage);
-                    messagePacket.setMessage(json);
-                    messagePacket.setMessageLength(json.getBytes().length);
-
-                    session.write(messagePacket);
-                }
-            }, 500, 1000);
-        }else{
+//            Timer timer = new Timer();
+//            timer.schedule(new TimerTask() {
+//                @Override
+//                public void run() {
+//                    MessagePacket messagePacket = new MessagePacket();
+//                    messagePacket.setCommand(CommandType.MESSAGE);
+//                    messagePacket.setMessageType(MessageType.MESSAGE);
+//
+//                    String account = Util.getInstance().getAccount(session);
+//                    ChatMessage chatMessage = new ChatMessage();
+//                    chatMessage.setSendAccount(account);
+//                    chatMessage.setReceiveAccount(account);
+//
+//                    String message = new StringBuilder()
+//                            .append(session.toString())
+//                            .append(" send: ")
+//                            .append(new Date(System.currentTimeMillis())).toString();
+//                    chatMessage.setMessage(message);
+//
+//                    String json = JSON.toJSONString(chatMessage);
+//                    messagePacket.setMessage(json);
+//                    messagePacket.setMessageLength(json.getBytes().length);
+//
+//                    session.write(messagePacket);
+//                }
+//            }, 500, 1000);
+        } else {
             Interactive.getInstance().printlnToConsole(ackMessage.getMessage());
         }
     }

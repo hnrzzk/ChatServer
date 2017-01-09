@@ -45,6 +45,7 @@ public class LoginVerifyPo extends ActionPo {
 
         //更新在线状态
         if (DBDao.getInstance().changeAccountOnlineStatus(account, 1)) { //更新在线状态 成功
+            System.out.println("account" + account);
             //将已建立的连接保存在内存中
             ChatServerHandler.sessionMap.put(account, ioSession);
             //在session中记录account名称
