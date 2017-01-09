@@ -29,7 +29,6 @@ public class ConnectionPool implements IConnectionPool {
     private static ThreadLocal<Connection> threadLocal = new ThreadLocal<Connection>();
 
     public ConnectionPool(DBBean dbBean) {
-        super();
         this.dbBean = dbBean;
         init();
         cheackPool();
