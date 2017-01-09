@@ -1,5 +1,8 @@
 package com.prefect.dbpool;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
@@ -12,6 +15,7 @@ import java.util.Vector;
  * Created by hnrzz on 2017/1/8.
  */
 public class ConnectionPool implements IConnectionPool {
+    private static Logger logger = LoggerFactory.getLogger(ConnectionPool.class);
     // 连接池配置属性
     private DBBean dbBean;
     private boolean isActive = false; // 连接池活动状态
@@ -31,7 +35,9 @@ public class ConnectionPool implements IConnectionPool {
         cheackPool();
     }
 
-    // 初始化
+    /**
+     * 初始化
+     */
     public void init() {
         try {
             Class.forName(dbBean.getDriverName());
@@ -46,13 +52,16 @@ public class ConnectionPool implements IConnectionPool {
             }
             isActive = true;
         } catch (ClassNotFoundException e) {
-            e.printStackTrace();
+            logger.error(e.getMessage(), e);
         } catch (SQLException e) {
-            e.printStackTrace();
+            logger.error(e.getMessage(), e);
         }
     }
 
-    // 获得当前连接
+    /**
+     * 获得当前连接
+     * @return
+     */
     public Connection getCurrentConnecton() {
         // 默认线程里面取
         Connection conn = threadLocal.get();
@@ -62,7 +71,10 @@ public class ConnectionPool implements IConnectionPool {
         return conn;
     }
 
-    // 获得连接
+    /**
+     * 获得连接
+     * @return
+     */
     public synchronized Connection getConnection() {
         Connection conn = null;
         try {
@@ -97,7 +109,12 @@ public class ConnectionPool implements IConnectionPool {
         return conn;
     }
 
-    // 获得新连接
+    /**
+     * 获得新连接
+     * @return
+     * @throws ClassNotFoundException
+     * @throws SQLException
+     */
     private synchronized Connection newConnection()
             throws ClassNotFoundException, SQLException {
         Connection conn = null;
@@ -109,7 +126,11 @@ public class ConnectionPool implements IConnectionPool {
         return conn;
     }
 
-    // 释放连接
+    /**
+     * 释放连接
+     * @param conn
+     * @throws SQLException
+     */
     public synchronized void releaseConn(Connection conn) throws SQLException {
         if (isValid(conn) && !(freeConnection.size() > dbBean.getMaxConnections())) {
             freeConnection.add(conn);
@@ -121,19 +142,25 @@ public class ConnectionPool implements IConnectionPool {
         }
     }
 
-    // 判断连接是否可用
+    /**
+     * 判断连接是否可用
+     * @param conn
+     * @return
+     */
     private boolean isValid(Connection conn) {
         try {
             if (conn == null || conn.isClosed()) {
                 return false;
             }
         } catch (SQLException e) {
-            e.printStackTrace();
+            logger.error(e.getMessage(), e);
         }
         return true;
     }
 
-    // 销毁连接池
+    /**
+     * 销毁连接池
+     */
     public synchronized void destroy() {
         for (Connection conn : freeConnection) {
             try {
@@ -141,7 +168,7 @@ public class ConnectionPool implements IConnectionPool {
                     conn.close();
                 }
             } catch (SQLException e) {
-                e.printStackTrace();
+                logger.error(e.getMessage(),e);
             }
         }
         for (Connection conn : activeConnection) {
