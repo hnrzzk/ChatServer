@@ -13,10 +13,10 @@ public class DBInitInfo {
         // 这里数据 可以从xml 等配置文件进行获取
         // 为了测试，这里我直接写死
         DBBean beanOracle = new DBBean();
-        beanOracle.setDriverName("oracle.jdbc.driver.OracleDriver");
-        beanOracle.setUrl("jdbc:oracle:thin:@7MEXGLUY95W1Y56:1521:orcl");
-        beanOracle.setUserName("mmsoa");
-        beanOracle.setPassword("password1234");
+        beanOracle.setDriverName("com.mysql.jdbc.Driver");
+        beanOracle.setUrl("jdbc:mysql://localhost/chatserver");
+        beanOracle.setUserName("root");
+        beanOracle.setPassword("root");
 
         beanOracle.setMinConnections(5);
         beanOracle.setMaxConnections(100);

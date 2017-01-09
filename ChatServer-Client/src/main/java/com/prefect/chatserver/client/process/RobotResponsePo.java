@@ -145,7 +145,9 @@ public class RobotResponsePo implements Runnable {
 
     private void processMessage() {
         ChatMessage chatMessage = JSON.parseObject(messagePacket.getMessage(), ChatMessage.class);
+        String account =chatMessage.getReceiveAccount();
+        String sendAccount=chatMessage.getSendAccount();
+        logger.info(account+" received message from "+sendAccount+" : "+chatMessage.getMessage());
 
-        Interactive.getInstance().printlnToConsole(chatMessage.getMessage());
     }
 }

@@ -84,7 +84,7 @@ public class Robot {
     }
 
     public static void main(String[] args) {
-        Robot robot = new Robot(100);
+        Robot robot = new Robot(5000);
         robot.start();
     }
 }
