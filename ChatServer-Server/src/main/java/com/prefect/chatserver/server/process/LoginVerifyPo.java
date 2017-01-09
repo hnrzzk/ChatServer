@@ -109,6 +109,11 @@ public class LoginVerifyPo extends ActionPo {
         sendNotice(accountList, messagePacket);
     }
 
+    /**
+     * 发送离线消息
+     * @param ioSession
+     * @param account
+     */
     private void sendOfflineMessage(IoSession ioSession, String account) {
         Timestamp now = TimeUtil.getInstance().getTimeStampNow();
         List<MessagePacket> messagePacketList = DBDao.getInstance().getOfflineMessage(account, now);

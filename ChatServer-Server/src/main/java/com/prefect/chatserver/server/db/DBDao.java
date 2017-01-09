@@ -536,11 +536,42 @@ public class DBDao {
             }
         } catch (SQLException e) {
             e.printStackTrace();
-        }finally {
+        } finally {
             chatServerDbConnectUnit.close();
         }
 
+        //修改离线消息的发送状态
+        changeOfflineMessageSendStatus(account, loginTime, OfflineMessageTable.Status.SEND);
+
         return messagePackets;
+    }
+
+    /**
+     * 修改离线消息的发送状态，从未发送改为 status
+     *
+     * @param account
+     * @param loginTime
+     * @param status
+     * @return
+     */
+    private long changeOfflineMessageSendStatus(String account, Timestamp loginTime, int status) {
+        //update offline_message set is_send=? where account=? and create_time < ? and is_send =?
+        String sql = new StringBuilder()
+                .append("update ").append(OfflineMessageTable.name)
+                .append(" set ").append(OfflineMessageTable.Field.isSend).append("=?")
+                .append(" where ")
+                .append(OfflineMessageTable.Field.account).append("=?")
+                .append(" and ").append(OfflineMessageTable.Field.createTime).append("<?")
+                .append(" and ").append(OfflineMessageTable.Field.isSend).append("=?")
+                .toString();
+        ChatServerDbConnectUnit chatServerDbConnectUnit =
+                DBUtil.getInstance().executeUpdate(sql, new Object[]{status, account, loginTime, OfflineMessageTable.Status.NOT_SEND});
+        int successRow = -1;
+        if (chatServerDbConnectUnit != null) {
+            successRow = chatServerDbConnectUnit.getSuccessRow();
+        }
+        chatServerDbConnectUnit.close();
+        return successRow;
     }
 }
 
