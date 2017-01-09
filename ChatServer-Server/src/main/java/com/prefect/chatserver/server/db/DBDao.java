@@ -170,7 +170,7 @@ public class DBDao {
     public boolean changeAccountOnlineStatus(String account, int onlineStatus) {
         boolean result = false;
 
-        //update $tableName set $filed = 0 where $field1 = ?
+        //update user set is_online = 0 where is_online = ?
         String sql = new StringBuilder()
                 .append("update ").append(UserTable.name)
                 .append(" set ").append(UserTable.Field.isOnline).append("=").append(onlineStatus).append(" where ")
@@ -178,7 +178,7 @@ public class DBDao {
                 .toString();
 
         ChatServerDbConnectUnit chatServerDbConnectUnit = DBUtil.getInstance().executeUpdate(sql, new Object[]{account});
-        if (chatServerDbConnectUnit != null) {
+        if (chatServerDbConnectUnit.getSuccessRow() >0) {
             result = true;
         }
         //关闭数据库连接

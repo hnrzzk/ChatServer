@@ -41,8 +41,8 @@ public class MessagePo extends ActionPo {
             return;
         }
 
-//        //判断是否在黑名单中
-//        if (!DBDao.getInstance().isInBlackList(receiveAccount, sendAccount)) {
+        //判断是否在黑名单中
+        if (!DBDao.getInstance().isInBlackList(receiveAccount, sendAccount)) {
             IoSession receiveSecession = ChatServerHandler.sessionMap.get(chatMessage.getReceiveAccount());
             if (receiveSecession != null) { //如果好友在线则发送消息
                 receiveSecession.write(messageObj);
@@ -50,7 +50,7 @@ public class MessagePo extends ActionPo {
                 //存储离线消息
                 DBDao.getInstance().saveOfflineMessage(receiveAccount,messageObj);
             }
-//        }
+        }
     }
 
     /**

@@ -27,7 +27,7 @@ public class BlackListAddPo extends ActionPo {
 
         if (blackListAdd > 0) { //添加成功
             response(ioSession, CommandType.BLACK_LIST_ADD_ACK, true,
-                    String.format("Black list add request is accepted. accountInfo:[%s]", relationShipMessage.getUserAccount()));
+                    String.format("Black list add request is accepted. accountInfo:[%s]", relationShipMessage.getFriendAccount()));
         } else { //添加失败
             response(ioSession, CommandType.BLACK_LIST_ADD_ACK, false,
                     String.format("Black list add error. accountInfo:[%s]", relationShipMessage.getFriendAccount()));
