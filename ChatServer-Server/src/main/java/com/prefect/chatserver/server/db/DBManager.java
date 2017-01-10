@@ -30,16 +30,16 @@ public class DBManager {
         return DBUtilHandler.instance;
     }
 
-        private DataSource ds = null;
-//    private DBConnectionSource ds;
+//        private DataSource ds = null;  //dbcp连接池
+    private DBConnectionSource ds;  //自己实现的连接池
 
     private DBManager() {
         Properties properties = new Properties();
 
         try {
             properties.load(DBManager.class.getClassLoader().getResourceAsStream(filePath));
-            ds = BasicDataSourceFactory.createDataSource(properties);
-//            ds = new DBConnectionSource();
+//            ds = BasicDataSourceFactory.createDataSource(properties); //dbcp连接池
+            ds = new DBConnectionSource();  //自己实现的连接池
         } catch (Exception e) {
             logger.error(e.getMessage(), e);
         }

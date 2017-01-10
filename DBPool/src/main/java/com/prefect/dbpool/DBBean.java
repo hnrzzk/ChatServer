@@ -9,8 +9,7 @@ public class DBBean {
     private String url;
     private String userName;
     private String password;
-    // 连接池名字
-    private String poolName;
+
     private int minConnections = 1; // 空闲池，最小连接数
     private int maxConnections = 10; // 空闲池，最大连接数
 
@@ -30,13 +29,11 @@ public class DBBean {
 
 
     public DBBean(String driverName, String url, String userName,
-                  String password, String poolName) {
-        super();
+                  String password) {
         this.driverName = driverName;
         this.url = url;
         this.userName = userName;
         this.password = password;
-        this.poolName = poolName;
     }
 
     public DBBean() {
@@ -75,14 +72,6 @@ public class DBBean {
 
     public void setPassword(String password) {
         this.password = password;
-    }
-
-    public String getPoolName() {
-        return poolName;
-    }
-
-    public void setPoolName(String poolName) {
-        this.poolName = poolName;
     }
 
     public int getMinConnections() {

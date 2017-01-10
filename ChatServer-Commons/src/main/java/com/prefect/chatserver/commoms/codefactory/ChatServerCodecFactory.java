@@ -14,7 +14,7 @@ import java.nio.charset.Charset;
  */
 public class ChatServerCodecFactory implements ProtocolCodecFactory{
     private final ChatServerEncode encoder;
-    private final ChatServerNewDecode decoder;
+    private final ChatServerDecode decoder;
 
     public ChatServerCodecFactory(){
         this(Charset.forName("UTF-8"));
@@ -22,7 +22,7 @@ public class ChatServerCodecFactory implements ProtocolCodecFactory{
 
     public ChatServerCodecFactory(Charset charset){
         this.encoder=new ChatServerEncode(charset);
-        this.decoder=new ChatServerNewDecode(charset);
+        this.decoder=new ChatServerDecode(charset);
     }
 
     public ProtocolEncoder getEncoder(IoSession ioSession) throws Exception {

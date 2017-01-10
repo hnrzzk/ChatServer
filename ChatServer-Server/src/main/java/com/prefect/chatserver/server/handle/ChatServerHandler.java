@@ -24,7 +24,7 @@ public class ChatServerHandler extends IoHandlerAdapter {
 
     public static Map<String, IoSession> sessionMap = new ConcurrentHashMap<String, IoSession>();
 
-    private ExecutorService cachedThreadPool = Executors.newCachedThreadPool();
+    private ExecutorService cachedThreadPool = Executors.newFixedThreadPool(100);
 
     @Override
     public void sessionCreated(IoSession session) throws Exception {

@@ -38,7 +38,7 @@
                     </descriptorRefs>
                     <archive>
                         <manifest>
-                            <mainClass>com.prefect.chatserver.client.ChatClient</mainClass>
+                            <mainClass>com.prefect.chatserver.client.Robot</mainClass>
                         </manifest>
                     </archive>
                 </configuration>

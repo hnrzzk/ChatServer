@@ -26,6 +26,8 @@ import java.util.TimerTask;
 public class RobotResponsePo implements Runnable {
     private static Logger logger = org.slf4j.LoggerFactory.getLogger(RobotResponsePo.class);
 
+    static int loginNum = 0;
+
     MessagePacket messagePacket;
     IoSession session;
 
@@ -112,37 +114,41 @@ public class RobotResponsePo implements Runnable {
         ACKMessage ackMessage = JSON.parseObject(messagePacket.getMessage(), ACKMessage.class);
         //如果登录成功
         if (ackMessage.getActionResult()) {
-            Interactive.getInstance().printlnToConsole("登录成功");
-            Timer timer = new Timer();
-            timer.schedule(new TimerTask() {
-                @Override
-                public void run() {
-                    MessagePacket messagePacket = new MessagePacket();
-                    messagePacket.setCommand(CommandType.MESSAGE);
-                    messagePacket.setMessageType(MessageType.MESSAGE);
+            synchronized (this) {
+                loginNum++;
+            }
 
-                    String account = Util.getInstance().getAccount(session);
-                    ChatMessage chatMessage = new ChatMessage();
-                    chatMessage.setSendAccount(account);
-                    chatMessage.setReceiveAccount(account);
-
-                    String message = new StringBuilder()
-                            .append(session.toString())
-                            .append(" send: ")
-                            .append(new Date(System.currentTimeMillis())).toString();
-                    chatMessage.setMessage(message);
-
-                    String json = JSON.toJSONString(chatMessage);
-                    messagePacket.setMessage(json);
-                    try {
-                        messagePacket.setMessageLength(json.getBytes("utf-8").length);
-                        session.write(messagePacket);
-                    } catch (UnsupportedEncodingException e) {
-                        e.printStackTrace();
-                    }
-
-                }
-            }, 500, 1000);
+            Interactive.getInstance().printlnToConsole("登录成功,登录成功数：" + loginNum);
+//            Timer timer = new Timer();
+//            timer.schedule(new TimerTask() {
+//                @Override
+//                public void run() {
+//                    MessagePacket messagePacket = new MessagePacket();
+//                    messagePacket.setCommand(CommandType.MESSAGE);
+//                    messagePacket.setMessageType(MessageType.MESSAGE);
+//
+//                    String account = Util.getInstance().getAccount(session);
+//                    ChatMessage chatMessage = new ChatMessage();
+//                    chatMessage.setSendAccount(account);
+//                    chatMessage.setReceiveAccount(account);
+//
+//                    String message = new StringBuilder()
+//                            .append(session.toString())
+//                            .append(" send: ")
+//                            .append(new Date(System.currentTimeMillis())).toString();
+//                    chatMessage.setMessage(message);
+//
+//                    String json = JSON.toJSONString(chatMessage);
+//                    messagePacket.setMessage(json);
+//                    try {
+//                        messagePacket.setMessageLength(json.getBytes("utf-8").length);
+//                        session.write(messagePacket);
+//                    } catch (UnsupportedEncodingException e) {
+//                        e.printStackTrace();
+//                    }
+//
+//                }
+//            }, 500, 1000);
         } else {
             Interactive.getInstance().printlnToConsole(ackMessage.getMessage());
         }

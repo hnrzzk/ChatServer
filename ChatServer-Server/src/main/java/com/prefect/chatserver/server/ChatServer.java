@@ -5,11 +5,9 @@ import com.prefect.chatserver.server.handle.ChatServerHandler;
 import com.prefect.chatserver.server.utils.Config;
 import com.prefect.chatserver.server.utils.ServerInfo;
 import org.apache.mina.core.filterchain.DefaultIoFilterChainBuilder;
-import org.apache.mina.core.service.IoAcceptor;
 import org.apache.mina.core.session.IdleStatus;
 import org.apache.mina.core.session.IoSession;
 import org.apache.mina.filter.codec.ProtocolCodecFilter;
-import org.apache.mina.filter.codec.textline.TextLineCodecFactory;
 import org.apache.mina.filter.executor.ExecutorFilter;
 import org.apache.mina.filter.logging.LogLevel;
 import org.apache.mina.filter.logging.LoggingFilter;
@@ -20,12 +18,12 @@ import org.slf4j.LoggerFactory;
 
 
 import java.io.IOException;
+import java.net.InetAddress;
 import java.net.InetSocketAddress;
-import java.nio.charset.Charset;
+import java.net.SocketAddress;
 
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArraySet;
-import java.util.concurrent.Executors;
 
 /**
  * 聊天服务器启动类
@@ -64,14 +62,16 @@ public class ChatServer {
 
         filterChainBuilder.addLast("codec", new ProtocolCodecFilter(new ChatServerCodecFactory()));
 
-//        filterChainBuilder.addLast("threadPool", new ExecutorFilter());
+        filterChainBuilder.addLast("threadPool", new ExecutorFilter());
 
         getAcceptor().setHandler(new ChatServerHandler());
         getAcceptor().getSessionConfig().setBothIdleTime(serverInfo.getIdleTime());
         getAcceptor().getSessionConfig().setReadBufferSize(serverInfo.getBufferSize());
         getAcceptor().getSessionConfig().setIdleTime(IdleStatus.BOTH_IDLE, serverInfo.getTimeOut());
         try {
-            getAcceptor().bind(new InetSocketAddress(serverInfo.getPort()));
+            SocketAddress socketAddress = new InetSocketAddress(InetAddress.getByName(serverInfo.getHostname()), serverInfo.getPort());
+            logger.info("服务器地址："+socketAddress.toString());
+            getAcceptor().bind(socketAddress);
             return true;
         } catch (IOException e) {
             logger.error(e.getMessage(), e);

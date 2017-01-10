@@ -108,12 +108,11 @@ public class LoginVerifyPo extends ActionPo {
         MessagePacket messagePacket = null;
         try {
             messagePacket = new MessagePacket(CommandType.USER_ON_LINE_NOTICE, MessageType.STRING, message.getBytes("utf-8").length, message);
+            //发送通知
             sendNotice(accountList, messagePacket);
         } catch (UnsupportedEncodingException e) {
             logger.error(e.getMessage(), e);
         }
-
-        //发送通知
 
     }
 

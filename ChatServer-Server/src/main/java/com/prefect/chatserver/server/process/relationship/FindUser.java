@@ -84,7 +84,6 @@ public class FindUser extends ActionPo {
                 logger.error(e.getMessage(), e);
             }
 
-
         } else {
             response(ioSession, CommandType.USER_FIND_ACK, false, "find friend failed!");
         }

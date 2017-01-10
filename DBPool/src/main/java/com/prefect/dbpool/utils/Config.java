@@ -46,8 +46,6 @@ public class Config {
         bean.setMinConnections(Integer.parseInt(properties.getProperty(MIN_CONNECTIONS)));
         bean.setMaxConnections(Integer.parseInt(properties.getProperty(MAX_CONNECTIONS)));
 
-        bean.setPoolName(properties.getProperty(POOL_NAME));
-
         return bean;
     }
 }
