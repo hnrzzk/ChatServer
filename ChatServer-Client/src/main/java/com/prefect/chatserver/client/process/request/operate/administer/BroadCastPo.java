@@ -45,7 +45,7 @@ public class BroadCastPo extends OperatePo {
             String json = JSON.toJSONString(chatMessage);
 
             messagePacket.setMessage(json);
-            messagePacket.setMessageLength(json.getBytes().length);
+            messagePacket.setMessageLength(json.getBytes("utf-8").length);
 
             ChatClient.session.write(messagePacket);
         } catch (Exception e) {

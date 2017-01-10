@@ -17,7 +17,7 @@ public class ChatServerCodecFactory implements ProtocolCodecFactory{
     private final ChatServerNewDecode decoder;
 
     public ChatServerCodecFactory(){
-        this(Charset.defaultCharset());
+        this(Charset.forName("UTF-8"));
     }
 
     public ChatServerCodecFactory(Charset charset){

@@ -8,6 +8,7 @@ import com.prefect.chatserver.commoms.utils.MessageType;
 import com.prefect.chatserver.commoms.utils.moudel.UserInfo;
 import org.apache.mina.core.session.IoSession;
 
+import java.io.UnsupportedEncodingException;
 import java.util.Scanner;
 
 /**
@@ -23,9 +24,14 @@ class SignIn {
 
         String jsonObject = JSON.toJSONString(getUserInfo());
         message.setMessage(jsonObject);
-        message.setMessageLength(jsonObject.getBytes().length);
+        try {
+            message.setMessageLength(jsonObject.getBytes("utf-8").length);
+            ioSession.write(message);
+        } catch (UnsupportedEncodingException e) {
+            e.printStackTrace();
+        }
 
-        ioSession.write(message);
+
     }
 
     private UserInfo getUserInfo() {

@@ -10,6 +10,7 @@ import com.prefect.chatserver.server.db.DBDao;
 import com.prefect.chatserver.server.process.ActionPo;
 import org.apache.mina.core.session.IoSession;
 
+import java.io.UnsupportedEncodingException;
 import java.util.List;
 
 /**
@@ -43,16 +44,22 @@ public class FindUser extends ActionPo {
     public void findUserForNickName(IoSession ioSession, String nickName) {
 
         List<UserInfo> userInfoList = DBDao.getInstance().findUserForNickName(nickName);
-        if (userInfoList!=null){
+        if (userInfoList != null) {
             UserListInfo userListInfo = new UserListInfo();
             userListInfo.setFriendList(userInfoList);
 
             String json = JSON.toJSONString(userListInfo);
-            MessagePacket messagePacket=new MessagePacket(CommandType.USER_FIND_ACK, MessageType.USER_LIST,json.getBytes().length,json);
+            MessagePacket messagePacket = null;
+            try {
+                messagePacket = new MessagePacket(CommandType.USER_FIND_ACK, MessageType.USER_LIST, json.getBytes("utf-8").length, json);
+                ioSession.write(messagePacket);
+            } catch (UnsupportedEncodingException e) {
+                logger.error(e.getMessage(), e);
+            }
 
-            ioSession.write(messagePacket);
-        }else {
-            response(ioSession,CommandType.USER_FIND_ACK,false,"find friend failed!");
+
+        } else {
+            response(ioSession, CommandType.USER_FIND_ACK, false, "find friend failed!");
         }
     }
 
@@ -64,16 +71,22 @@ public class FindUser extends ActionPo {
      */
     public void findUserForAccount(IoSession ioSession, String account) {
         List<UserInfo> userInfoList = DBDao.getInstance().findUserForAccount(account);
-        if (userInfoList!=null){
+        if (userInfoList != null) {
             UserListInfo userListInfo = new UserListInfo();
             userListInfo.setFriendList(userInfoList);
 
             String json = JSON.toJSONString(userListInfo);
-            MessagePacket messagePacket=new MessagePacket(CommandType.USER_FIND_ACK, MessageType.USER_LIST,json.getBytes().length,json);
+            MessagePacket messagePacket = null;
+            try {
+                messagePacket = new MessagePacket(CommandType.USER_FIND_ACK, MessageType.USER_LIST, json.getBytes("utf-8").length, json);
+                ioSession.write(messagePacket);
+            } catch (UnsupportedEncodingException e) {
+                logger.error(e.getMessage(), e);
+            }
 
-            ioSession.write(messagePacket);
-        }else {
-            response(ioSession,CommandType.USER_FIND_ACK,false,"find friend failed!");
+
+        } else {
+            response(ioSession, CommandType.USER_FIND_ACK, false, "find friend failed!");
         }
     }
 }

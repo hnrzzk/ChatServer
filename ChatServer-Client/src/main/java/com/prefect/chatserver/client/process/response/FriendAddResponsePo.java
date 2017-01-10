@@ -8,6 +8,7 @@ import com.prefect.chatserver.commoms.utils.MessagePacket;
 import com.prefect.chatserver.commoms.utils.MessageType;
 import com.prefect.chatserver.commoms.utils.moudel.RelationShipMessage;
 
+import java.io.UnsupportedEncodingException;
 import java.util.Scanner;
 
 /**
@@ -34,9 +35,14 @@ public class FriendAddResponsePo implements ResponsePo {
                 break;
         }
         String json = JSON.toJSONString(relationShipMessage);
-        MessagePacket responseMessagePacket = new MessagePacket(CommandType.FRIEND_LIST_ADD_ACK,
-                MessageType.RELATIONSHIP_MANAGE, json.getBytes().length, json);
+        MessagePacket responseMessagePacket = null;
+        try {
+            responseMessagePacket = new MessagePacket(CommandType.FRIEND_LIST_ADD_ACK,
+                    MessageType.RELATIONSHIP_MANAGE, json.getBytes("utf-8").length, json);
+            ChatClient.session.write(responseMessagePacket);
+        } catch (UnsupportedEncodingException e) {
+            e.printStackTrace();
+        }
 
-        ChatClient.session.write(responseMessagePacket);
     }
 }

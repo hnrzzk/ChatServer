@@ -9,6 +9,8 @@ import com.prefect.chatserver.commoms.utils.MessageType;
 import com.prefect.chatserver.commoms.utils.moudel.RelationShipMessage;
 import org.apache.mina.core.session.IoSession;
 
+import java.io.UnsupportedEncodingException;
+
 /**
  * 黑名单管理请求逻辑
  * Created by zhangkai on 2017/1/3.
@@ -52,13 +54,19 @@ public class BlackListManagePo extends OperatePo{
 
         String json = JSON.toJSONString(relationShipMessage);
 
-        MessagePacket messagePacket = new MessagePacket(
-                CommandType.BLACK_LIST_ADD,
-                MessageType.RELATIONSHIP_MANAGE,
-                json.getBytes().length,
-                json);
+        MessagePacket messagePacket = null;
+        try {
+            messagePacket = new MessagePacket(
+                    CommandType.BLACK_LIST_ADD,
+                    MessageType.RELATIONSHIP_MANAGE,
+                    json.getBytes("utf-8").length,
+                    json);
+            ChatClient.session.write(messagePacket);
+        } catch (UnsupportedEncodingException e) {
+            e.printStackTrace();
+        }
 
-        ChatClient.session.write(messagePacket);
+
     }
 
     private void requestRemoveBlack(String account) {
@@ -68,13 +76,19 @@ public class BlackListManagePo extends OperatePo{
 
         String json = JSON.toJSONString(relationShipMessage);
 
-        MessagePacket messagePacket = new MessagePacket(
-                CommandType.BLACK_LIST_REMOVE,
-                MessageType.RELATIONSHIP_MANAGE,
-                json.getBytes().length,
-                json);
+        MessagePacket messagePacket = null;
+        try {
+            messagePacket = new MessagePacket(
+                    CommandType.BLACK_LIST_REMOVE,
+                    MessageType.RELATIONSHIP_MANAGE,
+                    json.getBytes("utf-8").length,
+                    json);
+            ChatClient.session.write(messagePacket);
+        } catch (UnsupportedEncodingException e) {
+            e.printStackTrace();
+        }
 
-        ChatClient.session.write(messagePacket);
+
     }
 
     private void printHelpInfo() {

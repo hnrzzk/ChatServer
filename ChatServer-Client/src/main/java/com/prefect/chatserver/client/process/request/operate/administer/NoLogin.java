@@ -10,6 +10,8 @@ import com.prefect.chatserver.commoms.utils.MessageType;
 import com.prefect.chatserver.commoms.utils.moudel.UserAuthorityManageMessage;
 import org.apache.mina.core.session.IoSession;
 
+import java.io.UnsupportedEncodingException;
+
 /**
  * 请求设置用户禁止登录
  * Created by zhangkai on 2017/1/6.
@@ -55,10 +57,15 @@ public class NoLogin extends OperatePo{
         MessagePacket messagePacket = new MessagePacket();
         messagePacket.setCommand(CommandType.USER_NO_LOGIN);
         messagePacket.setMessageType(MessageType.USER_AUTHORITY_MANAGE);
-        messagePacket.setMessageLength(json.getBytes().length);
-        messagePacket.setMessage(json);
+        try {
+            messagePacket.setMessageLength(json.getBytes("utf-8").length);
+            messagePacket.setMessage(json);
 
-        ChatClient.session.write(messagePacket);
+            ChatClient.session.write(messagePacket);
+        } catch (UnsupportedEncodingException e) {
+            e.printStackTrace();
+        }
+
     }
 
     /**
@@ -74,10 +81,15 @@ public class NoLogin extends OperatePo{
         MessagePacket messagePacket = new MessagePacket();
         messagePacket.setCommand(CommandType.USER_NO_LOGIN_CANCEL);
         messagePacket.setMessageType(MessageType.USER_AUTHORITY_MANAGE);
-        messagePacket.setMessageLength(json.getBytes().length);
-        messagePacket.setMessage(json);
+        try {
+            messagePacket.setMessageLength(json.getBytes("utf-8").length);
+            messagePacket.setMessage(json);
 
-        ChatClient.session.write(messagePacket);
+            ChatClient.session.write(messagePacket);
+        } catch (UnsupportedEncodingException e) {
+            e.printStackTrace();
+        }
+
     }
 
     private void printHelpInfo() {

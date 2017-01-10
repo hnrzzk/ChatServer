@@ -9,6 +9,8 @@ import com.prefect.chatserver.server.db.DBDao;
 import com.prefect.chatserver.server.process.ActionPo;
 import org.apache.mina.core.session.IoSession;
 
+import java.io.UnsupportedEncodingException;
+
 /**
  * Created by zhangkai on 2017/1/6.
  */
@@ -20,7 +22,7 @@ public abstract class AdministerPo extends ActionPo {
      * @return
      */
     boolean authorizationCheck(IoSession ioSession, String account) {
-         boolean isAllow = DBDao.getInstance().authorityCheck(account);
+        boolean isAllow = DBDao.getInstance().authorityCheck(account);
 
         if (!isAllow) {
             ACKMessage ACKMessage = new ACKMessage();
@@ -28,7 +30,11 @@ public abstract class AdministerPo extends ActionPo {
             ACKMessage.setMessage("对不起，您没有权限!");
 
             String json = JSON.toJSONString(ACKMessage);
-            ioSession.write(new MessagePacket(CommandType.SEND_BROADCAST_ACK, MessageType.RESPONSE, json.getBytes().length, json));
+            try {
+                ioSession.write(new MessagePacket(CommandType.SEND_BROADCAST_ACK, MessageType.RESPONSE, json.getBytes("utf-8").length, json));
+            } catch (UnsupportedEncodingException e) {
+                logger.error(e.getMessage(), e);
+            }
         }
 
 

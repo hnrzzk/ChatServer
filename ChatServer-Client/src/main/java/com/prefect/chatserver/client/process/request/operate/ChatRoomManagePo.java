@@ -9,6 +9,8 @@ import com.prefect.chatserver.commoms.utils.MessageType;
 import com.prefect.chatserver.commoms.utils.moudel.ChatRoomMessage;
 import org.apache.mina.core.session.IoSession;
 
+import java.io.UnsupportedEncodingException;
+
 /**
  * 聊天室
  * Created by zhangkai on 2017/1/3.
@@ -77,13 +79,19 @@ public class ChatRoomManagePo extends OperatePo{
 
         String json = JSON.toJSONString(chatRoomMessage);
 
-        MessagePacket messagePacket = new MessagePacket(
-                CommandType.CHAT_ROOM_ENTER,
-                MessageType.CHATROOM_MANAGE,
-                json.getBytes().length,
-                json);
+        MessagePacket messagePacket = null;
+        try {
+            messagePacket = new MessagePacket(
+                    CommandType.CHAT_ROOM_ENTER,
+                    MessageType.CHATROOM_MANAGE,
+                    json.getBytes("utf-8").length,
+                    json);
+            ChatClient.session.write(messagePacket);
+        } catch (UnsupportedEncodingException e) {
+            e.printStackTrace();
+        }
 
-        ChatClient.session.write(messagePacket);
+
     }
 
     /**
@@ -101,13 +109,19 @@ public class ChatRoomManagePo extends OperatePo{
 
             String json = JSON.toJSONString(chatRoomMessage);
 
-            MessagePacket messagePacket = new MessagePacket(
-                    CommandType.CHAT_ROOM_QUIT,
-                    MessageType.CHATROOM_MANAGE,
-                    json.getBytes().length,
-                    json);
+            MessagePacket messagePacket = null;
+            try {
+                messagePacket = new MessagePacket(
+                        CommandType.CHAT_ROOM_QUIT,
+                        MessageType.CHATROOM_MANAGE,
+                        json.getBytes("utf-8").length,
+                        json);
+                ChatClient.session.write(messagePacket);
+            } catch (UnsupportedEncodingException e) {
+                e.printStackTrace();
+            }
 
-            ChatClient.session.write(messagePacket);
+
         }
     }
 
@@ -124,13 +138,18 @@ public class ChatRoomManagePo extends OperatePo{
 
         String json = JSON.toJSONString(chatRoomMessage);
 
-        MessagePacket messagePacket = new MessagePacket(
-                CommandType.CHAT_ROOM_SEND,
-                MessageType.CHATROOM_MANAGE,
-                json.getBytes().length,
-                json);
+        MessagePacket messagePacket = null;
+        try {
+            messagePacket = new MessagePacket(
+                    CommandType.CHAT_ROOM_SEND,
+                    MessageType.CHATROOM_MANAGE,
+                    json.getBytes("utf-8").length,
+                    json);
+            ChatClient.session.write(messagePacket);
+        } catch (UnsupportedEncodingException e) {
+            e.printStackTrace();
+        }
 
-        ChatClient.session.write(messagePacket);
     }
 
     void printChatRoomName(){

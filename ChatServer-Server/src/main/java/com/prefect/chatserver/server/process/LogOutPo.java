@@ -13,6 +13,7 @@ import org.apache.mina.core.session.IoSession;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.UnsupportedEncodingException;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArraySet;
 
@@ -30,7 +31,7 @@ public class LogOutPo extends ActionPo {
         String account = AttributeOperate.getInstance().getAccountOfAttribute(ioSession);
         String chatRoomName = AttributeOperate.getInstance().getChatRoomNameOfAttribute(ioSession);
 
-        if (account!=null&&!account.isEmpty()){
+        if (account != null && !account.isEmpty()) {
             //发送离线通知
             sendOfflineNotice(account);
 
@@ -62,10 +63,15 @@ public class LogOutPo extends ActionPo {
         String message = new StringBuilder().append("您的好友").append(account).append("已下线").toString();
 
         //打包
-        MessagePacket messagePacket = new MessagePacket(CommandType.USER_OFF_LINE_NOTICE, MessageType.STRING, message.getBytes().length, message);
+        MessagePacket messagePacket = null;
+        try {
+            messagePacket = new MessagePacket(CommandType.USER_OFF_LINE_NOTICE, MessageType.STRING, message.getBytes("utf-8").length, message);
+            //发送通知
+            sendNotice(accountList, messagePacket);
+        } catch (UnsupportedEncodingException e) {
+            logger.error(e.getMessage(), e);
+        }
 
-        //发送通知
-        sendNotice(accountList, messagePacket);
     }
 
     /**
@@ -98,16 +104,24 @@ public class LogOutPo extends ActionPo {
 
         String json = JSON.toJSONString(chatRoomMessage);
 
-        MessagePacket messagePacket = new MessagePacket(
-                CommandType.CHAT_ROOM_QUIT_ACK,
-                MessageType.CHATROOM_MANAGE,
-                json.getBytes().length,
-                json);
+        MessagePacket messagePacket = null;
+        try {
+            messagePacket = new MessagePacket(
+                    CommandType.CHAT_ROOM_QUIT_ACK,
+                    MessageType.CHATROOM_MANAGE,
+                    json.getBytes("utf-8").length,
+                    json);
 
-        for (IoSession item : sessionSet) {
-            if (item.isConnected()) {
-                item.write(messagePacket);
+            for (IoSession item : sessionSet) {
+                if (item.isConnected()) {
+                    item.write(messagePacket);
+                }
             }
+
+        } catch (UnsupportedEncodingException e) {
+            logger.error(e.getMessage(), e);
         }
+
+
     }
 }

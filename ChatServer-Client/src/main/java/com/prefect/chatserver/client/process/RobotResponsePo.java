@@ -13,6 +13,7 @@ import org.apache.log4j.spi.LoggerFactory;
 import org.apache.mina.core.session.IoSession;
 import org.slf4j.Logger;
 
+import java.io.UnsupportedEncodingException;
 import java.sql.Date;
 import java.util.Base64;
 import java.util.Scanner;
@@ -74,7 +75,7 @@ public class RobotResponsePo implements Runnable {
             session.write(new MessagePacket(
                     CommandType.USER_LOGIN_VERIFY,
                     MessageType.USER_LOGIN,
-                    json.getBytes().length,
+                    json.getBytes("utf-8").length,
                     json));
         } catch (Exception e) {
             logger.error(e.getMessage(), e);
@@ -112,32 +113,36 @@ public class RobotResponsePo implements Runnable {
         //如果登录成功
         if (ackMessage.getActionResult()) {
             Interactive.getInstance().printlnToConsole("登录成功");
-//            Timer timer = new Timer();
-//            timer.schedule(new TimerTask() {
-//                @Override
-//                public void run() {
-//                    MessagePacket messagePacket = new MessagePacket();
-//                    messagePacket.setCommand(CommandType.MESSAGE);
-//                    messagePacket.setMessageType(MessageType.MESSAGE);
-//
-//                    String account = Util.getInstance().getAccount(session);
-//                    ChatMessage chatMessage = new ChatMessage();
-//                    chatMessage.setSendAccount(account);
-//                    chatMessage.setReceiveAccount(account);
-//
-//                    String message = new StringBuilder()
-//                            .append(session.toString())
-//                            .append(" send: ")
-//                            .append(new Date(System.currentTimeMillis())).toString();
-//                    chatMessage.setMessage(message);
-//
-//                    String json = JSON.toJSONString(chatMessage);
-//                    messagePacket.setMessage(json);
-//                    messagePacket.setMessageLength(json.getBytes().length);
-//
-//                    session.write(messagePacket);
-//                }
-//            }, 500, 1000);
+            Timer timer = new Timer();
+            timer.schedule(new TimerTask() {
+                @Override
+                public void run() {
+                    MessagePacket messagePacket = new MessagePacket();
+                    messagePacket.setCommand(CommandType.MESSAGE);
+                    messagePacket.setMessageType(MessageType.MESSAGE);
+
+                    String account = Util.getInstance().getAccount(session);
+                    ChatMessage chatMessage = new ChatMessage();
+                    chatMessage.setSendAccount(account);
+                    chatMessage.setReceiveAccount(account);
+
+                    String message = new StringBuilder()
+                            .append(session.toString())
+                            .append(" send: ")
+                            .append(new Date(System.currentTimeMillis())).toString();
+                    chatMessage.setMessage(message);
+
+                    String json = JSON.toJSONString(chatMessage);
+                    messagePacket.setMessage(json);
+                    try {
+                        messagePacket.setMessageLength(json.getBytes("utf-8").length);
+                        session.write(messagePacket);
+                    } catch (UnsupportedEncodingException e) {
+                        e.printStackTrace();
+                    }
+
+                }
+            }, 500, 1000);
         } else {
             Interactive.getInstance().printlnToConsole(ackMessage.getMessage());
         }
@@ -145,9 +150,9 @@ public class RobotResponsePo implements Runnable {
 
     private void processMessage() {
         ChatMessage chatMessage = JSON.parseObject(messagePacket.getMessage(), ChatMessage.class);
-        String account =chatMessage.getReceiveAccount();
-        String sendAccount=chatMessage.getSendAccount();
-        logger.info(account+" received message from "+sendAccount+" : "+chatMessage.getMessage());
+        String account = chatMessage.getReceiveAccount();
+        String sendAccount = chatMessage.getSendAccount();
+        logger.info(account + " received message from " + sendAccount + " : " + chatMessage.getMessage());
 
     }
 }

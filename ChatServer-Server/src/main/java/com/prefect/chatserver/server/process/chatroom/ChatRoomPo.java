@@ -8,6 +8,7 @@ import com.prefect.chatserver.server.process.ActionPo;
 import com.prefect.chatserver.server.process.MessageProcess;
 import org.apache.mina.core.session.IoSession;
 
+import java.io.UnsupportedEncodingException;
 import java.util.concurrent.CopyOnWriteArraySet;
 
 /**
@@ -26,7 +27,7 @@ public abstract class ChatRoomPo extends ActionPo {
         CopyOnWriteArraySet<IoSession> sessionSet = ChatServer.chatRoomInfo.get(chatRoomName);
         if (null != sessionSet) {  //如果聊天室存在
             for (IoSession item : sessionSet) {
-                if(item.isConnected()){
+                if (item.isConnected()) {
                     item.write(messagePacket);
                 }
             }
@@ -38,10 +39,15 @@ public abstract class ChatRoomPo extends ActionPo {
 
             String json = JSON.toJSONString(chatRoomMessage);
 
-            messagePacket.setMessageLength(json.getBytes().length);
-            messagePacket.setMessage(json);
+            try {
+                messagePacket.setMessageLength(json.getBytes("utf-8").length);
+                messagePacket.setMessage(json);
 
-            session.write(messagePacket);
+                session.write(messagePacket);
+            } catch (UnsupportedEncodingException e) {
+                logger.error(e.getMessage(), e);
+            }
+
         }
     }
 }
