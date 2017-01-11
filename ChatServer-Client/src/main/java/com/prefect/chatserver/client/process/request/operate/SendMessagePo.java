@@ -7,6 +7,8 @@ import com.prefect.chatserver.commoms.utils.MessagePacket;
 import com.prefect.chatserver.commoms.utils.MessageType;
 import com.prefect.chatserver.commoms.utils.moudel.ChatMessage;
 
+import java.io.UnsupportedEncodingException;
+
 /**
  * 发送消息的处理逻辑
  * Created by zhangkai on 2016/12/29.
@@ -33,9 +35,11 @@ public class SendMessagePo extends OperatePo {
 
         String json = JSON.toJSONString(chatMessage);
         messagePacket.setMessage(json);
-        messagePacket.setMessageLength(json.getBytes().length);
-
-        ChatClient.session.write(messagePacket);
-
+        try {
+            messagePacket.setMessageLength(json.getBytes("utf-8").length);
+            ChatClient.session.write(messagePacket);
+        } catch (UnsupportedEncodingException e) {
+            e.printStackTrace();
+        }
     }
 }

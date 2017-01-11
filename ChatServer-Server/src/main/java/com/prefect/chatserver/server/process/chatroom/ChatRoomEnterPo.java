@@ -10,6 +10,7 @@ import org.apache.mina.core.session.IoSession;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.UnsupportedEncodingException;
 import java.util.concurrent.CopyOnWriteArraySet;
 
 /**
@@ -46,10 +47,13 @@ public class ChatRoomEnterPo extends ChatRoomPo {
             MessagePacket messagePacketError = new MessagePacket();
             messagePacketError.setCommand(CommandType.MESSAGE_ACK);
             messagePacketError.setMessageType(MessageType.STRING);
-            messagePacketError.setMessageLength(value.getBytes().length);
-            messagePacketError.setMessage(value);
-
-            ioSession.write(messagePacketError);
+            try {
+                messagePacketError.setMessageLength(value.getBytes("utf-8").length);
+                messagePacketError.setMessage(value);
+                ioSession.write(messagePacketError);
+            } catch (UnsupportedEncodingException e) {
+                logger.error(e.getMessage(), e);
+            }
             return;
         } else {
             sessionSet.add(ioSession);
@@ -65,12 +69,16 @@ public class ChatRoomEnterPo extends ChatRoomPo {
         ioSession.setAttribute("chatRoom", chatRoomName);
 
         String json = JSON.toJSONString(chatRoomMessage);
-        MessagePacket messagePacket = new MessagePacket(
-                CommandType.CHAT_ROOM_ENTER_ACK,
-                MessageType.CHATROOM_MANAGE,
-                json.getBytes().length,
-                json);
-
-        sendMessage(ioSession, chatRoomName, messagePacket);
+        MessagePacket messagePacket = null;
+        try {
+            messagePacket = new MessagePacket(
+                    CommandType.CHAT_ROOM_ENTER_ACK,
+                    MessageType.CHATROOM_MANAGE,
+                    json.getBytes("utf-8").length,
+                    json);
+            sendMessage(ioSession, chatRoomName, messagePacket);
+        } catch (UnsupportedEncodingException e) {
+            logger.error(e.getMessage(), e);
+        }
     }
 }

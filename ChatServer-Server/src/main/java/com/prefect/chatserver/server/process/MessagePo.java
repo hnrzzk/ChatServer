@@ -28,6 +28,12 @@ public class MessagePo extends ActionPo {
 
     /**
      * 发送聊天数据
+     *
+     * 存在的问题：
+     * 由于每次发送数据都会通过查询数据库来判断该用户是否被禁言或者处于黑名单中。由于查询数据库操作比较耗时，特别是在大并发的情况下。
+     * 现在猜测此处是造出数据阻塞的主要原因
+     * 解决方案：
+     * 将禁言表和黑名单表缓存一份在内存中。
      */
     private void sendChatMessage(IoSession ioSession, MessagePacket messageObj) {
         ChatMessage chatMessage = JSON.parseObject(messageObj.getMessage(), ChatMessage.class);
@@ -35,13 +41,13 @@ public class MessagePo extends ActionPo {
         String sendAccount = chatMessage.getSendAccount();
         String receiveAccount = chatMessage.getReceiveAccount();
 
-        //判读是否被禁言
+        //判读是否被禁言 此处应该加缓存 直接存在map中或者放在redis中
         if (DBDao.getInstance().isGag(sendAccount)) {
             response(ioSession, CommandType.MESSAGE_ACK, false, "Sorry, you have been gagged.");
             return;
         }
 
-        //判断是否在黑名单中
+        //判断是否在黑名单中 此处应该加缓存 存放在redis中
         if (!DBDao.getInstance().isInBlackList(receiveAccount, sendAccount)) {
             IoSession receiveSecession = ChatServerHandler.sessionMap.get(chatMessage.getReceiveAccount());
             if (receiveSecession != null) { //如果好友在线则发送消息

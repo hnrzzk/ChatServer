@@ -41,6 +41,7 @@ public class RobotHandler implements IoHandler {
                     logger.info(Thread.currentThread().getName() + " 已建立连接，当前连接数:" + Robot.sessionConcurrentHashMap.size());
 
                     RobotRequestPo.getInstance().login(ioSession);
+
 //                    RobotRequestPo.getInstance().signIn(ioSession);
 
                     //取消定时任务

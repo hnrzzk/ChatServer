@@ -42,7 +42,7 @@ public class LoginResponsePo implements ResponsePo {
             ChatClient.session.write(new MessagePacket(
                     CommandType.USER_LOGIN_VERIFY,
                     MessageType.USER_LOGIN,
-                    json.getBytes().length,
+                    json.getBytes("utf-8").length,
                     json));
         } catch (Exception e) {
             logger.error(e.getMessage(), e);

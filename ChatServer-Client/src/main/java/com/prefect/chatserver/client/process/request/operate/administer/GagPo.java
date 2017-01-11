@@ -10,6 +10,8 @@ import com.prefect.chatserver.commoms.utils.MessageType;
 import com.prefect.chatserver.commoms.utils.moudel.UserAuthorityManageMessage;
 import org.apache.mina.core.session.IoSession;
 
+import java.io.UnsupportedEncodingException;
+
 /**
  * 用户禁言操作
  * Created by zhangkai on 2017/1/6.
@@ -54,10 +56,15 @@ public class GagPo extends OperatePo {
         MessagePacket messagePacket = new MessagePacket();
         messagePacket.setCommand(CommandType.USER_GAG);
         messagePacket.setMessageType(MessageType.USER_AUTHORITY_MANAGE);
-        messagePacket.setMessageLength(json.getBytes().length);
-        messagePacket.setMessage(json);
+        try {
+            messagePacket.setMessageLength(json.getBytes("utf-8").length);
+            messagePacket.setMessage(json);
 
-        ChatClient.session.write(messagePacket);
+            ChatClient.session.write(messagePacket);
+        } catch (UnsupportedEncodingException e) {
+            e.printStackTrace();
+        }
+
     }
 
     /**
@@ -73,10 +80,15 @@ public class GagPo extends OperatePo {
         MessagePacket messagePacket = new MessagePacket();
         messagePacket.setCommand(CommandType.USER_GAG_CANCEL);
         messagePacket.setMessageType(MessageType.USER_AUTHORITY_MANAGE);
-        messagePacket.setMessageLength(json.getBytes().length);
-        messagePacket.setMessage(json);
+        try {
+            messagePacket.setMessageLength(json.getBytes("utf-8").length);
+            messagePacket.setMessage(json);
 
-        ChatClient.session.write(messagePacket);
+            ChatClient.session.write(messagePacket);
+        } catch (UnsupportedEncodingException e) {
+            e.printStackTrace();
+        }
+
     }
 
 

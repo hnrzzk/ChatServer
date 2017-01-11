@@ -5,6 +5,7 @@ import com.prefect.chatserver.commoms.utils.*;
 import com.prefect.chatserver.commoms.utils.moudel.ACKMessage;
 import org.apache.mina.core.session.IoSession;
 
+import java.io.UnsupportedEncodingException;
 import java.util.Base64;
 
 /**
@@ -21,7 +22,7 @@ public class LoginRequestPo extends ActionPo {
             String random = MathUtil.getInstance().getRandomStr(10);
 
             //对字符串用公钥加密
-            byte[] encodeData=RSA.encryptByPublicKey(random.getBytes(), pubKey);
+            byte[] encodeData = RSA.encryptByPublicKey(random.getBytes("utf-8"), pubKey);
             //转换为string
             String veirfyStr = new String(Base64.getEncoder().encode(encodeData));
 
@@ -29,7 +30,7 @@ public class LoginRequestPo extends ActionPo {
             ackMessage.setMessage(veirfyStr);
 
             //将验证字符串保存在session中
-            AttributeOperate.getInstance().setVerifyStr(ioSession,random);
+            AttributeOperate.getInstance().setVerifyStr(ioSession, random);
 
         } catch (Exception e) {
             logger.error("RSA公钥加密失败:" + e.getMessage(), e);
@@ -42,9 +43,14 @@ public class LoginRequestPo extends ActionPo {
         MessagePacket messagePacket = new MessagePacket();
         messagePacket.setCommand(CommandType.USER_LOGIN_REQUEST_ACK);
         messagePacket.setMessageType(MessageType.RESPONSE);
-        messagePacket.setMessageLength(json.getBytes().length);
-        messagePacket.setMessage(json);
+        try {
+            messagePacket.setMessageLength(json.getBytes("utf-8").length);
+            messagePacket.setMessage(json);
 
-        ioSession.write(messagePacket);
+            ioSession.write(messagePacket);
+        } catch (UnsupportedEncodingException e) {
+            logger.error(e.getMessage(), e);
+        }
+
     }
 }

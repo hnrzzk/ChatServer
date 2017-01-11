@@ -11,6 +11,8 @@ import org.apache.mina.core.session.IoSession;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.UnsupportedEncodingException;
+
 /**
  * Created by zhangkai on 2017/1/5.
  */
@@ -50,11 +52,16 @@ public class RobotRequestPo {
         userInfo.setNickname(account);
 
         String json = JSON.toJSONString(userInfo);
-        messagePacket.setMessageLength(json.getBytes().length);
-        messagePacket.setMessage(json);
+        try {
+            messagePacket.setMessageLength(json.getBytes("utf-8").length);
+            messagePacket.setMessage(json);
 
-        //发送报文
-        session.write(messagePacket);
+            //发送报文
+            session.write(messagePacket);
+        } catch (UnsupportedEncodingException e) {
+            e.printStackTrace();
+        }
+
     }
 
     /**
@@ -74,9 +81,14 @@ public class RobotRequestPo {
         }
 
         message.setMessage(pubKsy);
-        message.setMessageLength(pubKsy.getBytes().length);
+        try {
+            message.setMessageLength(pubKsy.getBytes("utf-8").length);
+            session.write(message);
+        } catch (UnsupportedEncodingException e) {
+            e.printStackTrace();
+        }
 
-        session.write(message);
+
     }
 
 

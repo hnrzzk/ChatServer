@@ -9,6 +9,7 @@ import org.apache.mina.core.session.IoSession;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -17,7 +18,8 @@ import java.util.List;
  * Created by zhangkai on 2016/12/28.
  */
 public abstract class ActionPo implements MessageProcess {
-    protected static Logger logger= LoggerFactory.getLogger(ActionPo.class);
+    protected static Logger logger = LoggerFactory.getLogger(ActionPo.class);
+
     /**
      * 服务器向客户端发送响应消息的逻辑
      *
@@ -32,13 +34,17 @@ public abstract class ActionPo implements MessageProcess {
             messagePacket.setMessageType(MessageType.RESPONSE);
             messagePacket.setCommand(commandType);
 
-            ACKMessage ACKMessage = new ACKMessage();
-            ACKMessage.setActionResult(result);
-            ACKMessage.setMessage(message);
+            ACKMessage ackMessage = new ACKMessage();
+            ackMessage.setActionResult(result);
+            ackMessage.setMessage(message);
 
-            String json = JSON.toJSONString(ACKMessage);
+            String json = JSON.toJSONString(ackMessage);
             messagePacket.setMessage(json);
-            messagePacket.setMessageLength(json.getBytes().length);
+            try {
+                messagePacket.setMessageLength(json.getBytes("utf-8").length);
+            } catch (UnsupportedEncodingException e) {
+                logger.error(e.getMessage(), e);
+            }
 
             ioSession.write(messagePacket);
         }

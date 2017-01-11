@@ -19,6 +19,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.net.InetSocketAddress;
+import java.net.SocketAddress;
 import java.util.Map;
 
 /**
@@ -74,7 +75,8 @@ public class ChatClient {
         Interactive.getInstance().printlnToConsole("正在连接服务器……");
         while (true) {
             try {
-                ConnectFuture future = connector.connect(new InetSocketAddress(serverInfo.getHostName(), serverInfo.getPort()));
+                SocketAddress socketAddress=new InetSocketAddress(serverInfo.getHostName(), serverInfo.getPort());
+                ConnectFuture future = connector.connect(socketAddress);
                 future.awaitUninterruptibly();
                 this.session = future.getSession();
                 //在session中存储密钥

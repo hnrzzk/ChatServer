@@ -9,6 +9,7 @@ import com.prefect.chatserver.server.db.TableInfo.UserTable;
 import com.prefect.chatserver.server.handle.ChatServerHandler;
 import org.apache.mina.core.session.IoSession;
 
+import java.io.UnsupportedEncodingException;
 import java.sql.Timestamp;
 import java.util.Iterator;
 import java.util.List;
@@ -52,6 +53,7 @@ public class LoginVerifyPo extends ActionPo {
             //在session中记录account名称
             AttributeOperate.getInstance().setAccountOfAttribute(ioSession, account);
             super.response(ioSession, CommandType.USER_LOGIN_VERIFY_ACK, true, "登录成功: Welcome!");
+            logger.info("user login, user num:" + ChatServerHandler.sessionMap.size());
         } else {
             //更新在线状态失败
             super.response(ioSession, CommandType.USER_LOGIN_VERIFY_ACK, false, "登录失败: Account does not exist or Incorrect password.");
@@ -104,14 +106,20 @@ public class LoginVerifyPo extends ActionPo {
         String message = new StringBuilder().append("您的好友").append(account).append("已上线").toString();
 
         //打包
-        MessagePacket messagePacket = new MessagePacket(CommandType.USER_ON_LINE_NOTICE, MessageType.STRING, message.getBytes().length, message);
+        MessagePacket messagePacket = null;
+        try {
+            messagePacket = new MessagePacket(CommandType.USER_ON_LINE_NOTICE, MessageType.STRING, message.getBytes("utf-8").length, message);
+            //发送通知
+            sendNotice(accountList, messagePacket);
+        } catch (UnsupportedEncodingException e) {
+            logger.error(e.getMessage(), e);
+        }
 
-        //发送通知
-        sendNotice(accountList, messagePacket);
     }
 
     /**
      * 发送离线消息
+     *
      * @param ioSession
      * @param account
      */

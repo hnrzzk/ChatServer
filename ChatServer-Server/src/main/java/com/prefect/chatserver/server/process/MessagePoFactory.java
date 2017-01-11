@@ -8,13 +8,36 @@ import com.prefect.chatserver.server.process.chatroom.ChatRoomQuit;
 import com.prefect.chatserver.server.process.chatroom.ChatRoomSend;
 import com.prefect.chatserver.server.process.relationship.*;
 
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+
 /**
  * 业务处理类工厂
  * Created by zhangkai on 2016/12/27.
  */
 public class MessagePoFactory {
+    static Map<Integer, MessageProcess> messageProcessMap = new ConcurrentHashMap<>();
 
     public static MessageProcess getClass(int commandType) {
+        MessageProcess messageProcess;
+        if (messageProcessMap.containsKey(commandType)) {
+            messageProcess = messageProcessMap.get(commandType);
+        } else {
+            synchronized (MessagePoFactory.class) {
+                if (!messageProcessMap.containsKey(commandType)){
+                    messageProcess = getMessageProcess(commandType);
+                    if (messageProcess != null) {
+                        messageProcessMap.put(commandType, messageProcess);
+                    }
+                }else{
+                    messageProcess = messageProcessMap.get(commandType);
+                }
+            }
+        }
+        return messageProcess;
+    }
+
+    private static MessageProcess getMessageProcess(int commandType) {
         switch (commandType) {
             case CommandType.USER_LOGIN_REQUEST:    //用户登录请求
                 return new LoginRequestPo();
@@ -52,4 +75,5 @@ public class MessagePoFactory {
                 return null;
         }
     }
+
 }

@@ -10,6 +10,8 @@ import com.prefect.chatserver.commoms.utils.moudel.RelationShipMessage;
 import com.prefect.chatserver.commoms.utils.moudel.UserInfo;
 import org.apache.mina.core.session.IoSession;
 
+import java.io.UnsupportedEncodingException;
+
 /**
  * 好友管理请求
  * Created by zhangkai on 2016/12/31.
@@ -71,13 +73,17 @@ public class FriendManagePo extends OperatePo {
 
         String json = JSON.toJSONString(relationShipMessage);
 
-        MessagePacket messagePacket = new MessagePacket(
-                CommandType.FRIEND_LIST_ADD,
-                MessageType.RELATIONSHIP_MANAGE,
-                json.getBytes().length,
-                json);
-
-        ChatClient.session.write(messagePacket);
+        MessagePacket messagePacket = null;
+        try {
+            messagePacket = new MessagePacket(
+                    CommandType.FRIEND_LIST_ADD,
+                    MessageType.RELATIONSHIP_MANAGE,
+                    json.getBytes("utf-8").length,
+                    json);
+            ChatClient.session.write(messagePacket);
+        } catch (UnsupportedEncodingException e) {
+            e.printStackTrace();
+        }
     }
 
     /**
@@ -92,13 +98,17 @@ public class FriendManagePo extends OperatePo {
 
         String json = JSON.toJSONString(relationShipMessage);
 
-        MessagePacket messagePacket = new MessagePacket(
-                CommandType.FRIEND_LIST_REMOVE,
-                MessageType.RELATIONSHIP_MANAGE,
-                json.getBytes().length,
-                json);
-
-        ChatClient.session.write(messagePacket);
+        MessagePacket messagePacket = null;
+        try {
+            messagePacket = new MessagePacket(
+                    CommandType.FRIEND_LIST_REMOVE,
+                    MessageType.RELATIONSHIP_MANAGE,
+                    json.getBytes("utf-8").length,
+                    json);
+            ChatClient.session.write(messagePacket);
+        } catch (UnsupportedEncodingException e) {
+            e.printStackTrace();
+        }
     }
 
     /**
@@ -122,10 +132,14 @@ public class FriendManagePo extends OperatePo {
                 break;
         }
         String json = JSON.toJSONString(userInfo);
-        messagePacket.setMessageLength(json.getBytes().length);
-        messagePacket.setMessage(json);
+        try {
+            messagePacket.setMessageLength(json.getBytes("utf-8").length);
+            messagePacket.setMessage(json);
 
-        ChatClient.session.write(messagePacket);
+            ChatClient.session.write(messagePacket);
+        } catch (UnsupportedEncodingException e) {
+            e.printStackTrace();
+        }
     }
 
     private void printHelpInfo() {

@@ -35,7 +35,6 @@ public class ConnectionPoolManager {
         ConnectionPool pool = new ConnectionPool(bean);
         if (pool != null) {
             pools = pool;
-            logger.info("Init connection successed ->" + bean.getPoolName());
         }
     }
 
@@ -75,7 +74,6 @@ public class ConnectionPoolManager {
             bean.setMinConnections(5);
             bean.setMaxConnections(100);
 
-            bean.setPoolName("testPool");
         }
         return bean;
     }

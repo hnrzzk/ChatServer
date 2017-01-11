@@ -7,6 +7,7 @@ import com.prefect.chatserver.server.db.TableInfo.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.UnsupportedEncodingException;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Timestamp;
@@ -84,6 +85,7 @@ public class DBDao {
                 logger.error(e.getMessage(), e);
             } finally {
                 chatServerDbConnectUnit.close();
+                chatServerDbConnectUnit = null;
             }
 
         }
@@ -156,6 +158,7 @@ public class DBDao {
             logger.error(e.getMessage(), e);
         } finally {
             chatServerDbConnectUnit.close();
+            chatServerDbConnectUnit = null;
         }
         return friendInfoList;
     }
@@ -178,11 +181,12 @@ public class DBDao {
                 .toString();
 
         ChatServerDbConnectUnit chatServerDbConnectUnit = DBUtil.getInstance().executeUpdate(sql, new Object[]{account});
-        if (chatServerDbConnectUnit.getSuccessRow() >0) {
+        if (chatServerDbConnectUnit.getSuccessRow() > 0) {
             result = true;
         }
         //关闭数据库连接
         chatServerDbConnectUnit.close();
+        chatServerDbConnectUnit = null;
 
         return result;
     }
@@ -362,11 +366,14 @@ public class DBDao {
                 sql,
                 new Object[]{TimeUtil.getInstance().getTimeStampNow(), account, UserNoLoginTable.Status.NO_LOGIN});
 
+        int result = -1;
         if (chatServerDbConnectUnit != null) {
-            return chatServerDbConnectUnit.getSuccessRow();
-        } else {
-            return -1;
+            result = chatServerDbConnectUnit.getSuccessRow();
         }
+        chatServerDbConnectUnit.close();
+        chatServerDbConnectUnit = null;
+
+        return result;
     }
 
     /**
@@ -438,6 +445,9 @@ public class DBDao {
             }
         } catch (SQLException e) {
             logger.error(e.getMessage(), e);
+        } finally {
+            chatServerDbConnectUnit.close();
+            chatServerDbConnectUnit = null;
         }
 
         return resultList;
@@ -466,6 +476,7 @@ public class DBDao {
             logger.error(e.getMessage(), e);
         } finally {
             chatServerDbConnectUnit.close();
+            chatServerDbConnectUnit = null;
         }
         return password;
     }
@@ -531,13 +542,16 @@ public class DBDao {
                 messagePacket.setCommand(commandType);
                 messagePacket.setMessageType(messageType);
                 messagePacket.setMessage(json);
-                messagePacket.setMessageLength(json.getBytes().length);
+                messagePacket.setMessageLength(json.getBytes("utf-8").length);
                 messagePackets.add(messagePacket);
             }
+        } catch (UnsupportedEncodingException e) {
+            logger.error(e.getMessage(), e);
         } catch (SQLException e) {
-            e.printStackTrace();
+            logger.error(e.getMessage(), e);
         } finally {
             chatServerDbConnectUnit.close();
+            chatServerDbConnectUnit = null;
         }
 
         //修改离线消息的发送状态
@@ -571,6 +585,7 @@ public class DBDao {
             successRow = chatServerDbConnectUnit.getSuccessRow();
         }
         chatServerDbConnectUnit.close();
+        chatServerDbConnectUnit = null;
         return successRow;
     }
 }

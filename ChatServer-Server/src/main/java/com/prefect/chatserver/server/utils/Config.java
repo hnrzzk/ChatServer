@@ -1,7 +1,5 @@
 package com.prefect.chatserver.server.utils;
 
-import java.io.File;
-import java.io.FileInputStream;
 import java.util.Properties;
 
 /**
@@ -24,6 +22,7 @@ public class Config {
         String SERVER_TIME_OUT = "server.timeOut";
         String SERVER_IDLE_TIME = "server.IdleTime";
         String SERVER_BUFFER_SIZE = "server.BufferSize";
+        String SERVER_HOSTNAME = "server.hostname";
 
 //        ClassLoader classLoader = Config.class.getClassLoader();
 //        if (classLoader != null) {
@@ -37,6 +36,7 @@ public class Config {
 
         ServerInfo serverInfo = new ServerInfo();
 
+        serverInfo.setHostname(properties.getProperty(SERVER_HOSTNAME));
         serverInfo.setPort(Integer.parseInt(properties.getProperty(SERVER_PORT)));
         serverInfo.setTimeOut(Integer.parseInt(properties.getProperty(SERVER_TIME_OUT)));
         serverInfo.setIdleTime(Integer.parseInt(properties.getProperty(SERVER_IDLE_TIME)));

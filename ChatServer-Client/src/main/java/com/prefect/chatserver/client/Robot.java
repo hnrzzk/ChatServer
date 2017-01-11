@@ -1,6 +1,8 @@
 package com.prefect.chatserver.client;
 
 import com.prefect.chatserver.client.handler.RobotHandler;
+import com.prefect.chatserver.client.utils.Config;
+import com.prefect.chatserver.client.utils.ServerInfo;
 import com.prefect.chatserver.commoms.codefactory.ChatServerCodecFactory;
 import com.prefect.chatserver.commoms.utils.AttributeOperate;
 import com.prefect.chatserver.commoms.utils.RSA;
@@ -21,8 +23,8 @@ import java.util.concurrent.ConcurrentHashMap;
 public class Robot {
     public static ConcurrentHashMap<String, IoSession> sessionConcurrentHashMap;
 
-    private final String HOSTNAME = "localhost";
-    private final int PORT = 9123;
+    private final String HOSTNAME = "192.168.137.57";
+    private final int PORT = 55555;
     private final long CONNECT_TIMEOUT = 30 * 1000L;
     private final boolean USE_CUSTOM_CODEC = true;
 
@@ -38,7 +40,7 @@ public class Robot {
 
         this.connector = new NioSocketConnector();
         this.connector.setConnectTimeoutMillis(CONNECT_TIMEOUT);
-        this.connector.getFilterChain().addLast("logger", new LoggingFilter());
+//        this.connector.getFilterChain().addLast("logger", new LoggingFilter());
         this.connector.getFilterChain().addLast("codec",
                 new ProtocolCodecFilter(new ChatServerCodecFactory()));
         this.connector.setHandler(new RobotHandler());
@@ -51,11 +53,13 @@ public class Robot {
     }
 
     private void getConnect() {
+        Config Config = new Config();
+        ServerInfo serverInfo = Config.getServerConf();
         for (int i = 1; i <= connectNum; i++) {
 
             while (true) {
                 try {
-                    ConnectFuture future = connector.connect(new InetSocketAddress(HOSTNAME, PORT));
+                    ConnectFuture future = connector.connect(new InetSocketAddress(serverInfo.getHostName(), serverInfo.getPort()));
                     future.awaitUninterruptibly();
                     String account = String.format("%04d", i);
                     IoSession session = future.getSession();

@@ -11,6 +11,7 @@ import com.prefect.chatserver.commoms.utils.moudel.UserInfo;
 import com.prefect.chatserver.commoms.utils.moudel.UserLogin;
 import org.apache.mina.core.session.IoSession;
 
+import java.io.UnsupportedEncodingException;
 import java.util.Scanner;
 
 /**
@@ -34,9 +35,13 @@ class LoginPo {
         }
 
         message.setMessage(pubKsy);
-        message.setMessageLength(pubKsy.getBytes().length);
+        try {
+            message.setMessageLength(pubKsy.getBytes("utf-8").length);
+            ioSession.write(message);
+        } catch (UnsupportedEncodingException e) {
+            e.printStackTrace();
+        }
 
-        ioSession.write(message);
     }
 
 
