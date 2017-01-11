@@ -53,6 +53,7 @@ public class LoginVerifyPo extends ActionPo {
             //在session中记录account名称
             AttributeOperate.getInstance().setAccountOfAttribute(ioSession, account);
             super.response(ioSession, CommandType.USER_LOGIN_VERIFY_ACK, true, "登录成功: Welcome!");
+            logger.info("user login, user num:" + ChatServerHandler.sessionMap.size());
         } else {
             //更新在线状态失败
             super.response(ioSession, CommandType.USER_LOGIN_VERIFY_ACK, false, "登录失败: Account does not exist or Incorrect password.");
