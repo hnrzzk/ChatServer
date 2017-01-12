@@ -1,107 +1,43 @@
 package com.prefect.chatserver.server.db;
 
-
-import com.prefect.dbpool.DBConnectionSource;
-import org.apache.commons.dbcp2.BasicDataSourceFactory;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import javax.sql.DataSource;
-import java.sql.Connection;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
-import java.util.Properties;
+import org.hibernate.Session;
+import org.hibernate.SessionFactory;
+import org.hibernate.cfg.Configuration;
 
 /**
  * 通过dbcp管理数据库连接 单例
  * Created by zhangkai on 2016/12/26.
  */
 public class DBManager {
-    String filePath = "dbcpconfig.properties";
 
-    private final static Logger logger = LoggerFactory.getLogger(DBManager.class);
+    SessionFactory sessionFactory;
+    private static DBManager instance = new DBManager();
 
     private static class DBUtilHandler {
         private static DBManager instance = new DBManager();
     }
 
     public static DBManager getInstance() {
-        return DBUtilHandler.instance;
+        return instance;
     }
-
-//        private DataSource ds = null;  //dbcp连接池
-    private DBConnectionSource ds;  //自己实现的连接池
 
     private DBManager() {
-        Properties properties = new Properties();
+        Configuration configuration = new Configuration().configure();
 
-        try {
-            properties.load(DBManager.class.getClassLoader().getResourceAsStream(filePath));
-//            ds = BasicDataSourceFactory.createDataSource(properties); //dbcp连接池
-            ds = new DBConnectionSource();  //自己实现的连接池
-        } catch (Exception e) {
-            logger.error(e.getMessage(), e);
-        }
-
-
-    }
-
-    public Connection getConnection() throws SQLException {
-        Connection connection = ds.getConnection();
-        return connection;
+        sessionFactory = configuration.buildSessionFactory();
     }
 
     /**
-     * 关闭closeResultSet
-     *
-     * @param rs
+     * 从hibernae得到session
+     * @return session
      */
-    public static void closeResultSet(ResultSet rs) {
-        try {
-            if (rs != null && !rs.isClosed()) {
-                rs.close();
-            }
-
-        } catch (SQLException e) {
-            logger.error(e.getMessage(), e);
-        }
-
-        rs = null;
+    public Session getSession() {
+        return sessionFactory.openSession();
     }
 
-    /**
-     * 关闭statement
-     *
-     * @param stm
-     */
-    public static void closeStatement(Statement stm) {
-        try {
-            if (stm != null && !stm.isClosed()) {
-                stm.close();
-            }
-
-        } catch (SQLException e) {
-            logger.error(e.getMessage(), e);
+    protected void finalize(){
+        if (sessionFactory.isOpen()){
+            this.sessionFactory.close();
         }
-
-        stm = null;
-    }
-
-    /**
-     * 关闭connection
-     *
-     * @param conn
-     */
-    public static void closeConnection(Connection conn) {
-        try {
-            if (conn != null && !conn.isClosed()) {
-                conn.close();
-            }
-        } catch (SQLException e) {
-            logger.error(e.getMessage(), e);
-        }
-
-        conn = null;
     }
 }

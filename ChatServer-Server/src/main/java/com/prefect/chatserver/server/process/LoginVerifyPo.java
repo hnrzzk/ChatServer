@@ -5,7 +5,7 @@ import com.prefect.chatserver.commoms.utils.*;
 import com.prefect.chatserver.commoms.utils.moudel.UserLogin;
 import com.prefect.chatserver.server.db.DBDao;
 import com.prefect.chatserver.server.db.DBUtil;
-import com.prefect.chatserver.server.db.TableInfo.UserTable;
+import com.prefect.chatserver.server.db.tables.UserTable;
 import com.prefect.chatserver.server.handle.ChatServerHandler;
 import org.apache.mina.core.session.IoSession;
 
@@ -33,11 +33,7 @@ public class LoginVerifyPo extends ActionPo {
         if (!result) {
             super.response(ioSession, CommandType.USER_LOGIN_VERIFY_ACK, false, "登录验证失败: Account does not exist or Incorrect password.");
             return;
-        } else if (DBUtil.getInstance().isExit(
-                UserTable.name,
-                new String[]{UserTable.Field.account, UserTable.Field.isOnline},
-                new Object[]{account, 1})) { //用户已登录
-
+        } else if (DBDao.getInstance().getOnlineStatue(account) > 0) { //用户已登录
             super.response(ioSession, CommandType.USER_LOGIN_VERIFY_ACK, false, "登录失败: Account is logged in.");
             return;
         } else if (DBDao.getInstance().isNoLogin(account)) { //验证是否禁封登录

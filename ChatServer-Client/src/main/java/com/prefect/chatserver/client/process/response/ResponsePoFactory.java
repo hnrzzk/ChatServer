@@ -41,9 +41,12 @@ public class ResponsePoFactory {
             case CommandType.USER_LOGIN_REQUEST_ACK:
                 return new LoginResponsePo();
 
-            case CommandType.USER_SIGN_IN_ACK:
+
             case CommandType.USER_LOGIN_VERIFY_ACK:
                 return new LoginVerifyResponsePo();
+
+            case CommandType.USER_SIGN_IN_ACK:
+                return new SignInResponsePo();
             default:
                 return null;
         }

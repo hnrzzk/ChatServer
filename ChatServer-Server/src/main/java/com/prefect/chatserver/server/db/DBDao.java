@@ -3,7 +3,8 @@ package com.prefect.chatserver.server.db;
 import com.prefect.chatserver.commoms.utils.MessagePacket;
 import com.prefect.chatserver.commoms.utils.TimeUtil;
 import com.prefect.chatserver.commoms.utils.moudel.UserInfo;
-import com.prefect.chatserver.server.db.TableInfo.*;
+import com.prefect.chatserver.server.db.tables.*;
+import com.prefect.chatserver.server.process.MessageProcess;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -14,14 +15,16 @@ import java.sql.Timestamp;
 import java.util.*;
 
 /**
+ * 持久层操作逻辑
  * Created by zhangkai on 2016/12/29.
  */
 public class DBDao {
-
     private final static Logger logger = LoggerFactory.getLogger(DBDao.class);
 
-    private DBDao() {
+    DBUtil dbUtil;
 
+    private DBDao() {
+        dbUtil = DBUtil.getInstance();
     }
 
     private static class DBDaoHandle {
@@ -32,6 +35,7 @@ public class DBDao {
         return DBDaoHandle.instance;
     }
 
+
     /**
      * 查询该user表中该账户是否存在
      *
@@ -39,7 +43,11 @@ public class DBDao {
      * @return 是否存在
      */
     public boolean accountIsExist(String account) {
-        return DBUtil.getInstance().isExit("user", "account", account);
+
+        String sql = "select 1 from UserTable user where user.account=?";
+        List result = dbUtil.executeQuery(sql, new Object[]{account});
+
+        return !(null == result || result.isEmpty());
     }
 
     /**
@@ -50,46 +58,33 @@ public class DBDao {
      * @return 分组id：>0
      * 失败：-1
      */
-    public long creatCategory(String account, String category) {
-        DBUtil dbUtil = DBUtil.getInstance();
-        long result = -1;
+    private long createCategory(String account, String category) {
+        //判断分组是否存在
+        boolean categoryExist = false;
+        String sqlCategoryExist = "select 1 from "+CategoryTable.class.getName() +" cate  where cate.userAccount=? and cate.name =?";
+        List result = dbUtil.executeQuery(sqlCategoryExist, new Object[]{account, category});
 
-        //该用户下没有改分组
-        if (!dbUtil.isExit(CategoryTable.name, new String[]{CategoryTable.Field.userAccount, CategoryTable.Field.name}, new String[]{account, category})) {
+        categoryExist = !(null == result || result.isEmpty());
 
-            Map<String, Object> dataMap = new HashMap<>();
-            dataMap.put(CategoryTable.Field.userAccount, account);
-            dataMap.put(CategoryTable.Field.name, category);
+        if (!categoryExist) {
+            //如果不存在则创建
+            CategoryTable categoryTable = new CategoryTable();
 
-            Object key = dbUtil.insert(CategoryTable.name, dataMap);
-
-            if (key == null) {
-                return -1;
-            }
-            result = Long.parseLong(key.toString());
-
-        } else {
-
-            //该用户下有分组，则根据account和categoryName得到分组id
-            String sql = String.format("select %s from %s where %s=? and %s=?",
-                    CategoryTable.Field.id, CategoryTable.name, CategoryTable.Field.userAccount, CategoryTable.Field.name);
-
-            ChatServerDbConnectUnit chatServerDbConnectUnit = dbUtil.executeQuery(sql, new Object[]{account, category});
-            ResultSet resultSet = chatServerDbConnectUnit.getResultSet();
+            categoryTable.setName(category);
+            categoryTable.setUserAccount(account);
 
             try {
-                while (resultSet.next()) {
-                    result = resultSet.getLong(1);
-                }
-            } catch (SQLException e) {
-                logger.error(e.getMessage(), e);
-            } finally {
-                chatServerDbConnectUnit.close();
-                chatServerDbConnectUnit = null;
+                dbUtil.executeInsert(categoryTable);
+            } catch (Exception e) {
+                logger.error("Create category failed! :" + e.getMessage(), e);
+                return -1;
             }
+            return categoryTable.getId();
+        } else {
+            String sql = "select cate.id from CategoryTable cate where cate.userAccount=? and cate.name=?";
 
+            return (long) dbUtil.executeQuery(sql, new Object[]{account, category}).get(0);
         }
-        return result;
     }
 
     /**
@@ -101,137 +96,118 @@ public class DBDao {
      * @return 大于0:用户id 0：用户已存在 小于0：操作失败
      */
     public long addFriendInfo(String userAccount, String friendAccount, String categoryName) {
+        if (null == userAccount || null == friendAccount) {
+            return -1;
+        }
 
-        //如果用户关系不存在
-        if (!DBUtil.getInstance().isExit(FriendsTable.name,
-                new String[]{FriendsTable.Field.userAccount, FriendsTable.Field.friendAccount},
-                new Object[]{userAccount, friendAccount})) {
+        boolean friendRelationshipExist = false;
+        String sqlFriendRelationship = "select 1 from FriendsTable friend where friend.userAccount=? and friend.friendAccount=?";
+        List resultFRE = dbUtil.executeQuery(sqlFriendRelationship, new Object[]{userAccount, friendAccount});
 
-            //新增
-            long categoryId = DBDao.getInstance().creatCategory(userAccount, categoryName);
+        friendRelationshipExist = !(null == resultFRE || resultFRE.isEmpty());
+
+        if (!friendRelationshipExist) {
+            //如果好友关系不存在，则新增
+            long categoryId = DBDao.getInstance().createCategory(userAccount, categoryName);
             if (categoryId > 0) {
+                FriendsTable friendsTable = new FriendsTable();
+                friendsTable.setUserAccount(userAccount);
+                friendsTable.setFriendAccount(friendAccount);
+                friendsTable.setCategoryId(categoryId);
+                friendsTable.setCreateTime(TimeUtil.getInstance().getTimeStampNow());
 
-                Timestamp date = new Timestamp(System.currentTimeMillis());
-
-                Map<String, Object> friendRelationship = new HashMap<>();
-                friendRelationship.put(FriendsTable.Field.userAccount, userAccount);
-                friendRelationship.put(FriendsTable.Field.friendAccount, friendAccount);
-                friendRelationship.put(FriendsTable.Field.createTime, date);
-                if (friendAccount != null) {
-                    friendRelationship.put(FriendsTable.Field.categoryId, categoryId);
+                try {
+                    dbUtil.executeInsert(friendsTable);
+                } catch (Exception e) {
+                    logger.error("add friend failed:" + e.getMessage(), e);
+                    return -1;
                 }
-                Object key = DBUtil.getInstance().insert(FriendsTable.name, friendRelationship);
-                return Long.parseLong(key.toString());
+                return friendsTable.getId();
             } else {
                 return -1;
             }
         } else {
             return 0;
         }
+
     }
 
     /**
      * 根据在线状态查找指定用户的朋友列表
      *
      * @param uesrAccount  账号
-     * @param onLineStatue (1在线用户 0离线用户 -1所有用户)
+     * @param onLineStatus (1在线用户 0离线用户 -1所有用户)
      * @return
      */
-    public List<String> getFriendListForOnlineStatus(String uesrAccount, int onLineStatue) {
-
-        //select friends.friend_account from friends left join user on friends.friend_account=user.account where friend.user_account=? and user.is_online = ?;
-        String sql = new StringBuilder().append("select ").append(FriendsTable.name).append(".").append(FriendsTable.Field.friendAccount)
-                .append(" from ").append(FriendsTable.name).append(" left join ").append(UserTable.name)
-                .append(" on ").append(FriendsTable.name).append(".").append(FriendsTable.Field.friendAccount).append("=").append(UserTable.name).append(".").append(UserTable.Field.account)
-                .append(" where ").append(FriendsTable.name).append(".").append(FriendsTable.Field.userAccount).append("=?")
-                .append(" and ").append(UserTable.name).append(".").append(UserTable.Field.isOnline).append("=?").toString();
-
-        ChatServerDbConnectUnit chatServerDbConnectUnit = DBUtil.getInstance().executeQuery(sql, new Object[]{uesrAccount, onLineStatue});
-        ResultSet resultSet = chatServerDbConnectUnit.getResultSet();
-
-        List<String> friendInfoList = new ArrayList<>();
-        try {
-            while (resultSet.next()) {
-                friendInfoList.add(resultSet.getString(1));
-            }
-        } catch (SQLException e) {
-            logger.error(e.getMessage(), e);
-        } finally {
-            chatServerDbConnectUnit.close();
-            chatServerDbConnectUnit = null;
+    public List<String> getFriendListForOnlineStatus(String uesrAccount, int onLineStatus) {
+        if (null == uesrAccount) {
+            return null;
         }
-        return friendInfoList;
-    }
 
-    /**
-     * 修改用户的在线状态
-     *
-     * @param account
-     * @param onlineStatus (1:在线，0：离线)
-     * @return
-     */
-    public boolean changeAccountOnlineStatus(String account, int onlineStatus) {
-        boolean result = false;
-
-        //update user set is_online = 0 where is_online = ?
+        //select friends.friend_account from friends left join user on friends.friend_account=user.account
+        // where friend.user_account=? and user.is_online = ?;
         String sql = new StringBuilder()
-                .append("update ").append(UserTable.name)
-                .append(" set ").append(UserTable.Field.isOnline).append("=").append(onlineStatus).append(" where ")
-                .append(UserTable.Field.account).append("=?")
+                .append("select friends.friendAccount from ").append(FriendsTable.class.getName()).append(" friends left join UserTable user on friends.friendAccount = user.account")
+                .append(" where friends.userAccount=? and user.onlineStatus=?")
                 .toString();
 
-        ChatServerDbConnectUnit chatServerDbConnectUnit = DBUtil.getInstance().executeUpdate(sql, new Object[]{account});
-        if (chatServerDbConnectUnit.getSuccessRow() > 0) {
-            result = true;
-        }
-        //关闭数据库连接
-        chatServerDbConnectUnit.close();
-        chatServerDbConnectUnit = null;
+        List<String> result = (List<String>) dbUtil.executeQuery(sql, new Object[]{uesrAccount, onLineStatus});
 
         return result;
     }
 
     /**
+     * 修改用户的在线状态
+     *
+     * @param account      用户帐户
+     * @param onlineStatus (1:在线，0：离线)
+     * @return
+     */
+    public boolean changeAccountOnlineStatus(String account, int onlineStatus) {
+        if (null == account) {
+            return false;
+        }
+
+        boolean result = false;
+
+        String sql = "update " + UserTable.class.getName() + " user set user.onlineStatus = ? where user.account=?";
+
+        int successNum = dbUtil.executeUpdate(sql, new Object[]{onlineStatus, account});
+
+        return successNum > 0;
+
+    }
+
+    /**
      * 增加黑名单
      *
-     * @param userAccount
-     * @param friendAccount
+     * @param userAccount   用户帐户
+     * @param friendAccount 要添加黑名单的账户
      * @return
      */
     public long addBlackListInfo(String userAccount, String friendAccount) {
+        if (null == userAccount || null == friendAccount) {
+            return -1;
+        }
+
         //如果用户关系不存在
-        if (!DBUtil.getInstance().isExit(
-                BlackListTable.name,
-                new String[]{BlackListTable.Field.userAccount, BlackListTable.Field.blackAccount},
-                new Object[]{userAccount, friendAccount})) {
+        if (!isInBlackList(userAccount, friendAccount)) {
+            BlackListTable blackListTable = new BlackListTable();
+            blackListTable.setUserAccount(userAccount);
+            blackListTable.setBlackAccount(friendAccount);
+            blackListTable.setCreateTime(TimeUtil.getInstance().getTimeStampNow());
 
-            Timestamp date = new Timestamp(System.currentTimeMillis());
-
-            Map<String, Object> friendRelationship = new HashMap<>();
-            friendRelationship.put(BlackListTable.Field.userAccount, userAccount);
-            friendRelationship.put(BlackListTable.Field.blackAccount, friendAccount);
-            friendRelationship.put(BlackListTable.Field.createTime, date);
-
-            Object key = DBUtil.getInstance().insert(BlackListTable.name, friendRelationship);
-            return Long.parseLong(key.toString());
+            try {
+                dbUtil.executeInsert(blackListTable);
+                return blackListTable.getId();
+            } catch (Exception e) {
+                logger.error(e.getMessage(), e);
+                return -1;
+            }
 
         } else {
             return 0;
         }
-    }
-
-    /**
-     * 移出黑名单
-     *
-     * @param userAccount 用户帐号
-     * @param account     目标账号
-     * @return
-     */
-    public List<Long> removeFriendRelationShip(String userAccount, String account) {
-        Map<String, Object> map = new HashMap<>();
-        map.put(FriendsTable.Field.userAccount, userAccount);
-        map.put(FriendsTable.Field.friendAccount, account);
-        return DBUtil.getInstance().deleteRow(FriendsTable.name, map);
     }
 
     /**
@@ -239,14 +215,42 @@ public class DBDao {
      *
      * @param userAccount 用户帐号
      * @param account     目标账号
-     * @return
+     * @return 是否在黑名单中
      */
     public boolean isInBlackList(String userAccount, String account) {
-        return DBUtil.getInstance().isExit(
-                BlackListTable.name,
-                new String[]{BlackListTable.Field.userAccount, BlackListTable.Field.blackAccount}
-                , new Object[]{userAccount, account});
+
+        String sqlExist = "select 1 from " + BlackListTable.class.getName() + " blacklist where blacklist.userAccount=? and blacklist.blackAccount=?";
+        List resultExist = dbUtil.executeQuery(sqlExist, new Object[]{userAccount, account});
+
+        return !(null == resultExist || resultExist.isEmpty());
     }
+
+    /**
+     * 移出好友
+     *
+     * @param userAccount   用户帐号
+     * @param friendAccount 目标账号
+     * @return 是否删除成功
+     */
+    public boolean removeFriendRelationShip(String userAccount, String friendAccount) {
+        String sqlDelete = "delete from " + FriendsTable.class.getName() + " friends where friends.userAccount=? and friends.friendAccount=?";
+
+        return dbUtil.executeUpdate(sqlDelete, new Object[]{userAccount, friendAccount}) > 0;
+    }
+
+    /**
+     * 移出黑名单
+     *
+     * @param userAccount  用户帐号
+     * @param blackAccount 目标账号
+     * @return 是否删除成功
+     */
+    public boolean removeBlackRelationShip(String userAccount, String blackAccount) {
+        String sqlDelete = "delete from " + BlackListTable.class.getName() + " black where black.userAccount=? and black.blackAccount=?";
+
+        return dbUtil.executeUpdate(sqlDelete, new Object[]{userAccount, blackAccount}) > 0;
+    }
+
 
     /**
      * 检查该用户是否是管理员
@@ -255,9 +259,11 @@ public class DBDao {
      * @return
      */
     public boolean authorityCheck(String userAccount) {
-        return DBUtil.getInstance().isExit(UserTable.name,
-                new String[]{UserTable.Field.account, UserTable.Field.identify},
-                new Object[]{userAccount, AuthorityTable.ADMINISTER});
+        String sqlExist = "select 1 from " + UserTable.class.getName() + " user where user.account=? and user.authority=?";
+
+        List resultExist = dbUtil.executeQuery(sqlExist, new Object[]{userAccount, UserTable.Status.ADMINISTER});
+
+        return !(null == resultExist || resultExist.isEmpty());
     }
 
     /**
@@ -268,59 +274,51 @@ public class DBDao {
      * @return 禁言表该条数据对应的id 如果没有则返回-1
      */
     public long addGagAccount(String account, String reason, Timestamp startTime, Timestamp endTime) {
-        Map<String, Object> conditions = new HashMap<>();
-        conditions.put(UserGagTable.Field.account, account);
-        conditions.put(UserGagTable.Field.reason, reason);
-        conditions.put(UserGagTable.Field.startTime, startTime);
-        conditions.put(UserGagTable.Field.endTimne, endTime);
+        UserGagTable userGagTable = new UserGagTable();
+        userGagTable.setAccount(account);
+        userGagTable.setReason(reason);
+        userGagTable.setStartTime(startTime);
+        userGagTable.setEndTime(endTime);
 
-        Object result = DBUtil.getInstance().insert(UserGagTable.name, conditions);
-        if (reason != null) {
-            return Long.parseLong(result.toString());
-        } else {
+        try {
+            dbUtil.executeInsert(userGagTable);
+            return userGagTable.getId();
+        } catch (Exception e) {
+            logger.error(e.getMessage(), e);
             return -1;
         }
-
     }
 
     /**
      * 取消用户禁言
      *
-     * @param account
+     * @param account 账户
      * @return 影响的行数，-1 执行失败
      */
     public int cancelGagAccount(String account) {
-        //update user_gag set cancel=1 , cancel_time=? where account=? and cancel=?;
-        String sql = new StringBuilder()
-                .append("update ").append(UserGagTable.name)
-                .append(" set ").append(UserGagTable.Field.cancel).append("=").append(UserGagTable.Status.CANCEL)
-                .append(",").append(UserGagTable.Field.cancelTime).append("=?")
-                .append(" where ").append(UserGagTable.Field.account).append("=?")
-                .append(" and ").append(UserGagTable.Field.cancel).append("=?")
-                .toString();
+        String sql = "update " + UserGagTable.class.getName() +
+                " gag set gag.cancel=? , gag.cancelTime=? where gag.account=? and gag.cancel=?";
 
-        ChatServerDbConnectUnit chatServerDbConnectUnit = DBUtil.getInstance().executeUpdate(
-                sql,
-                new Object[]{TimeUtil.getInstance().getTimeStampNow(), account, UserNoLoginTable.Status.NO_LOGIN});
-
-        if (chatServerDbConnectUnit != null) {
-            return chatServerDbConnectUnit.getSuccessRow();
-        } else {
-            return -1;
-        }
+        return dbUtil.executeUpdate(sql,
+                new Object[]{
+                        UserGagTable.Status.CANCEL,
+                        TimeUtil.getInstance().getTimeStampNow(),
+                        account,
+                        UserGagTable.Status.GAG});
     }
 
     /**
      * 用户是否处于禁言中
      *
-     * @param account
-     * @return
+     * @param account 账户
+     * @return 是否存在
      */
     public boolean isGag(String account) {
-        return DBUtil.getInstance().isExit(
-                UserGagTable.name,
-                new String[]{UserGagTable.Field.account, UserGagTable.Field.cancel},
-                new Object[]{account, UserGagTable.Status.GAG});
+        String sqlExist = "select 1 from " + UserGagTable.class.getName() + " gag where gag.account=? and gag.cancel=?";
+
+        List resultExist = dbUtil.executeQuery(sqlExist, new Object[]{account, UserGagTable.Status.GAG});
+
+        return !(null == resultExist || resultExist.isEmpty());
     }
 
     /**
@@ -331,19 +329,19 @@ public class DBDao {
      * @return 禁言表该条数据对应的id 如果没有则返回-1
      */
     public long addNoLoginAccount(String account, String reason, Timestamp startTime, Timestamp endTime) {
-        Map<String, Object> conditions = new HashMap<>();
-        conditions.put(UserNoLoginTable.Field.account, account);
-        conditions.put(UserNoLoginTable.Field.reason, reason);
-        conditions.put(UserNoLoginTable.Field.startTime, startTime);
-        conditions.put(UserNoLoginTable.Field.endTime, endTime);
+        UserNoLoginTable userNoLoginTable = new UserNoLoginTable();
+        userNoLoginTable.setAccount(account);
+        userNoLoginTable.setReason(reason);
+        userNoLoginTable.setStartTime(startTime);
+        userNoLoginTable.setEndTime(endTime);
 
-        Object result = DBUtil.getInstance().insert(UserNoLoginTable.name, conditions);
-        if (reason != null) {
-            return Long.parseLong(result.toString());
-        } else {
+        try {
+            dbUtil.executeInsert(userNoLoginTable);
+            return userNoLoginTable.getId();
+        } catch (Exception e) {
+            logger.error(e.getMessage(), e);
             return -1;
         }
-
     }
 
     /**
@@ -353,27 +351,16 @@ public class DBDao {
      * @return 影响的行数，-1 执行失败
      */
     public int cancelNoLoginAccount(String account) {
-        //update user_no_login set cancel=1 , cancel_time=? where account=? and cancel=?;
-        String sql = new StringBuilder()
-                .append("update ").append(UserNoLoginTable.name)
-                .append(" set ").append(UserNoLoginTable.Field.cancel).append("=").append(UserNoLoginTable.Status.CANCEL)
-                .append(",").append(UserNoLoginTable.Field.cancelTime).append("=?")
-                .append(" where ").append(UserNoLoginTable.Field.account).append("=?")
-                .append(" and ").append(UserNoLoginTable.Field.cancel).append("=?")
-                .toString();
 
-        ChatServerDbConnectUnit chatServerDbConnectUnit = DBUtil.getInstance().executeUpdate(
-                sql,
-                new Object[]{TimeUtil.getInstance().getTimeStampNow(), account, UserNoLoginTable.Status.NO_LOGIN});
+        String sql = "update " + UserNoLoginTable.class.getName() +
+                " nologin set nologin.cancel=? nologin.cancelTime=? where nologin.account=? and nologin.cancel=?";
 
-        int result = -1;
-        if (chatServerDbConnectUnit != null) {
-            result = chatServerDbConnectUnit.getSuccessRow();
-        }
-        chatServerDbConnectUnit.close();
-        chatServerDbConnectUnit = null;
-
-        return result;
+        return dbUtil.executeUpdate(sql,
+                new Object[]{
+                        UserNoLoginTable.Status.CANCEL,
+                        TimeUtil.getInstance().getTimeStampNow(),
+                        account,
+                        UserNoLoginTable.Status.NO_CANCEL});
     }
 
     /**
@@ -383,10 +370,11 @@ public class DBDao {
      * @return
      */
     public boolean isNoLogin(String account) {
-        return DBUtil.getInstance().isExit(
-                UserNoLoginTable.name,
-                new String[]{UserNoLoginTable.Field.account, UserNoLoginTable.Field.cancel},
-                new Object[]{account, UserNoLoginTable.Status.NO_LOGIN});
+        String sqlExist = "select 1 from " + UserGagTable.class.getName() + " gag where gag.account=? and gag.cancel=?";
+
+        List resultExist = dbUtil.executeQuery(sqlExist, new Object[]{account, UserNoLoginTable.Status.NO_CANCEL});
+
+        return !(null == resultExist || resultExist.isEmpty());
     }
 
     /**
@@ -396,7 +384,7 @@ public class DBDao {
      * @return
      */
     public List<UserInfo> findUserForNickName(String nickName) {
-        return findUser(UserTable.Field.nickName, nickName);
+        return findUser("nickName", nickName);
     }
 
     /**
@@ -406,7 +394,7 @@ public class DBDao {
      * @return
      */
     public List<UserInfo> findUserForAccount(String account) {
-        return findUser(UserTable.Field.account, account);
+        return findUser("account", account);
     }
 
     /**
@@ -417,37 +405,20 @@ public class DBDao {
      * @return
      */
     private List<UserInfo> findUser(String columnName, String nickName) {
-        //select id,account,nick_name,sex from user where nick_name = ?
-        String sql = new StringBuilder()
-                .append("select ")
-                .append(UserTable.Field.id).append(",")
-                .append(UserTable.Field.account).append(",")
-                .append(UserTable.Field.nickName).append(",")
-                .append(UserTable.Field.sex)
-                .append(" from ")
-                .append(UserTable.name)
-                .append(" where ")
-                .append(columnName).append(" like ?")
-                .toString();
+        String sql = "select user.id,user.account,user.nickName,user.sex from " + UserTable.class.getName() + " user where user." + nickName + "=?";
+
+        List queryList = dbUtil.executeQuery(sql, new Object[]{nickName});
 
         List<UserInfo> resultList = new ArrayList<>();
+        for (Iterator iterator = queryList.iterator(); iterator.hasNext(); ) {
+            Object[] objects = (Object[]) iterator.next();
+            UserInfo userInfo = new UserInfo();
+            userInfo.setId(Long.parseLong(objects[0].toString()));
+            userInfo.setAccount(objects[1].toString());
+            userInfo.setNickname(objects[2].toString());
+            userInfo.setSex(objects[3].toString());
 
-        ChatServerDbConnectUnit chatServerDbConnectUnit = DBUtil.getInstance().executeQuery(sql, new Object[]{"%" + nickName + "%"});
-        ResultSet resultSet = chatServerDbConnectUnit.getResultSet();
-        try {
-            while (resultSet.next()) {
-                UserInfo userInfo = new UserInfo();
-                userInfo.setId(resultSet.getLong(1));
-                userInfo.setAccount(resultSet.getString(2));
-                userInfo.setNickname(resultSet.getString(3));
-                userInfo.setSex(resultSet.getString(4));
-                resultList.add(userInfo);
-            }
-        } catch (SQLException e) {
-            logger.error(e.getMessage(), e);
-        } finally {
-            chatServerDbConnectUnit.close();
-            chatServerDbConnectUnit = null;
+            resultList.add(userInfo);
         }
 
         return resultList;
@@ -457,28 +428,15 @@ public class DBDao {
      * 根据账户查找密码
      */
     public String getPassWord(String account) {
-        //select password from user where account=?
-        String sql = new StringBuilder()
-                .append("select ").append(UserTable.Field.password)
-                .append(" from ").append(UserTable.name)
-                .append(" where ").append(UserTable.Field.account).append("=?")
-                .toString();
+        String sql = "select user.password from " + UserTable.class.getName() + " user where user.account=?";
 
-        ChatServerDbConnectUnit chatServerDbConnectUnit = DBUtil.getInstance().executeQuery(sql, new Object[]{account});
-        ResultSet resultSet = chatServerDbConnectUnit.getResultSet();
+        List queryResult = dbUtil.executeQuery(sql, new Object[]{account});
 
-        String password = null;
-        try {
-            while (resultSet.next()) {
-                password = resultSet.getString(1);
-            }
-        } catch (SQLException e) {
-            logger.error(e.getMessage(), e);
-        } finally {
-            chatServerDbConnectUnit.close();
-            chatServerDbConnectUnit = null;
+        if (null != queryResult && !queryResult.isEmpty()) {
+            return queryResult.get(0).toString();
+        } else {
+            return null;
         }
-        return password;
     }
 
     /**
@@ -486,23 +444,26 @@ public class DBDao {
      *
      * @param account
      * @param messagePacket
-     * @return 是否插入成功
+     * @return 返回是否插入成功
      */
     public boolean saveOfflineMessage(String account, MessagePacket messagePacket) {
-        Map<String, Object> sqlMap = new HashMap<>();
-        sqlMap.put(OfflineMessageTable.Field.account, account);
-        sqlMap.put(OfflineMessageTable.Field.messageType, messagePacket.getMessageType());
-        sqlMap.put(OfflineMessageTable.Field.commandType, messagePacket.getCommand());
-        sqlMap.put(OfflineMessageTable.Field.message, messagePacket.getMessage());
-        sqlMap.put(OfflineMessageTable.Field.createTime, TimeUtil.getInstance().getTimeStampNow());
 
-        Object data = DBUtil.getInstance().insert(OfflineMessageTable.name, sqlMap);
+        OfflineMessageTable data = new OfflineMessageTable();
+        data.setAccount(account);
+        data.setCommandType(messagePacket.getCommand());
+        data.setMessageType(messagePacket.getMessageType());
+        data.setMessage(messagePacket.getMessage());
+        data.setCreateTime(TimeUtil.getInstance().getTimeStampNow());
 
-        if (data != null) {
-            return true;
-        } else {
-            return false;
+        long dataId = -1;
+        try {
+            dbUtil.executeInsert(data);
+            dataId = data.getId();
+        } catch (Exception e) {
+            logger.error(e.getMessage(), e);
         }
+
+        return dataId > 0;
     }
 
     /**
@@ -513,51 +474,32 @@ public class DBDao {
      * @return
      */
     public List<MessagePacket> getOfflineMessage(String account, Timestamp loginTime) {
-        //select command_type,message_type,message where account=? and create_time < ? and is_send =?
-        String sql = new StringBuilder()
-                .append("select ")
-                .append(OfflineMessageTable.Field.commandType).append(", ")
-                .append(OfflineMessageTable.Field.messageType).append(", ")
-                .append(OfflineMessageTable.Field.message)
-                .append(" from ").append(OfflineMessageTable.name)
-                .append(" where ")
-                .append(OfflineMessageTable.Field.account).append("=? and ")
-                .append(OfflineMessageTable.Field.createTime).append("<? and ")
-                .append(OfflineMessageTable.Field.isSend).append("=?")
-                .toString();
+        String sql = "from " + OfflineMessageTable.class.getName() + " msg where msg.account=? and msg.createTime<? and msg.isSend=?";
 
-        ChatServerDbConnectUnit chatServerDbConnectUnit =
-                DBUtil.getInstance().executeQuery(sql, new Object[]{account, loginTime, OfflineMessageTable.Status.NOT_SEND});
+        List<MessagePacket> messagePacketList = new ArrayList<>();
+        List msgList = dbUtil.executeQuery(sql, new Object[]{account, loginTime, OfflineMessageTable.Status.NOT_SEND});
+        for (Iterator iterator = msgList.iterator(); iterator.hasNext(); ) {
+            Object obj = iterator.next();
+            if (obj instanceof OfflineMessageTable) {
+                try {
+                    OfflineMessageTable offlineMessageTable = (OfflineMessageTable) obj;
+                    MessagePacket messagePacket = new MessagePacket();
+                    messagePacket.setCommand(offlineMessageTable.getCommandType());
+                    messagePacket.setMessageType(offlineMessageTable.getMessageType());
+                    messagePacket.setMessage(offlineMessageTable.getMessage());
+                    messagePacket.setMessageLength(offlineMessageTable.getMessage().getBytes("utf-8").length);
 
-        ResultSet resultSet = chatServerDbConnectUnit.getResultSet();
-
-        List<MessagePacket> messagePackets = new LinkedList<>();
-        try {
-            while (resultSet.next()) {
-                int commandType = resultSet.getInt(1);
-                int messageType = resultSet.getInt(2);
-                String json = resultSet.getString(3);
-
-                MessagePacket messagePacket = new MessagePacket();
-                messagePacket.setCommand(commandType);
-                messagePacket.setMessageType(messageType);
-                messagePacket.setMessage(json);
-                messagePacket.setMessageLength(json.getBytes("utf-8").length);
-                messagePackets.add(messagePacket);
+                    messagePacketList.add(messagePacket);
+                } catch (UnsupportedEncodingException e) {
+                    logger.error(e.getMessage(), e);
+                }
             }
-        } catch (UnsupportedEncodingException e) {
-            logger.error(e.getMessage(), e);
-        } catch (SQLException e) {
-            logger.error(e.getMessage(), e);
-        } finally {
-            chatServerDbConnectUnit.close();
-            chatServerDbConnectUnit = null;
         }
 
         //修改离线消息的发送状态
         changeOfflineMessageSendStatus(account, loginTime, OfflineMessageTable.Status.SEND);
 
-        return messagePackets;
+        return messagePacketList;
     }
 
     /**
@@ -569,24 +511,58 @@ public class DBDao {
      * @return
      */
     private long changeOfflineMessageSendStatus(String account, Timestamp loginTime, int status) {
-        //update offline_message set is_send=? where account=? and create_time < ? and is_send =?
-        String sql = new StringBuilder()
-                .append("update ").append(OfflineMessageTable.name)
-                .append(" set ").append(OfflineMessageTable.Field.isSend).append("=?")
-                .append(" where ")
-                .append(OfflineMessageTable.Field.account).append("=?")
-                .append(" and ").append(OfflineMessageTable.Field.createTime).append("<?")
-                .append(" and ").append(OfflineMessageTable.Field.isSend).append("=?")
-                .toString();
-        ChatServerDbConnectUnit chatServerDbConnectUnit =
-                DBUtil.getInstance().executeUpdate(sql, new Object[]{status, account, loginTime, OfflineMessageTable.Status.NOT_SEND});
-        int successRow = -1;
-        if (chatServerDbConnectUnit != null) {
-            successRow = chatServerDbConnectUnit.getSuccessRow();
-        }
-        chatServerDbConnectUnit.close();
-        chatServerDbConnectUnit = null;
-        return successRow;
+        String sql = "update " + OfflineMessageTable.class.getName() +
+                " msg set msg.isSend=? where msg.account=? and msg.createTime<? and msg.isSend=?";
+
+        return dbUtil.executeUpdate(sql, new Object[]{status, account, loginTime, OfflineMessageTable.Status.NOT_SEND});
     }
+
+    /**
+     * 注册用户
+     *
+     * @param info
+     * @return >=0 用户id；-1 用户存在；-2 数据库操作失败; -3数据无效
+     */
+    public long siginAccount(UserInfo info) {
+        if (null == info) {
+            return -3;
+        }
+
+        if (accountIsExist(info.getAccount())) {
+            //用户如果存在
+            return -1;
+        } else {
+            //用户如果不存在
+            UserTable userTable = new UserTable();
+            userTable.setAccount(info.getAccount());
+            userTable.setPassword(info.getPassword());
+            userTable.setSex(info.getSex());
+            userTable.setNickName(info.getNickname());
+            userTable.setRegisterTime(TimeUtil.getInstance().getTimeStampNow());
+
+            try {
+                dbUtil.executeInsert(userTable);
+                return userTable.getId();
+            } catch (Exception e) {
+                logger.error(e.getMessage(), e);
+                return -2;
+            }
+        }
+    }
+
+    /**
+     * 获取用户在线状态
+     *
+     * @param account 账户
+     * @return
+     */
+    public int getOnlineStatue(String account) {
+        String sqlExist = "select user.onlineStatus from " + UserTable.class.getName() + " user where user.account=?";
+        List resultExist = dbUtil.executeQuery(sqlExist, new Object[]{account});
+
+        int result=(int) resultExist.get(0);
+        return result;
+    }
+
 }
 

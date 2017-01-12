@@ -39,7 +39,10 @@ public class FriendAddACKPo extends ActionPo {
             if (friendId > 0) { //好友添加成功
                 response(session, CommandType.FRIEND_LIST_ADD_ACK, true,
                         String.format("Friend request is accepted. accountInfo:[%s]", relationShipMessage.getFriendAccount()));
-            } else { //好友添加失败
+            } else if (0==friendId){ //好友添加失败
+                response(session, CommandType.FRIEND_LIST_ADD_ACK, false,
+                        String.format("Friend is exist. accountInfo:[%s]", relationShipMessage.getFriendAccount()));
+            }else {
                 response(session, CommandType.FRIEND_LIST_ADD_ACK, false,
                         String.format("Friend add error. accountInfo:[%s]", relationShipMessage.getFriendAccount()));
             }

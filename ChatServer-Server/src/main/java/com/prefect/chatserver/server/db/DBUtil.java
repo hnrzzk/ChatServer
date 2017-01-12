@@ -1,5 +1,9 @@
 package com.prefect.chatserver.server.db;
 
+import org.hibernate.HibernateException;
+import org.hibernate.Session;
+import org.hibernate.Transaction;
+import org.hibernate.query.Query;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -33,208 +37,113 @@ public class DBUtil {
     /**
      * 执行查询操作
      *
+     * @param sql     sql语句
+     * @param columns 参数值
+     * @return 空则返回null
      */
-    public ChatServerDbConnectUnit executeQuery(String sql, Object[] values) {
-        ResultSet resultSet = null;
-        Connection connection = null;
-        PreparedStatement statement = null;
-        try {
-            connection = this.dbManager.getConnection();
-            statement = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
+    List executeQuery(String sql, Object[] columns) {
+        List result = null;
 
-            for (int i = 0; i < values.length; i++) {
-                statement.setObject(i + 1, values[i]);
+        Session session = this.dbManager.getSession();
+
+        if (session.isOpen()){
+            try {
+                Query query = session.createQuery(sql);
+
+                for (int i = 0; i < columns.length; i++) {
+                    query.setParameter(i, columns[i]);
+                }
+
+                result = query.list();
+            } catch (Exception e) {
+                logger.error(e.getMessage(), e);
+            } finally {
+                session.close();
             }
-            resultSet = statement.executeQuery();
-
-        } catch (SQLException e) {
-            DBManager.closeConnection(connection);
-            DBManager.closeStatement(statement);
-            DBManager.closeResultSet(resultSet);
-            logger.error(String.format("sql execute error, sql[%s] values[%s] ", sql, values), e);
         }
 
-        return new ChatServerDbConnectUnit(resultSet, statement, connection);
+        return result;
     }
 
     /**
      * 执行update操作
      *
-     * @param sql
-     * @return sql影响的行数
+     * @param sql     sql语句
+     * @param columns 参数名称与值的对应表
+     * @return
      */
-    public ChatServerDbConnectUnit executeUpdate(String sql, Object[] values) {
-        Connection connection = null;
-        PreparedStatement statement = null;
-        ResultSet resultSet = null;
-        int successRow = -1;
-
+    int executeUpdate(String sql, Object[] columns) {
+        int successNum = -1;
+        Session session = this.dbManager.getSession();
+        Transaction transaction=null;
         try {
-            connection = this.dbManager.getConnection();
-            statement = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
-            for (int i = 0; i < values.length; i++) {
-                statement.setObject(i + 1, values[i]);
+            transaction=session.beginTransaction();
+            Query query = session.createQuery(sql);
+
+            for (int i = 0; i < columns.length; i++) {
+                query.setParameter(i, columns[i]);
             }
-
-            successRow = statement.executeUpdate();
-            resultSet = statement.getGeneratedKeys();
-        } catch (SQLException e) {
-            DBManager.closeResultSet(resultSet);
-            DBManager.closeStatement(statement);
-            DBManager.closeConnection(connection);
-            logger.error(String.format("sql execute error, sql[%s] values[%s] ", sql, values), e);
-            return null;
-        }
-
-        return new ChatServerDbConnectUnit(resultSet, statement, connection, successRow);
-    }
-
-    /**
-     * 查询数据库中是否存在在某个值
-     *
-     * @param table  数据库表名
-     * @param column 字段名
-     * @param value  要查询的值
-     * @return 是否存在
-     */
-    public boolean isExit(String table, String column, String value) {
-        String sql = String.format(
-                "select * from %s where %s = ?",
-                table, column);
-
-        ChatServerDbConnectUnit connectUnit = this.executeQuery(sql, new Object[]{value});
-
-        return resultSetIsEmpty(connectUnit);
-    }
-
-    /**
-     * 查询数据库中是否存在某些值
-     *
-     * @param table   表名
-     * @param columns 列名
-     * @param values  字段数组
-     * @return 是否存在
-     */
-    public boolean isExit(String table, String[] columns, Object[] values) {
-        StringBuilder stringBuilder = new StringBuilder("select * from " + table + " where 1=1");
-        for (int i = 0; i < columns.length; i++) {
-            stringBuilder.append(
-                    String.format(" and %s = ?", columns[i]));
-        }
-        ChatServerDbConnectUnit connectUnit = this.executeQuery(stringBuilder.toString(), values);
-
-        return resultSetIsEmpty(connectUnit);
-    }
-
-    /**
-     * 判断结果集是否为空
-     *
-     * @param connectUnit
-     * @return 结果集是否是空
-     */
-    public boolean resultSetIsEmpty(ChatServerDbConnectUnit connectUnit) {
-        boolean flag = false;
-        try {
-            while (connectUnit.getResultSet().next()) {
-                flag = true;
-                break;
+            successNum = query.executeUpdate();
+            transaction.commit();//提交事务，将保存在session中的缓存提交到数据库
+        } catch (Exception e) {
+            if (transaction!=null){
+                transaction.rollback();
             }
-        } catch (SQLException e) {
             logger.error(e.getMessage(), e);
         } finally {
-            connectUnit.close();
+            session.close();
         }
-        return flag;
+
+        return successNum;
+    }
+
+
+    /**
+     * 插入数据
+     *
+     * @param object
+     */
+    void executeInsert(Object object) throws Exception{
+        Session session = this.dbManager.getSession();
+        Transaction transaction=null;
+        try {
+            transaction=session.beginTransaction();
+            session.save(object);
+            transaction.commit();//提交事务，将保存在session中的缓存提交到数据库
+        } catch (HibernateException e) {
+            if (transaction!=null){
+                transaction.rollback();
+            }
+            throw e;
+        } finally {
+            if (session != null) {
+                session.close();
+            }
+        }
     }
 
     /**
-     * 执行插入操作 返回受影响的key 列表
-     *
-     * @param tableName 数据表
-     * @param data      要插入的数据
-     * @return 返回一个ResultSet里面保存了受影响的key 如果没有则返回null
+     * 从数据库中删除数据
+     * @param object 要删除的数据
+     * @throws Exception
      */
-    public Object insert(String tableName, Map<String, Object> data) {
-        if (data.isEmpty()) {
-            return null;
-        }
-
-        StringBuilder keyNameList = new StringBuilder();
-        StringBuilder valueList = new StringBuilder();
-
-        int i = 0;
-        Object[] objects = new Object[data.size()];
-
-        Iterator iterator = data.entrySet().iterator();
-        while (iterator.hasNext()) {
-            Map.Entry entry = (Map.Entry) iterator.next();
-            objects[i++] = entry.getValue();
-            keyNameList.append(String.format("%s,", entry.getKey()));
-            valueList.append("?,");
-        }
-
-        //删除最后一个逗号
-        keyNameList.deleteCharAt(keyNameList.length() - 1);
-        valueList.deleteCharAt(valueList.length() - 1);
-
-        StringBuilder sql = new StringBuilder(
-                String.format("insert into %s (%s) values (%s)", tableName, keyNameList, valueList));
-
-
-        Object key = null;
-        ChatServerDbConnectUnit chatServerDbConnectUnit = this.executeUpdate(sql.toString(), objects);
-        ResultSet resultSet = chatServerDbConnectUnit.getResultSet();
-
-        //得到主键
+    void executeDelete(Object object) throws Exception{
+        Session session = this.dbManager.getSession();
+        Transaction transaction=null;
         try {
-            while (resultSet.next()) {
-                key = resultSet.getObject(1);
+            transaction=session.beginTransaction();
+            session.delete(object);
+            transaction.commit();//提交事务，将保存在session中的缓存提交到数据库
+        } catch (HibernateException e) {
+            if (transaction!=null){
+                transaction.rollback();
             }
-        } catch (SQLException e) {
-            logger.error(e.getMessage(), e);
+            throw e;
         } finally {
-            chatServerDbConnectUnit.close();
+            if (session != null) {
+                session.close();
+            }
         }
-
-        return key;
     }
 
-    /**
-     * 删除数据库的数据
-     *
-     * @param table     表名
-     * @param condition 条件
-     * @return 受影响的id列表
-     */
-    public List<Long> deleteRow(String table, Map<String, Object> condition) {
-        Object[] values = new Object[condition.size()];
-
-        StringBuilder conditionSql = new StringBuilder("");
-        Iterator iterator = condition.entrySet().iterator();
-        int i = 0;
-        while (iterator.hasNext()) {
-            Map.Entry entry = (Map.Entry) iterator.next();
-            values[i++] = entry.getValue();
-            conditionSql.append(" and ").append(entry.getKey()).append("=?");
-        }
-
-        String sql = new StringBuilder()
-                .append("Delete from ").append(table).append(" where 1=1").append(conditionSql)
-                .toString();
-
-        ChatServerDbConnectUnit chatServerDbConnectUnit = this.executeUpdate(sql, values);
-        ResultSet resultSet = chatServerDbConnectUnit.getResultSet();
-        List<Long> list = new ArrayList<>();
-
-        try {
-            while (resultSet.next()) {
-                list.add(resultSet.getLong(1));
-            }
-        } catch (SQLException e) {
-            logger.error(e.getMessage(), e);
-        } finally {
-            chatServerDbConnectUnit.close();
-        }
-        return list;
-    }
 }

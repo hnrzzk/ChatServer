@@ -1,0 +1,90 @@
+<?xml version="1.0"?>
+<!DOCTYPE hibernate-mapping PUBLIC
+        "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+        " http://www.hibernate.org/dtd/hibernate-configuration">
+
+<hibernate-mapping>
+    <class name="com.prefect.chatserver.server.db.tables.UserTable" table="user" dynamic-insert="true"
+           dynamic-update="true">
+        <id name="id">
+            <generator class="increment"/>
+        </id>
+        <property name="nickName" column="nick_name" />
+        <property name="account" column="account" />
+        <property name="password" column="password"/>
+        <property name="registerTime" column="register_time" />
+        <property name="sex" column="sex" />
+        <property name="onlineStatus" column="online_status" insert="false" update="false"/>
+        <property name="authority" column="authority" insert="false" update="false"/>
+    </class>
+
+    <class name="com.prefect.chatserver.server.db.tables.CategoryTable" table="category" dynamic-insert="true"
+           dynamic-update="true">
+        <id name="id">
+            <generator class="increment"/>
+        </id>
+        <property name="userAccount" column="user_account"/>
+        <property name="name" column="name"/>
+    </class>
+
+    <class name="com.prefect.chatserver.server.db.tables.FriendsTable" table="friends" dynamic-insert="true"
+           dynamic-update="true">
+        <id name="id">
+            <generator class="increment"/>
+        </id>
+        <property name="userAccount" column="user_account"/>
+        <property name="friendAccount" column="friend_account"/>
+        <property name="categoryId" column="category_id"/>
+        <property name="createTime" column="create_time"/>
+    </class>
+
+    <class name="com.prefect.chatserver.server.db.tables.BlackListTable" table="black_list" dynamic-insert="true"
+           dynamic-update="true">
+        <id name="id">
+            <generator class="increment"/>
+        </id>
+        <property name="userAccount" column="user_account"/>
+        <property name="blackAccount" column="black_account"/>
+        <property name="createTime" column="create_time"/>
+    </class>
+
+    <class name="com.prefect.chatserver.server.db.tables.UserNoLoginTable" table="user_no_login" dynamic-insert="true"
+           dynamic-update="true">
+        <id name="id">
+            <generator class="increment"/>
+        </id>
+        <property name="account" column="account"/>
+        <property name="reason" column="reason"/>
+        <property name="startTime" column="start_time"/>
+        <property name="endTime" column="end_time"/>
+        <property name="cancel" column="cancel"/>
+        <property name="cancelTime" column="cancel_time"/>
+    </class>
+
+    <class name="com.prefect.chatserver.server.db.tables.OfflineMessageTable" table="offline_message"
+           dynamic-insert="true" dynamic-update="true">
+        <id name="id">
+            <generator class="increment"/>
+        </id>
+        <property name="commandType" column="command_type"/>
+        <property name="account" column="account"/>
+        <property name="message" column="message"/>
+        <property name="createTime" column="create_time"/>
+        <property name="isSend" column="is_send"/>
+        <property name="messageType" column="message_type"/>
+    </class>
+
+    <class name="com.prefect.chatserver.server.db.tables.UserGagTable" table="user_gag" dynamic-insert="true"
+           dynamic-update="true">
+        <id name="id">
+            <generator class="increment"/>
+        </id>
+        <property name="account" column="account"/>
+        <property name="reason" column="reason"/>
+        <property name="startTime" column="start_time"/>
+        <property name="endTime" column="end_time"/>
+        <property name="cancel" column="cancel"/>
+        <property name="cancelTime" column="cancel_time"/>
+    </class>
+
+</hibernate-mapping>

@@ -4,8 +4,9 @@ import com.alibaba.fastjson.JSON;
 import com.prefect.chatserver.commoms.utils.CommandType;
 import com.prefect.chatserver.commoms.utils.MessagePacket;
 import com.prefect.chatserver.commoms.utils.moudel.RelationShipMessage;
+import com.prefect.chatserver.server.db.DBDao;
 import com.prefect.chatserver.server.db.DBUtil;
-import com.prefect.chatserver.server.db.TableInfo.BlackListTable;
+import com.prefect.chatserver.server.db.tables.BlackListTable;
 import com.prefect.chatserver.server.process.ActionPo;
 import org.apache.mina.core.session.IoSession;
 
@@ -25,15 +26,16 @@ public class BlackListRemovePo extends ActionPo {
         String userAccount = relationShipMessage.getUserAccount();
         String friendAccount = relationShipMessage.getFriendAccount();
 
-        removeBlackListRelationShip(userAccount,friendAccount);
+        if (removeBlackListRelationShip(userAccount,friendAccount)){
+            response(ioSession, CommandType.BLACK_LIST_REMOVE_ACK,true, "已成功将用户移出黑名单 account："+friendAccount);
+        }else {
+            response(ioSession, CommandType.BLACK_LIST_REMOVE_ACK,true, "系统错误，移除黑名单失败 account："+friendAccount);
+        }
 
-        response(ioSession, CommandType.BLACK_LIST_REMOVE_ACK,true, "已成功将用户移出黑名单 account："+friendAccount);
+
     }
 
-    private void removeBlackListRelationShip(String userAccount, String friendAccount) {
-        Map<String, Object> map = new HashMap<>();
-        map.put(BlackListTable.Field.userAccount, userAccount);
-        map.put(BlackListTable.Field.blackAccount, friendAccount);
-        DBUtil.getInstance().deleteRow(BlackListTable.name, map);
+    private boolean removeBlackListRelationShip(String userAccount, String friendAccount) {
+        return DBDao.getInstance().removeBlackRelationShip(userAccount,friendAccount);
     }
 }
