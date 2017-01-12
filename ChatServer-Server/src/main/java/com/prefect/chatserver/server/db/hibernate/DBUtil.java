@@ -1,4 +1,4 @@
-package com.prefect.chatserver.server.db;
+package com.prefect.chatserver.server.db.hibernate;
 
 import org.hibernate.HibernateException;
 import org.hibernate.Session;
@@ -7,11 +7,7 @@ import org.hibernate.query.Query;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.sql.*;
-import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
 
 /**
  * 数据库操作相关工具类
@@ -44,22 +40,28 @@ public class DBUtil {
     List executeQuery(String sql, Object[] columns) {
         List result = null;
 
-        Session session = this.dbManager.getSession();
+        Session session = null;
+        try {
+            session = this.dbManager.getSession();
+//            Transaction transaction = null;
+//            transaction = session.beginTransaction();
+            Query query = session.createQuery(sql);
 
-        if (session.isOpen()){
-            try {
-                Query query = session.createQuery(sql);
-
-                for (int i = 0; i < columns.length; i++) {
-                    query.setParameter(i, columns[i]);
-                }
-
-                result = query.list();
-            } catch (Exception e) {
-                logger.error(e.getMessage(), e);
-            } finally {
-                session.close();
+            for (int i = 0; i < columns.length; i++) {
+                query.setParameter(i, columns[i]);
             }
+
+            result = query.list();
+//            transaction.commit();
+        } catch (Exception e) {
+            logger.error(e.getMessage(), e);
+            System.exit(0);
+        } finally {
+            if (session != null) {
+                session.close();
+                session = null;
+            }
+
         }
 
         return result;
@@ -74,10 +76,11 @@ public class DBUtil {
      */
     int executeUpdate(String sql, Object[] columns) {
         int successNum = -1;
-        Session session = this.dbManager.getSession();
-        Transaction transaction=null;
+        Session session = null;
+        Transaction transaction = null;
         try {
-            transaction=session.beginTransaction();
+            session = this.dbManager.getSession();
+            transaction = session.beginTransaction();
             Query query = session.createQuery(sql);
 
             for (int i = 0; i < columns.length; i++) {
@@ -86,12 +89,16 @@ public class DBUtil {
             successNum = query.executeUpdate();
             transaction.commit();//提交事务，将保存在session中的缓存提交到数据库
         } catch (Exception e) {
-            if (transaction!=null){
+            if (transaction != null) {
                 transaction.rollback();
             }
             logger.error(e.getMessage(), e);
+            System.exit(0);
         } finally {
-            session.close();
+            if (session != null) {
+                session.close();
+                session = null;
+            }
         }
 
         return successNum;
@@ -103,45 +110,54 @@ public class DBUtil {
      *
      * @param object
      */
-    void executeInsert(Object object) throws Exception{
-        Session session = this.dbManager.getSession();
-        Transaction transaction=null;
+    void executeInsert(Object object) throws Exception {
+        Session session = null;
+        Transaction transaction = null;
         try {
-            transaction=session.beginTransaction();
+            session = this.dbManager.getSession();
+            transaction = session.beginTransaction();
             session.save(object);
             transaction.commit();//提交事务，将保存在session中的缓存提交到数据库
         } catch (HibernateException e) {
-            if (transaction!=null){
+            if (transaction != null) {
                 transaction.rollback();
             }
+            logger.error(e.getMessage(), e);
+            System.exit(0);
             throw e;
         } finally {
             if (session != null) {
                 session.close();
+                session = null;
             }
         }
     }
 
     /**
      * 从数据库中删除数据
+     *
      * @param object 要删除的数据
      * @throws Exception
      */
-    void executeDelete(Object object) throws Exception{
-        Session session = this.dbManager.getSession();
-        Transaction transaction=null;
+    void executeDelete(Object object) throws Exception {
+        Session session = null;
+        Transaction transaction = null;
         try {
-            transaction=session.beginTransaction();
+            session = this.dbManager.getSession();
+            transaction = session.beginTransaction();
             session.delete(object);
             transaction.commit();//提交事务，将保存在session中的缓存提交到数据库
         } catch (HibernateException e) {
-            if (transaction!=null){
+            if (transaction != null) {
                 transaction.rollback();
             }
+            logger.error(e.getMessage(), e);
+            System.exit(0);
             throw e;
         } finally {
             if (session != null) {
                 session.close();
+                session = null;
             }
         }
     }

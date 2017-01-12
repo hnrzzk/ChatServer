@@ -5,7 +5,7 @@ import com.prefect.chatserver.commoms.utils.AttributeOperate;
 import com.prefect.chatserver.commoms.utils.CommandType;
 import com.prefect.chatserver.commoms.utils.MessagePacket;
 import com.prefect.chatserver.commoms.utils.moudel.UserAuthorityManageMessage;
-import com.prefect.chatserver.server.db.DBDao;
+import com.prefect.chatserver.server.db.hibernate.DBDao;
 import org.apache.mina.core.session.IoSession;
 
 import java.sql.Timestamp;

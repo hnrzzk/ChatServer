@@ -7,7 +7,7 @@ import com.prefect.chatserver.commoms.utils.MessageType;
 import com.prefect.chatserver.commoms.utils.moudel.ChatMessage;
 import com.prefect.chatserver.commoms.utils.moudel.RelationShipMessage;
 import com.prefect.chatserver.server.handle.ChatServerHandler;
-import com.prefect.chatserver.server.db.DBDao;
+import com.prefect.chatserver.server.db.hibernate.DBDao;
 import org.apache.mina.core.session.IoSession;
 
 /**

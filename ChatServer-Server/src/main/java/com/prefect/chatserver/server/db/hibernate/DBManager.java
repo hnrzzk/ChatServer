@@ -1,4 +1,4 @@
-package com.prefect.chatserver.server.db;
+package com.prefect.chatserver.server.db.hibernate;
 
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;

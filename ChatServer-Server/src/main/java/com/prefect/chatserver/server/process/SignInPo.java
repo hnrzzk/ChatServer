@@ -3,17 +3,11 @@ package com.prefect.chatserver.server.process;
 import com.alibaba.fastjson.JSON;
 import com.prefect.chatserver.commoms.utils.MessagePacket;
 import com.prefect.chatserver.commoms.utils.CommandType;
-import com.prefect.chatserver.server.db.DBDao;
-import com.prefect.chatserver.server.db.DBUtil;
+import com.prefect.chatserver.server.db.hibernate.DBDao;
 import com.prefect.chatserver.commoms.utils.moudel.UserInfo;
-import com.prefect.chatserver.server.db.tables.UserTable;
 import org.apache.mina.core.session.IoSession;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.sql.Timestamp;
-import java.util.HashMap;
-import java.util.Map;
 
 
 /**

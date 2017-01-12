@@ -1,16 +1,13 @@
-package com.prefect.chatserver.server.db;
+package com.prefect.chatserver.server.db.hibernate;
 
 import com.prefect.chatserver.commoms.utils.MessagePacket;
 import com.prefect.chatserver.commoms.utils.TimeUtil;
 import com.prefect.chatserver.commoms.utils.moudel.UserInfo;
 import com.prefect.chatserver.server.db.tables.*;
-import com.prefect.chatserver.server.process.MessageProcess;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.UnsupportedEncodingException;
-import java.sql.ResultSet;
-import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.util.*;
 
