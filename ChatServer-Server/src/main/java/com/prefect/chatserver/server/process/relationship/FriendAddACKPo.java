@@ -5,11 +5,9 @@ import com.prefect.chatserver.commoms.utils.CommandType;
 import com.prefect.chatserver.commoms.utils.MessagePacket;
 import com.prefect.chatserver.commoms.utils.moudel.RelationShipMessage;
 import com.prefect.chatserver.server.handle.ChatServerHandler;
-import com.prefect.chatserver.server.db.hibernate.DBDao;
+import com.prefect.chatserver.server.db.DBDao;
 import com.prefect.chatserver.server.process.ActionPo;
 import org.apache.mina.core.session.IoSession;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * 用户a向用户b发送好友请求，用户b针对该请求的返回一个响应。
@@ -17,7 +15,6 @@ import org.slf4j.LoggerFactory;
  * Created by zhangkai on 2016/12/29.
  */
 public class FriendAddACKPo extends ActionPo {
-    private final static Logger logger = LoggerFactory.getLogger(ChatServerHandler.class);
 
     public String defaultCategory = "好友";
 

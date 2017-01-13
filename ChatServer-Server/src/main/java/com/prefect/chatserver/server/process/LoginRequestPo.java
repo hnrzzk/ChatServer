@@ -9,6 +9,7 @@ import java.io.UnsupportedEncodingException;
 import java.util.Base64;
 
 /**
+ * 登录请求
  * Created by hnrzz on 2017/1/7.
  */
 public class LoginRequestPo extends ActionPo {

@@ -7,7 +7,7 @@ import com.prefect.chatserver.commoms.utils.MessagePacket;
 import com.prefect.chatserver.commoms.utils.MessageType;
 import com.prefect.chatserver.commoms.utils.moudel.ChatRoomMessage;
 import com.prefect.chatserver.server.ChatServer;
-import com.prefect.chatserver.server.db.hibernate.DBDao;
+import com.prefect.chatserver.server.db.DBDao;
 import com.prefect.chatserver.server.handle.ChatServerHandler;
 import org.apache.mina.core.session.IoSession;
 import org.slf4j.Logger;

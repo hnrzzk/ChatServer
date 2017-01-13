@@ -12,6 +12,7 @@ import java.io.UnsupportedEncodingException;
 import java.util.concurrent.CopyOnWriteArraySet;
 
 /**
+ * 聊天室消息处理抽象类
  * Created by zhangkai on 2017/1/3.
  */
 public abstract class ChatRoomPo extends ActionPo {

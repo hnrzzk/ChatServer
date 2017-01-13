@@ -6,7 +6,7 @@ import com.prefect.chatserver.commoms.utils.MessagePacket;
 import com.prefect.chatserver.commoms.utils.MessageType;
 import com.prefect.chatserver.commoms.utils.moudel.UserListInfo;
 import com.prefect.chatserver.commoms.utils.moudel.UserInfo;
-import com.prefect.chatserver.server.db.hibernate.DBDao;
+import com.prefect.chatserver.server.db.DBDao;
 import com.prefect.chatserver.server.process.ActionPo;
 import org.apache.mina.core.session.IoSession;
 

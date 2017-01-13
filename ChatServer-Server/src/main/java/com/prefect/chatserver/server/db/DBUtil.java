@@ -1,4 +1,4 @@
-package com.prefect.chatserver.server.db.hibernate;
+package com.prefect.chatserver.server.db;
 
 import org.hibernate.HibernateException;
 import org.hibernate.Session;
@@ -43,8 +43,6 @@ public class DBUtil {
         Session session = null;
         try {
             session = this.dbManager.getSession();
-//            Transaction transaction = null;
-//            transaction = session.beginTransaction();
             Query query = session.createQuery(sql);
 
             for (int i = 0; i < columns.length; i++) {
@@ -52,7 +50,6 @@ public class DBUtil {
             }
 
             result = query.list();
-//            transaction.commit();
         } catch (Exception e) {
             logger.error(e.getMessage(), e);
             System.exit(0);
@@ -117,35 +114,6 @@ public class DBUtil {
             session = this.dbManager.getSession();
             transaction = session.beginTransaction();
             session.save(object);
-            transaction.commit();//提交事务，将保存在session中的缓存提交到数据库
-        } catch (HibernateException e) {
-            if (transaction != null) {
-                transaction.rollback();
-            }
-            logger.error(e.getMessage(), e);
-            System.exit(0);
-            throw e;
-        } finally {
-            if (session != null) {
-                session.close();
-                session = null;
-            }
-        }
-    }
-
-    /**
-     * 从数据库中删除数据
-     *
-     * @param object 要删除的数据
-     * @throws Exception
-     */
-    void executeDelete(Object object) throws Exception {
-        Session session = null;
-        Transaction transaction = null;
-        try {
-            session = this.dbManager.getSession();
-            transaction = session.beginTransaction();
-            session.delete(object);
             transaction.commit();//提交事务，将保存在session中的缓存提交到数据库
         } catch (HibernateException e) {
             if (transaction != null) {

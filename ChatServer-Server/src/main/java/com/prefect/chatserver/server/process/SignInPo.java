@@ -3,7 +3,7 @@ package com.prefect.chatserver.server.process;
 import com.alibaba.fastjson.JSON;
 import com.prefect.chatserver.commoms.utils.MessagePacket;
 import com.prefect.chatserver.commoms.utils.CommandType;
-import com.prefect.chatserver.server.db.hibernate.DBDao;
+import com.prefect.chatserver.server.db.DBDao;
 import com.prefect.chatserver.commoms.utils.moudel.UserInfo;
 import org.apache.mina.core.session.IoSession;
 import org.slf4j.Logger;

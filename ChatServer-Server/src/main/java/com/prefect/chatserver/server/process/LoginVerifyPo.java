@@ -3,7 +3,7 @@ package com.prefect.chatserver.server.process;
 import com.alibaba.fastjson.JSON;
 import com.prefect.chatserver.commoms.utils.*;
 import com.prefect.chatserver.commoms.utils.moudel.UserLogin;
-import com.prefect.chatserver.server.db.hibernate.DBDao;
+import com.prefect.chatserver.server.db.DBDao;
 import com.prefect.chatserver.server.handle.ChatServerHandler;
 import org.apache.mina.core.session.IoSession;
 
@@ -13,7 +13,7 @@ import java.util.Iterator;
 import java.util.List;
 
 /**
- * 登录请求验证
+ * 登录验证
  * Created by hnrzz on 2017/1/7.
  */
 public class LoginVerifyPo extends ActionPo {

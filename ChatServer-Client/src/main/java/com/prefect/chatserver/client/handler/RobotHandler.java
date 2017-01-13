@@ -31,24 +31,40 @@ public class RobotHandler implements IoHandler {
     @Override
     public void sessionOpened(IoSession ioSession) throws Exception {
 
-        //每500ms检查一次session是否建立成功
-        Timer timer = new Timer();
-        timer.schedule(new TimerTask() {
+        new Thread(new Runnable() {
             @Override
             public void run() {
-                //判断连接是否建立
-                if (ioSession.isConnected()) {
-                    logger.info(Thread.currentThread().getName() + " 已建立连接，当前连接数:" + Robot.sessionConcurrentHashMap.size());
-
-                    RobotRequestPo.getInstance().login(ioSession);
-
-//                    RobotRequestPo.getInstance().signIn(ioSession);
-
-                    //取消定时任务
-                    this.cancel();
+                while (!ioSession.isConnected()) {
+                    try {
+                        Thread.sleep(500);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
                 }
+                logger.info(Thread.currentThread().getName() + " 已建立连接，当前连接数:" + Robot.sessionConcurrentHashMap.size());
+                RobotRequestPo.getInstance().login(ioSession);
+//                    RobotRequestPo.getInstance().signIn(ioSession);
             }
-        }, 0, 500);
+        }).start();
+
+//        //每500ms检查一次session是否建立成功
+//        Timer timer = new Timer();
+//        timer.schedule(new TimerTask() {
+//            @Override
+//            public void run() {
+//                //判断连接是否建立
+//                if (ioSession.isConnected()) {
+//                    logger.info(Thread.currentThread().getName() + " 已建立连接，当前连接数:" + Robot.sessionConcurrentHashMap.size());
+//
+//                    RobotRequestPo.getInstance().login(ioSession);
+//
+////                    RobotRequestPo.getInstance().signIn(ioSession);
+//
+//                    //取消定时任务
+//                    this.cancel();
+//                }
+//            }
+//        }, 0, 500);
     }
 
     @Override
@@ -73,7 +89,7 @@ public class RobotHandler implements IoHandler {
         if (o instanceof MessagePacket) {
             MessagePacket messagePacket = (MessagePacket) o;
 
-            RobotResponsePo responsePo=new RobotResponsePo(ioSession,messagePacket);
+            RobotResponsePo responsePo = new RobotResponsePo(ioSession, messagePacket);
             cachedThreadPool.execute(responsePo);
         }
     }

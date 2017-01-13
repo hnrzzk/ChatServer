@@ -1,4 +1,4 @@
-package com.prefect.chatserver.server.db.hibernate;
+package com.prefect.chatserver.server.db;
 
 import com.prefect.chatserver.commoms.utils.MessagePacket;
 import com.prefect.chatserver.commoms.utils.TimeUtil;

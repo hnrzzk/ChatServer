@@ -7,10 +7,11 @@ import com.prefect.chatserver.commoms.utils.MessageType;
 import com.prefect.chatserver.commoms.utils.moudel.ChatMessage;
 import com.prefect.chatserver.commoms.utils.moudel.RelationShipMessage;
 import com.prefect.chatserver.server.handle.ChatServerHandler;
-import com.prefect.chatserver.server.db.hibernate.DBDao;
+import com.prefect.chatserver.server.db.DBDao;
 import org.apache.mina.core.session.IoSession;
 
 /**
+ * 消息处理逻辑：聊天消息，好友请求
  * Created by zhangkai on 2016/12/29.
  */
 public class MessagePo extends ActionPo {
