@@ -27,9 +27,12 @@
                 <artifactId>maven-assembly-plugin</artifactId>
                 <configuration>
                     <appendAssemblyId>false</appendAssemblyId>
-                    <descriptorRefs>
-                        <descriptorRef>jar-with-dependencies</descriptorRef>
-                    </descriptorRefs>
+                    <!--<descriptorRefs>-->
+                        <!--<descriptorRef>jar-with-dependencies</descriptorRef>-->
+                    <!--</descriptorRefs>-->
+                    <descriptors> <!--描述文件路径-->
+                        <descriptor>src/assembly/package.xml</descriptor>
+                    </descriptors>
                     <archive>
                         <manifest>
                             <mainClass>com.prefect.chatserver.server.ChatServer</mainClass>
@@ -80,6 +83,7 @@
             <artifactId>ChatServerCommons</artifactId>
             <version>1.0</version>
         </dependency>
+
         <dependency>
             <groupId>com.prefect</groupId>
             <artifactId>DBPool</artifactId>

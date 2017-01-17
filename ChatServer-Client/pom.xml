@@ -33,9 +33,12 @@
                 <artifactId>maven-assembly-plugin</artifactId>
                 <configuration>
                     <appendAssemblyId>false</appendAssemblyId>
-                    <descriptorRefs>
-                        <descriptorRef>jar-with-dependencies</descriptorRef>
-                    </descriptorRefs>
+                    <!--<descriptorRefs>-->
+                    <!--<descriptorRef>jar-with-dependencies</descriptorRef>-->
+                    <!--</descriptorRefs>-->
+                    <descriptors> <!--描述文件路径-->
+                        <descriptor>src/assembly/package.xml</descriptor>
+                    </descriptors>
                     <archive>
                         <manifest>
                             <mainClass>com.prefect.chatserver.client.Robot</mainClass>
@@ -63,6 +66,16 @@
             <groupId>com.prefect</groupId>
             <artifactId>ChatServerCommons</artifactId>
             <version>1.0</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.slf4j</groupId>
+                    <artifactId>slf4j-log4j12</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>log4j</groupId>
+                    <artifactId>log4j</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
     </dependencies>
 

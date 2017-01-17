@@ -42,29 +42,14 @@ public class RobotHandler implements IoHandler {
                     }
                 }
                 logger.info(Thread.currentThread().getName() + " 已建立连接，当前连接数:" + Robot.sessionConcurrentHashMap.size());
-                RobotRequestPo.getInstance().login(ioSession);
-//                    RobotRequestPo.getInstance().signIn(ioSession);
+
+                if (1 == Robot.command) {
+                    RobotRequestPo.getInstance().signIn(ioSession);
+                } else if (2 == Robot.command) {
+                    RobotRequestPo.getInstance().login(ioSession);
+                }
             }
         }).start();
-
-//        //每500ms检查一次session是否建立成功
-//        Timer timer = new Timer();
-//        timer.schedule(new TimerTask() {
-//            @Override
-//            public void run() {
-//                //判断连接是否建立
-//                if (ioSession.isConnected()) {
-//                    logger.info(Thread.currentThread().getName() + " 已建立连接，当前连接数:" + Robot.sessionConcurrentHashMap.size());
-//
-//                    RobotRequestPo.getInstance().login(ioSession);
-//
-////                    RobotRequestPo.getInstance().signIn(ioSession);
-//
-//                    //取消定时任务
-//                    this.cancel();
-//                }
-//            }
-//        }, 0, 500);
     }
 
     @Override

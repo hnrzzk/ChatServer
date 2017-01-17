@@ -2,6 +2,10 @@ package com.prefect.chatserver.server.utils;
 
 import org.apache.log4j.PropertyConfigurator;
 
+import javax.persistence.criteria.CriteriaBuilder;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.InputStream;
 import java.util.Properties;
 
 /**
@@ -10,7 +14,7 @@ import java.util.Properties;
  */
 public class Config {
     private String systemConfigFile = "ChatServerConfig.properties";
-    private String log4jConfigFile="log4j.properties";
+    private String log4jConfigFile = "log4j.properties";
 
     public Config() {
         this("ChatServerConfig.properties");
@@ -28,17 +32,25 @@ public class Config {
         String SERVER_HOSTNAME = "server.hostname";
         String SERVER_CACHE_SIZE = "server.cacheSize";
 
-//        ClassLoader classLoader = Config.class.getClassLoader();
-//        if (classLoader != null) {
-//            System.out.println("项目路径：" + classLoader.getResource(systemConfigFile).toString());
-//        } else {
-//            System.out.println("项目路径：" + ClassLoader.getSystemResource(systemConfigFile).getPath());
-//        }
-
-        PropertyConfigurator.configure(Config.class.getClassLoader().getResourceAsStream(log4jConfigFile));
+        //读取log4j配置文件
+        InputStream log4jConfigInputStream;
+        try {
+            log4jConfigInputStream = new FileInputStream("../config/" + log4jConfigFile);
+        } catch (Exception e) {
+            log4jConfigInputStream = Config.class.getClassLoader().getResourceAsStream(log4jConfigFile);
+        }
+        PropertyConfigurator.configure(log4jConfigInputStream);
 
         Properties properties = new Properties();
-        properties.load(Config.class.getClassLoader().getResourceAsStream(systemConfigFile));
+
+        //读取系统配置文件
+        InputStream appConfigInputStream;
+        try {
+            appConfigInputStream = new FileInputStream("../config/" + systemConfigFile);
+        } catch (Exception e) {
+            appConfigInputStream = Config.class.getClassLoader().getResourceAsStream(systemConfigFile);
+        }
+        properties.load(appConfigInputStream);
 
         ServerInfo serverInfo = new ServerInfo();
 

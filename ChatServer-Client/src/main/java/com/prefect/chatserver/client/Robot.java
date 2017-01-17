@@ -15,12 +15,16 @@ import org.apache.mina.transport.socket.nio.NioSocketConnector;
 
 import java.net.InetSocketAddress;
 import java.util.Map;
+import java.util.Scanner;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * Created by zhangkai on 2017/1/4.
  */
 public class Robot {
+    //robot要执行的操作：1.注册5000个用户，2用注册的用户登录，并每隔1s发送消息
+    public static int command;
+
     public static ConcurrentHashMap<String, IoSession> sessionConcurrentHashMap;
 
     private final String HOSTNAME = "192.168.137.57";
@@ -64,7 +68,7 @@ public class Robot {
                     String account = String.format("%04d", i);
                     IoSession session = future.getSession();
                     setKeyPair(session);
-                    System.out.println("get session: "+session);
+                    System.out.println("get session: " + session);
                     AttributeOperate.getInstance().setAccountOfAttribute(session, account);
                     this.sessionConcurrentHashMap.put(account, session);
                     break;
@@ -88,6 +92,25 @@ public class Robot {
     }
 
     public static void main(String[] args) {
+        Scanner scanner = new Scanner(System.in);
+        System.out.println("请输入命令:");
+
+        while (true) {
+            System.out.println("1:注册 2:登录并发送消息");
+            String input = scanner.nextLine();
+
+            try {
+                command = Integer.parseInt(input);
+
+                if (command <= 2 && command >= 1) {
+                    break;
+                }
+
+            } catch (Exception e) {
+            }
+            System.out.println("输入有误，请重新输入！\n");
+        }
+
         Robot robot = new Robot(5000);
         robot.start();
     }
