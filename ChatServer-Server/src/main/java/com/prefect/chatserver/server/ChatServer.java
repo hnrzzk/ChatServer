@@ -1,8 +1,10 @@
 package com.prefect.chatserver.server;
 
 import com.prefect.chatserver.commoms.codefactory.ChatServerCodecFactory;
+import com.prefect.chatserver.server.db.DBDao;
 import com.prefect.chatserver.server.handle.ChatServerHandler;
 import com.prefect.chatserver.server.utils.Config;
+import com.prefect.chatserver.server.utils.LRUCache;
 import com.prefect.chatserver.server.utils.ServerInfo;
 import org.apache.mina.core.filterchain.DefaultIoFilterChainBuilder;
 import org.apache.mina.core.session.IdleStatus;
@@ -34,6 +36,11 @@ public class ChatServer {
 
     //聊天室信息 <聊天室名称，用户session列表>
     public static ConcurrentHashMap<String, CopyOnWriteArraySet<IoSession>> chatRoomInfo = new ConcurrentHashMap<>();
+    //禁言表缓存<String account,Boolean isGag>
+    public static LRUCache gagListCache;
+
+    //黑名单缓存<String account,Vector blackList>
+    public static LRUCache blackListCache;
 
     private SocketAcceptor acceptor;
 
@@ -45,14 +52,37 @@ public class ChatServer {
     }
 
     public boolean start() {
+        logger.info("Start loading configuration file.");
         ServerInfo serverInfo = new ServerInfo();
         try {
             Config config = new Config();
             serverInfo = config.getServerConf();
+            logger.info("Load configuration finished.");
         } catch (Exception e) {
-            logger.warn("读取配置文件失败，启用默认设置. ", e);
+            logger.warn("Load configuration failed. Use the default configuration:", e);
         }
 
+        initCache(serverInfo);
+
+        return initServer(serverInfo);
+    }
+
+    /**
+     * 初始化缓存
+     * @param serverInfo    配置信息
+     */
+    private void initCache(ServerInfo serverInfo) {
+        int cacheSize = serverInfo.getCacheSize();
+        gagListCache = new LRUCache(cacheSize);
+        blackListCache = new LRUCache(cacheSize);
+    }
+
+    /**
+     * 初始化mina框架
+     * @param serverInfo    配置信息
+     * @return
+     */
+    private boolean initServer(ServerInfo serverInfo) {
         DefaultIoFilterChainBuilder filterChainBuilder = getAcceptor().getFilterChain();
 
         LoggingFilter loggingFilter = new LoggingFilter();
@@ -70,22 +100,21 @@ public class ChatServer {
         getAcceptor().getSessionConfig().setIdleTime(IdleStatus.BOTH_IDLE, serverInfo.getTimeOut());
         try {
             SocketAddress socketAddress = new InetSocketAddress(InetAddress.getByName(serverInfo.getHostname()), serverInfo.getPort());
-            logger.info("服务器地址："+socketAddress.toString());
+            logger.info("Bind address to：" + socketAddress.toString());
             getAcceptor().bind(socketAddress);
             return true;
         } catch (IOException e) {
-            logger.error(e.getMessage(), e);
+            logger.error("Bind address error:", e);
+            return false;
         }
-
-        return true;
     }
 
     public static void main(String[] argv) throws IOException {
         ChatServer chatServer = new ChatServer();
         if (chatServer.start()) {
-            logger.info("服务器启动成功。。。");
+            logger.info("Service start success!");
         } else {
-            logger.error("服务器启动失败");
+            logger.error("Service start failed!");
         }
     }
 }

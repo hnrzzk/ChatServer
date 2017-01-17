@@ -4,11 +4,12 @@ package com.prefect.chatserver.server.utils;
  * Created by zhangkai on 2016/12/27.
  */
 public class ServerInfo {
-    private String hostname="localhost";
+    private String hostname = "localhost";
     private int port = 9123;   //端口号
     private int timeOut = 30;    //超时时间
     private int IdleTime = 30;
-    private int BufferSize = 2048;
+    private int bufferSize = 2048;
+    private int cacheSize = 4000;
 
     public String getHostname() {
         return hostname;
@@ -43,10 +44,18 @@ public class ServerInfo {
     }
 
     public int getBufferSize() {
-        return BufferSize;
+        return bufferSize;
     }
 
     public void setBufferSize(int bufferSize) {
-        BufferSize = bufferSize;
+        bufferSize = bufferSize;
+    }
+
+    public int getCacheSize() {
+        return cacheSize;
+    }
+
+    public void setCacheSize(int cacheSize) {
+        this.cacheSize = cacheSize;
     }
 }

@@ -35,9 +35,10 @@ public class DBUtil {
      *
      * @param sql     sql语句
      * @param columns 参数值
+     * @param resultNum 查询结果的最大数目
      * @return 空则返回null
      */
-    List executeQuery(String sql, Object[] columns) {
+    List executeQuery(String sql, Object[] columns, int resultNum) {
         List result = null;
 
         Session session = null;
@@ -45,9 +46,16 @@ public class DBUtil {
             session = this.dbManager.getSession();
             Query query = session.createQuery(sql);
 
-            for (int i = 0; i < columns.length; i++) {
-                query.setParameter(i, columns[i]);
+            if (columns != null) {
+                for (int i = 0; i < columns.length; i++) {
+                    query.setParameter(i, columns[i]);
+                }
             }
+
+            if (resultNum > 0) {
+                query.setMaxResults(resultNum);
+            }
+
 
             result = query.list();
         } catch (Exception e) {
@@ -63,6 +71,17 @@ public class DBUtil {
 
         return result;
     }
+
+    /**
+     * 执行查询操作 不指定MaxResults
+     * @param sql
+     * @param columns
+     * @return
+     */
+    List executeQuery(String sql, Object[] columns) {
+        return this.executeQuery(sql,columns,0);
+    }
+
 
     /**
      * 执行update操作

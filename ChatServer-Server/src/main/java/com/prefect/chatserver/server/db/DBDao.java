@@ -3,6 +3,7 @@ package com.prefect.chatserver.server.db;
 import com.prefect.chatserver.commoms.utils.MessagePacket;
 import com.prefect.chatserver.commoms.utils.TimeUtil;
 import com.prefect.chatserver.commoms.utils.moudel.UserInfo;
+import com.prefect.chatserver.server.ChatServer;
 import com.prefect.chatserver.server.db.tables.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -58,7 +59,7 @@ public class DBDao {
     private long createCategory(String account, String category) {
         //判断分组是否存在
         boolean categoryExist = false;
-        String sqlCategoryExist = "select 1 from "+CategoryTable.class.getName() +" cate  where cate.userAccount=? and cate.name =?";
+        String sqlCategoryExist = "select 1 from " + CategoryTable.class.getName() + " cate  where cate.userAccount=? and cate.name =?";
         List result = dbUtil.executeQuery(sqlCategoryExist, new Object[]{account, category});
 
         categoryExist = !(null == result || result.isEmpty());
@@ -216,10 +217,21 @@ public class DBDao {
      */
     public boolean isInBlackList(String userAccount, String account) {
 
-        String sqlExist = "select 1 from " + BlackListTable.class.getName() + " blacklist where blacklist.userAccount=? and blacklist.blackAccount=?";
-        List resultExist = dbUtil.executeQuery(sqlExist, new Object[]{userAccount, account});
+        boolean result;
 
-        return !(null == resultExist || resultExist.isEmpty());
+        String key = userAccount + "_" + account;
+        Object v = ChatServer.blackListCache.get(key);
+        if (null == v) {
+            String sqlExist = "select 1 from " + BlackListTable.class.getName() + " blacklist where blacklist.userAccount=? and blacklist.blackAccount=?";
+            List resultExist = dbUtil.executeQuery(sqlExist, new Object[]{userAccount, account});
+
+            result = !(null == resultExist || resultExist.isEmpty());
+            ChatServer.blackListCache.put(key, result);
+        } else {
+            result = (boolean) v;
+        }
+
+        return result;
     }
 
     /**
@@ -279,6 +291,7 @@ public class DBDao {
 
         try {
             dbUtil.executeInsert(userGagTable);
+
             return userGagTable.getId();
         } catch (Exception e) {
             logger.error(e.getMessage(), e);
@@ -311,11 +324,20 @@ public class DBDao {
      * @return 是否存在
      */
     public boolean isGag(String account) {
-        String sqlExist = "select 1 from " + UserGagTable.class.getName() + " gag where gag.account=? and gag.cancel=?";
+        boolean result;
+        Object v = ChatServer.gagListCache.get(account);
+        if (null == v) {
+            String sqlExist = "select 1 from " + UserGagTable.class.getName() + " gag where gag.account=? and gag.cancel=?";
 
-        List resultExist = dbUtil.executeQuery(sqlExist, new Object[]{account, UserGagTable.Status.GAG});
+            List resultExist = dbUtil.executeQuery(sqlExist, new Object[]{account, UserGagTable.Status.GAG});
 
-        return !(null == resultExist || resultExist.isEmpty());
+            result = !(null == resultExist || resultExist.isEmpty());
+            ChatServer.gagListCache.put(account, result);
+        } else {
+            result = (boolean) v;
+        }
+
+        return result;
     }
 
     /**
@@ -557,8 +579,33 @@ public class DBDao {
         String sqlExist = "select user.onlineStatus from " + UserTable.class.getName() + " user where user.account=?";
         List resultExist = dbUtil.executeQuery(sqlExist, new Object[]{account});
 
-        int result=(int) resultExist.get(0);
+        int result = (int) resultExist.get(0);
         return result;
+    }
+
+    /**
+     * 获取用户禁言数据
+     *
+     * @param num 数据个数
+     * @return
+     */
+    public Map<String, Boolean> getGagList(int num) {
+        Map<String, Boolean> resultMap = new HashMap<>();
+
+        String sql = "select user.account, user_gag.cancel FROM UserTable user LEFT JOIN UserGagTable user_gag ON user.account=user_gag.account where user_gag.cancel=0";
+        List result = dbUtil.executeQuery(sql, null, num);
+        for (Iterator iterator = result.iterator(); iterator.hasNext(); ) {
+            Object[] objects = (Object[]) iterator.next();
+            String account = objects[0].toString();
+            boolean isGag = false;
+
+            if (objects[1] != null) {
+                isGag = Integer.valueOf(objects[1].toString()) <= 0;
+            }
+
+            resultMap.put(account, isGag);
+        }
+        return resultMap;
     }
 
 }

@@ -120,73 +120,36 @@ public class RobotResponsePo implements Runnable {
 
             Interactive.getInstance().printlnToConsole("登录成功,登录成功数：" + loginNum);
 
-            new Thread(new Runnable() {
+            Timer timer = new Timer();
+            timer.schedule(new TimerTask() {
                 @Override
                 public void run() {
-                    while (true) {
-                        MessagePacket messagePacket = new MessagePacket();
-                        messagePacket.setCommand(CommandType.MESSAGE);
-                        messagePacket.setMessageType(MessageType.MESSAGE);
+                    MessagePacket messagePacket = new MessagePacket();
+                    messagePacket.setCommand(CommandType.MESSAGE);
+                    messagePacket.setMessageType(MessageType.MESSAGE);
 
-                        String account = Util.getInstance().getAccount(session);
-                        ChatMessage chatMessage = new ChatMessage();
-                        chatMessage.setSendAccount(account);
-                        chatMessage.setReceiveAccount(account);
+                    String account = Util.getInstance().getAccount(session);
+                    ChatMessage chatMessage = new ChatMessage();
+                    chatMessage.setSendAccount(account);
+                    chatMessage.setReceiveAccount(account);
 
-                        String message = new StringBuilder()
-                                .append(session.toString())
-                                .append(" send: ")
-                                .append(new Date(System.currentTimeMillis())).toString();
-                        chatMessage.setMessage(message);
+                    String message = new StringBuilder()
+                            .append(session.toString())
+                            .append(" send: ")
+                            .append(new Date(System.currentTimeMillis())).toString();
+                    chatMessage.setMessage(message);
 
-                        String json = JSON.toJSONString(chatMessage);
-                        messagePacket.setMessage(json);
-                        try {
-                            messagePacket.setMessageLength(json.getBytes("utf-8").length);
-                            session.write(messagePacket);
-
-                            Thread.sleep(1000);
-
-                        } catch (UnsupportedEncodingException e) {
-                            e.printStackTrace();
-                        } catch (InterruptedException e) {
-                            e.printStackTrace();
-                        }
+                    String json = JSON.toJSONString(chatMessage);
+                    messagePacket.setMessage(json);
+                    try {
+                        messagePacket.setMessageLength(json.getBytes("utf-8").length);
+                        session.write(messagePacket);
+                    } catch (UnsupportedEncodingException e) {
+                        e.printStackTrace();
                     }
 
                 }
-            }).start();
-
-//            Timer timer = new Timer();
-//            timer.schedule(new TimerTask() {
-//                @Override
-//                public void run() {
-//                    MessagePacket messagePacket = new MessagePacket();
-//                    messagePacket.setCommand(CommandType.MESSAGE);
-//                    messagePacket.setMessageType(MessageType.MESSAGE);
-//
-//                    String account = Util.getInstance().getAccount(session);
-//                    ChatMessage chatMessage = new ChatMessage();
-//                    chatMessage.setSendAccount(account);
-//                    chatMessage.setReceiveAccount(account);
-//
-//                    String message = new StringBuilder()
-//                            .append(session.toString())
-//                            .append(" send: ")
-//                            .append(new Date(System.currentTimeMillis())).toString();
-//                    chatMessage.setMessage(message);
-//
-//                    String json = JSON.toJSONString(chatMessage);
-//                    messagePacket.setMessage(json);
-//                    try {
-//                        messagePacket.setMessageLength(json.getBytes("utf-8").length);
-//                        session.write(messagePacket);
-//                    } catch (UnsupportedEncodingException e) {
-//                        e.printStackTrace();
-//                    }
-//
-//                }
-//            }, 500, 1000);
+            }, 500, 1000);
         } else {
             Interactive.getInstance().printlnToConsole(ackMessage.getMessage());
         }

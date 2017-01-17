@@ -5,6 +5,7 @@ import com.prefect.chatserver.commoms.utils.AttributeOperate;
 import com.prefect.chatserver.commoms.utils.CommandType;
 import com.prefect.chatserver.commoms.utils.MessagePacket;
 import com.prefect.chatserver.commoms.utils.moudel.UserAuthorityManageMessage;
+import com.prefect.chatserver.server.ChatServer;
 import com.prefect.chatserver.server.db.DBDao;
 import org.apache.mina.core.session.IoSession;
 
@@ -24,7 +25,7 @@ public class UserAuthorityManagePo extends AdministerPo {
         String reason = userAuthorityManageMessage.getReasong();
 
         //如果要设置禁言的用户不存在
-        if (!DBDao.getInstance().accountIsExist(account)){
+        if (!DBDao.getInstance().accountIsExist(account)) {
             response(ioSession, CommandType.USER_GAG_ACK, false, "account does not exist!");
             return;
         }
@@ -64,6 +65,9 @@ public class UserAuthorityManagePo extends AdministerPo {
 
             processResult = true;
 
+            //修改缓存中的禁言表
+            ChatServer.gagListCache.put(account, true);
+
             message = "Gag user Success, account:" + account;
         } else {
             processResult = false;
@@ -86,6 +90,9 @@ public class UserAuthorityManagePo extends AdministerPo {
         if (successRows > 0) {
             processResult = true;
             message = "Cancel Gag Success, account:" + account;
+
+            //修改缓存中的禁言表
+            ChatServer.gagListCache.put(account, false);
         } else {
             processResult = false;
             message = "Cancel Gag user Failed, account:" + account;

@@ -14,7 +14,7 @@ import java.util.List;
 
 /**
  * 登录验证
- * Created by hnrzz on 2017/1/7.
+ * Created by zhangkai on 2017/1/7.
  */
 public class LoginVerifyPo extends ActionPo {
     @Override

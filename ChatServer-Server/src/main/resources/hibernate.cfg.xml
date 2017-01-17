@@ -21,7 +21,7 @@
         <property name="hibernate.dialect">org.hibernate.dialect.MySQLDialect</property>
 
         <!--是否将运行期生成的SQL输出到控制台-->
-        <property name="show_sql">true</property>
+        <property name="show_sql">false</property>
 
 
         <!--C3P0配置-->
@@ -37,6 +37,9 @@
         <!--<property name="c3p0.idleConnectionTestPeriod">18000</property>-->
         <!--<property name="c3p0.maxIdleTime">25000</property>-->
         <!--<property name="c3p0.idle_test_period">120</property>-->
+
+        <!--<property name="cache.provider_class">org.hibernate.cache.HashtableCacheProvider</property>-->
+        <!--<property name="hibernate.cache.use_query_cache">true</property>-->
 
         <mapping resource="hbms/tables.cfg.xml"/>
     </session-factory>

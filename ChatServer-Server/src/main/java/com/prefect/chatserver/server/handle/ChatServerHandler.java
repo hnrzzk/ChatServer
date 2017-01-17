@@ -55,7 +55,7 @@ public class ChatServerHandler extends IoHandlerAdapter {
     @Override
     public void exceptionCaught(IoSession session, Throwable cause) throws Exception {
         logger.warn(session.toString() + "异常");
-//        session.closeNow();
+        session.closeNow();
     }
 
     @Override
