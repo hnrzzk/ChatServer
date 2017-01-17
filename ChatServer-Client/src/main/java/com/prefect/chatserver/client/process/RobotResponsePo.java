@@ -114,7 +114,7 @@ public class RobotResponsePo implements Runnable {
         ACKMessage ackMessage = JSON.parseObject(messagePacket.getMessage(), ACKMessage.class);
         //如果登录成功
         if (ackMessage.getActionResult()) {
-            synchronized (this) {
+            synchronized (RobotResponsePo.class) {
                 loginNum++;
             }
 

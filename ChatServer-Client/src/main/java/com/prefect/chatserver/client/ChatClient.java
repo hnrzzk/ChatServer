@@ -34,16 +34,37 @@ public class ChatClient {
     private final long CONNECT_TIMEOUT = 30 * 1000L;
     private final boolean USE_CUSTOM_CODEC = true;
 
+    //配置文件文件夹路径
+    private String configDirPath;
+
     /**
      * 与服务器的连接
      */
     public static IoSession session;
 
-    //账户名
+    /**
+     * 账户名
+     */
     public static String account = "";
 
-    //聊天室名称
+    /**
+     * 聊天室名称
+     */
     public static String chatRoomName = "";
+
+    public ChatClient() {
+
+    }
+
+    /**
+     * 客户端类构造函数
+     *
+     * @param configDirPath 配置文件文件夹路径
+     */
+    public ChatClient(String configDirPath) {
+        this.configDirPath = configDirPath;
+    }
+
 
     synchronized public static String getAccount() {
         return account;
@@ -53,12 +74,18 @@ public class ChatClient {
         ChatClient.account = account;
     }
 
-    public void start() throws InterruptedException {
+    private void start() throws InterruptedException {
         Interactive.getInstance().printlnToConsole("程序启动……");
         Interactive.getInstance().printlnToConsole("正在读取配置文件……");
 
-        Config Config = new Config();
-        ServerInfo serverInfo = Config.getServerConf();
+        Config config;
+        if (configDirPath != null) {
+            config = new Config(configDirPath);
+        } else {
+            config = new Config();
+        }
+
+        ServerInfo serverInfo = config.getServerConf();
 
         Interactive.getInstance().printlnToConsole("正在初始化连接……");
 
@@ -75,7 +102,7 @@ public class ChatClient {
         Interactive.getInstance().printlnToConsole("正在连接服务器……");
         while (true) {
             try {
-                SocketAddress socketAddress=new InetSocketAddress(serverInfo.getHostName(), serverInfo.getPort());
+                SocketAddress socketAddress = new InetSocketAddress(serverInfo.getHostName(), serverInfo.getPort());
                 ConnectFuture future = connector.connect(socketAddress);
                 future.awaitUninterruptibly();
                 this.session = future.getSession();
@@ -84,7 +111,7 @@ public class ChatClient {
 
                 break;
             } catch (Exception e) {
-                logger.error("Failed to connect." + e.getMessage(), e);
+                logger.error("Connection server failed:" + e.getMessage());
                 Thread.sleep(1000);
             }
         }
@@ -106,7 +133,13 @@ public class ChatClient {
 
 
     public static void main(String[] args) throws Throwable {
-        ChatClient clientInstance = new ChatClient();
+        ChatClient clientInstance;
+        if (args.length > 0) {
+            clientInstance = new ChatClient(args[0]);
+        } else {
+            clientInstance = new ChatClient();
+        }
+
         clientInstance.start();
     }
 

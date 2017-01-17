@@ -9,6 +9,7 @@ import java.io.InputStream;
 import java.util.Properties;
 
 /**
+ * 配置文件类
  * Created by zhangkai on 2016/12/27.
  */
 public class Config {
@@ -20,13 +21,23 @@ public class Config {
     private String systemConfigFile = "ChatClientConfig.properties";
     private String log4jConfigFile = "log4j.properties";
 
+    private String configDirPath = "";
+
     public Config() {
+        this("../config/");
+    }
+
+    public Config(String configDirPath) {
+        this.configDirPath = configDirPath;
+    }
+
+    public ServerInfo getServerConf() {
         properties = new Properties();
 
         //读取log4j配置文件
         InputStream log4jConfigInputStream;
         try {
-            log4jConfigInputStream = new FileInputStream("../config/" + log4jConfigFile);
+            log4jConfigInputStream = new FileInputStream(configDirPath + log4jConfigFile);
         } catch (Exception e) {
             log4jConfigInputStream = Config.class.getClassLoader().getResourceAsStream(log4jConfigFile);
         }
@@ -35,7 +46,7 @@ public class Config {
         //读取系统配置文件
         InputStream appConfigInputStream;
         try {
-            appConfigInputStream = new FileInputStream("../config/" + systemConfigFile);
+            appConfigInputStream = new FileInputStream(configDirPath + systemConfigFile);
         } catch (Exception e) {
             appConfigInputStream = Config.class.getClassLoader().getResourceAsStream(systemConfigFile);
         }
@@ -45,9 +56,7 @@ public class Config {
         } catch (IOException e) {
             e.printStackTrace();
         }
-    }
 
-    public ServerInfo getServerConf() {
         ServerInfo serverInfo = new ServerInfo();
         serverInfo.setHostName(properties.getProperty(SERVER_HOST_NAME));
         serverInfo.setPort(Integer.parseInt(properties.getProperty(SERVER_PORT)));

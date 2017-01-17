@@ -27,10 +27,12 @@ public class Robot {
 
     public static ConcurrentHashMap<String, IoSession> sessionConcurrentHashMap;
 
-    private final String HOSTNAME = "192.168.137.57";
-    private final int PORT = 55555;
+    //默认连接超时时间
     private final long CONNECT_TIMEOUT = 30 * 1000L;
-    private final boolean USE_CUSTOM_CODEC = true;
+
+
+    //配置文件文件夹路径
+    private String configDirPath;
 
     NioSocketConnector connector;
     int connectNum;
@@ -40,6 +42,15 @@ public class Robot {
     }
 
     public Robot(int connectNum) {
+        init(connectNum);
+    }
+
+    public Robot(int connectNum, String configDirPath) {
+        this.configDirPath = configDirPath;
+        init(connectNum);
+    }
+
+    private void init(int connectNum) {
         sessionConcurrentHashMap = new ConcurrentHashMap<>();
 
         this.connector = new NioSocketConnector();
@@ -57,8 +68,14 @@ public class Robot {
     }
 
     private void getConnect() {
-        Config Config = new Config();
-        ServerInfo serverInfo = Config.getServerConf();
+        Config config ;
+        if (configDirPath!=null){
+            config = new Config(configDirPath);
+        }else {
+            config = new Config();
+        }
+
+        ServerInfo serverInfo = config.getServerConf();
         for (int i = 1; i <= connectNum; i++) {
 
             while (true) {
@@ -111,7 +128,14 @@ public class Robot {
             System.out.println("输入有误，请重新输入！\n");
         }
 
-        Robot robot = new Robot(5000);
+        Robot robot;
+        if (args.length > 0) {
+            robot = new Robot(5000, args[0]);
+        } else {
+            robot = new Robot(5000);
+        }
+
+
         robot.start();
     }
 }
