@@ -2,9 +2,8 @@ package com.prefect.chatserver.server.utils;
 
 import org.apache.log4j.PropertyConfigurator;
 
-import javax.persistence.criteria.CriteriaBuilder;
+import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.InputStream;
 import java.util.Properties;
 
@@ -13,15 +12,17 @@ import java.util.Properties;
  * Created by zhangkai on 2016/12/27.
  */
 public class Config {
-    private String systemConfigFile = "ChatServerConfig.properties";
-    private String log4jConfigFile = "log4j.properties";
+    private String systemConfigFilePath = "ChatServerConfig.properties";
+    private String log4jConfigFilePath = "log4j.properties";
+
+    private String configDirPath = "";
 
     public Config() {
-        this("ChatServerConfig.properties");
+        this("../config/");
     }
 
-    public Config(String filePath) {
-        this.systemConfigFile = filePath;
+    public Config(String configDirPath) {
+        this.configDirPath = configDirPath;
     }
 
     public ServerInfo getServerConf() throws Exception {
@@ -35,9 +36,9 @@ public class Config {
         //读取log4j配置文件
         InputStream log4jConfigInputStream;
         try {
-            log4jConfigInputStream = new FileInputStream("../config/" + log4jConfigFile);
+            log4jConfigInputStream = new FileInputStream(configDirPath + log4jConfigFilePath);
         } catch (Exception e) {
-            log4jConfigInputStream = Config.class.getClassLoader().getResourceAsStream(log4jConfigFile);
+            log4jConfigInputStream = Config.class.getClassLoader().getResourceAsStream(log4jConfigFilePath);
         }
         PropertyConfigurator.configure(log4jConfigInputStream);
 
@@ -46,9 +47,9 @@ public class Config {
         //读取系统配置文件
         InputStream appConfigInputStream;
         try {
-            appConfigInputStream = new FileInputStream("../config/" + systemConfigFile);
+            appConfigInputStream = new FileInputStream(configDirPath + systemConfigFilePath);
         } catch (Exception e) {
-            appConfigInputStream = Config.class.getClassLoader().getResourceAsStream(systemConfigFile);
+            appConfigInputStream = Config.class.getClassLoader().getResourceAsStream(systemConfigFilePath);
         }
         properties.load(appConfigInputStream);
 

@@ -47,18 +47,34 @@ public class ChatServer {
 
     private SocketAcceptor acceptor;
 
-    public SocketAcceptor getAcceptor() {
+    private String configDirPath;
+
+    public ChatServer() {
+
+    }
+
+    public ChatServer(String configDirPath) {
+        this.configDirPath = configDirPath;
+    }
+
+    private SocketAcceptor getAcceptor() {
         if (null == acceptor) {
             acceptor = new NioSocketAcceptor();
         }
         return acceptor;
     }
 
-    public boolean start() {
+    private boolean start() {
         logger.info("Start loading configuration file.");
         ServerInfo serverInfo = new ServerInfo();
         try {
-            Config config = new Config();
+            Config config ;
+            if (configDirPath!=null){
+                config= new Config(configDirPath);
+            }else {
+                config= new Config();
+            }
+
             serverInfo = config.getServerConf();
             logger.info("Load configuration finished.");
         } catch (Exception e) {
@@ -72,7 +88,8 @@ public class ChatServer {
 
     /**
      * 初始化缓存
-     * @param serverInfo    配置信息
+     *
+     * @param serverInfo 配置信息
      */
     private void initCache(ServerInfo serverInfo) {
         int cacheSize = serverInfo.getCacheSize();
@@ -82,7 +99,8 @@ public class ChatServer {
 
     /**
      * 初始化mina框架
-     * @param serverInfo    配置信息
+     *
+     * @param serverInfo 配置信息
      * @return
      */
     private boolean initServer(ServerInfo serverInfo) {
@@ -112,7 +130,16 @@ public class ChatServer {
     }
 
     public static void main(String[] argv) throws IOException {
-        ChatServer chatServer = new ChatServer();
+        ChatServer chatServer;
+
+        if (argv.length > 0) {
+            System.out.println("!");
+            chatServer = new ChatServer(argv[0]);
+        } else {
+            chatServer = new ChatServer();
+        }
+
+
         if (chatServer.start()) {
             logger.info("Service start success!");
         } else {
