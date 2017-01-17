@@ -4,6 +4,7 @@ import com.alibaba.fastjson.JSON;
 import com.prefect.chatserver.commoms.utils.CommandType;
 import com.prefect.chatserver.commoms.utils.MessagePacket;
 import com.prefect.chatserver.commoms.utils.moudel.ChatMessage;
+import com.prefect.chatserver.server.ChatServer;
 import com.prefect.chatserver.server.handle.ChatServerHandler;
 import org.apache.mina.core.session.IoSession;
 
@@ -30,7 +31,7 @@ public class BroadcastPo extends AdministerPo {
      * @param messagePacket
      */
     void broadcast(MessagePacket messagePacket) {
-        for (Map.Entry<String, IoSession> entry : ChatServerHandler.sessionMap.entrySet()) {
+        for (Map.Entry<String, IoSession> entry : ChatServer.sessionMap.entrySet()) {
             messagePacket.setCommand(CommandType.SEND_BROADCAST_ACK);
             IoSession ioSession = entry.getValue();
             if (ioSession.isConnected()) {

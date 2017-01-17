@@ -6,6 +6,7 @@ import com.prefect.chatserver.commoms.utils.MessagePacket;
 import com.prefect.chatserver.commoms.utils.MessageType;
 import com.prefect.chatserver.commoms.utils.moudel.ChatMessage;
 import com.prefect.chatserver.commoms.utils.moudel.RelationShipMessage;
+import com.prefect.chatserver.server.ChatServer;
 import com.prefect.chatserver.server.handle.ChatServerHandler;
 import com.prefect.chatserver.server.db.DBDao;
 import org.apache.mina.core.session.IoSession;
@@ -42,15 +43,15 @@ public class MessagePo extends ActionPo {
         String sendAccount = chatMessage.getSendAccount();
         String receiveAccount = chatMessage.getReceiveAccount();
 
-        //判读是否被禁言 此处应该加缓存 直接存在map中或者放在redis中
+        //判读是否被禁言
         if (DBDao.getInstance().isGag(sendAccount)) {
             response(ioSession, CommandType.MESSAGE_ACK, false, "Sorry, you have been gagged.");
             return;
         }
 
-        //判断是否在黑名单中 此处应该加缓存 存放在redis中
+        //判断是否在黑名单中
         if (!DBDao.getInstance().isInBlackList(receiveAccount, sendAccount)) {
-            IoSession receiveSecession = ChatServerHandler.sessionMap.get(chatMessage.getReceiveAccount());
+            IoSession receiveSecession = ChatServer.sessionMap.get(chatMessage.getReceiveAccount());
             if (receiveSecession != null) { //如果好友在线则发送消息
                 receiveSecession.write(messageObj);
             } else {
@@ -76,7 +77,7 @@ public class MessagePo extends ActionPo {
                 return;
             }
 
-            IoSession receiveSecession = ChatServerHandler.sessionMap.get(friendAccount);
+            IoSession receiveSecession = ChatServer.sessionMap.get(friendAccount);
             //判断该账户是否在线
             if (receiveSecession != null) { //如果好友在线则发送消息
                 receiveSecession.write(messageObj);

@@ -24,6 +24,7 @@ import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.net.SocketAddress;
 
+import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArraySet;
 
@@ -33,6 +34,8 @@ import java.util.concurrent.CopyOnWriteArraySet;
  */
 public class ChatServer {
     private final static Logger logger = LoggerFactory.getLogger(ChatServer.class);
+
+    public static Map<String, IoSession> sessionMap = new ConcurrentHashMap<String, IoSession>();
 
     //聊天室信息 <聊天室名称，用户session列表>
     public static ConcurrentHashMap<String, CopyOnWriteArraySet<IoSession>> chatRoomInfo = new ConcurrentHashMap<>();
@@ -90,9 +93,8 @@ public class ChatServer {
         loggingFilter.setMessageSentLogLevel(LogLevel.INFO);
         filterChainBuilder.addLast("logger", loggingFilter);
 
-        filterChainBuilder.addLast("codec", new ProtocolCodecFilter(new ChatServerCodecFactory()));
-
         filterChainBuilder.addLast("threadPool", new ExecutorFilter());
+        filterChainBuilder.addLast("codec", new ProtocolCodecFilter(new ChatServerCodecFactory()));
 
         getAcceptor().setHandler(new ChatServerHandler());
         getAcceptor().getSessionConfig().setBothIdleTime(serverInfo.getIdleTime());

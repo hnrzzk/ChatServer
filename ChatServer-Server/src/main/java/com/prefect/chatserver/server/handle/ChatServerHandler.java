@@ -22,9 +22,9 @@ public class ChatServerHandler extends IoHandlerAdapter {
     private final static Logger logger = LoggerFactory.getLogger(ChatServerHandler.class);
 
 
-    public static Map<String, IoSession> sessionMap = new ConcurrentHashMap<String, IoSession>();
 
-    private ExecutorService cachedThreadPool = Executors.newFixedThreadPool(100);
+
+    private ExecutorService cachedThreadPool = Executors.newFixedThreadPool(200);
 
     @Override
     public void sessionCreated(IoSession session) throws Exception {

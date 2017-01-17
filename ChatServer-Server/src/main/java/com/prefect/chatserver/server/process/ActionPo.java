@@ -4,6 +4,7 @@ import com.alibaba.fastjson.JSON;
 import com.prefect.chatserver.commoms.utils.MessagePacket;
 import com.prefect.chatserver.commoms.utils.MessageType;
 import com.prefect.chatserver.commoms.utils.moudel.ACKMessage;
+import com.prefect.chatserver.server.ChatServer;
 import com.prefect.chatserver.server.handle.ChatServerHandler;
 import org.apache.mina.core.session.IoSession;
 import org.slf4j.Logger;
@@ -75,7 +76,7 @@ public abstract class ActionPo implements MessageProcess {
 
         //遍历用户名列表，根据用户名从sessionMap中获取session，如果不为null，则加入list中
         for (String item : accountList) {
-            IoSession tempSession = ChatServerHandler.sessionMap.get(item);
+            IoSession tempSession = ChatServer.sessionMap.get(item);
             if (tempSession != null) {
                 activeSessionList.add(tempSession);
             }

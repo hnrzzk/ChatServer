@@ -4,6 +4,7 @@ import com.alibaba.fastjson.JSON;
 import com.prefect.chatserver.commoms.utils.CommandType;
 import com.prefect.chatserver.commoms.utils.MessagePacket;
 import com.prefect.chatserver.commoms.utils.moudel.RelationShipMessage;
+import com.prefect.chatserver.server.ChatServer;
 import com.prefect.chatserver.server.handle.ChatServerHandler;
 import com.prefect.chatserver.server.db.DBDao;
 import com.prefect.chatserver.server.process.ActionPo;
@@ -22,7 +23,7 @@ public class FriendAddACKPo extends ActionPo {
     public void process(IoSession ioSession, MessagePacket messageObj) {
         RelationShipMessage relationShipMessage = JSON.parseObject(messageObj.getMessage(), RelationShipMessage.class);
 
-        IoSession session = ChatServerHandler.sessionMap.get(relationShipMessage.getUserAccount());
+        IoSession session = ChatServer.sessionMap.get(relationShipMessage.getUserAccount());
 
         //对方接受好友请求
         if (relationShipMessage.isAccept()) {

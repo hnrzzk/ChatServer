@@ -3,6 +3,7 @@ package com.prefect.chatserver.server.process;
 import com.alibaba.fastjson.JSON;
 import com.prefect.chatserver.commoms.utils.*;
 import com.prefect.chatserver.commoms.utils.moudel.UserLogin;
+import com.prefect.chatserver.server.ChatServer;
 import com.prefect.chatserver.server.db.DBDao;
 import com.prefect.chatserver.server.handle.ChatServerHandler;
 import org.apache.mina.core.session.IoSession;
@@ -43,11 +44,11 @@ public class LoginVerifyPo extends ActionPo {
         if (DBDao.getInstance().changeAccountOnlineStatus(account, 1)) { //更新在线状态 成功
 
             //将已建立的连接保存在内存中
-            ChatServerHandler.sessionMap.put(account, ioSession);
+            ChatServer.sessionMap.put(account, ioSession);
             //在session中记录account名称
             AttributeOperate.getInstance().setAccountOfAttribute(ioSession, account);
             super.response(ioSession, CommandType.USER_LOGIN_VERIFY_ACK, true, "登录成功: Welcome!");
-            logger.info("user login, user num:" + ChatServerHandler.sessionMap.size());
+            logger.info("user login, user num:" + ChatServer.sessionMap.size());
         } else {
             //更新在线状态失败
             super.response(ioSession, CommandType.USER_LOGIN_VERIFY_ACK, false, "登录失败: Account does not exist or Incorrect password.");

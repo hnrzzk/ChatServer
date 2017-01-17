@@ -41,7 +41,7 @@ public class LogOutPo extends ActionPo {
             }
 
             //将离线用户的session从在线sessionMap中移除
-            ChatServerHandler.sessionMap.remove(account);
+            ChatServer.sessionMap.remove(account);
 
             //修改对应聊天室消息
             quitChatRoom(account, chatRoomName, ioSession);
